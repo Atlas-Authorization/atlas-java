@@ -32,7 +32,7 @@ import java.util.function.LongSupplier;
  *
  * <pre>{@code
  * SessionVerifier verifier = SessionVerifier.builder()
- *     .jwksUrl("https://api.atlas.dev/v1/jwks")
+ *     .jwksUrl("https://api.atlasauth.net/v1/jwks")
  *     .issuer("https://clerk.your-domain.com")
  *     .build();
  *

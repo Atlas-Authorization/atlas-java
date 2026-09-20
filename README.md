@@ -62,7 +62,7 @@ Every namespace hangs off the client — `atlas.organizations()`, `atlas.roles()
 ```java
 AtlasClient atlas = AtlasClient.builder()
         .secretKey(secret)
-        .apiUrl("https://api.atlas.dev")        // default; override per instance
+        .apiUrl("https://api.atlasauth.net")        // default; override per instance
         .timeout(java.time.Duration.ofSeconds(15))
         .httpClient(myTunedHttpClient)          // optional: proxy, pooling
         .build();
@@ -99,7 +99,7 @@ no call to Atlas on the request path. Build it once and reuse it.
 import net.atlasauth.atlas.verify.*;
 
 SessionVerifier verifier = SessionVerifier.builder()
-        .jwksUrl("https://api.atlas.dev/v1/jwks")
+        .jwksUrl("https://api.atlasauth.net/v1/jwks")
         .issuer("https://clerk.your-domain.com")   // required — pins the instance
         .build();
 

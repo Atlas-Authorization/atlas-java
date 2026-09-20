@@ -73,7 +73,7 @@ import java.time.Duration;
 public final class AtlasClient {
 
     /** The default Backend API origin, overridable per instance via the builder. */
-    public static final String DEFAULT_API_URL = "https://api.atlas.dev";
+    public static final String DEFAULT_API_URL = "https://api.atlasauth.net";
 
     private final Transport transport;
 
