@@ -6,7 +6,7 @@
 
   <groupId>net.atlasauth</groupId>
   <artifactId>atlas-java</artifactId>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
   <packaging>jar</packaging>
 
   <name>Atlas Java SDK</name>
@@ -43,6 +43,11 @@
     <jackson.version>2.17.2</jackson.version>
     <nimbus.version>9.40</nimbus.version>
     <junit.version>5.10.2</junit.version>
+    <!-- Spring is an OPTIONAL integration (see the spring-boot block below). -->
+    <spring.version>6.1.13</spring.version>
+    <spring-boot.version>3.3.4</spring-boot.version>
+    <spring-security.version>6.3.3</spring-security.version>
+    <jakarta-servlet.version>6.0.0</jakarta-servlet.version>
   </properties>
 
   <dependencies>
@@ -60,11 +65,61 @@
       <version>${nimbus.version}</version>
     </dependency>
 
+    <!--
+      Spring Boot native integration (net.atlasauth.atlas.spring.*). Every Spring
+      dependency is <optional>true</optional>: it is on OUR compile classpath so
+      the auto-configuration compiles, but is NOT transitive to consumers. A plain
+      backend that uses only SessionVerifier pulls none of it; a Spring Boot app
+      already has these on its own classpath, at which point AtlasAutoConfiguration
+      activates. This keeps ONE artifact (atlas-java) instead of a sibling starter.
+    -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-autoconfigure</artifactId>
+      <version>${spring-boot.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+      <version>${spring.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <version>${jakarta-servlet.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <!-- Spring Security is optional-within-optional: the filter only touches it
+         (via AtlasSecurityBridge) when it is actually present at runtime. -->
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-core</artifactId>
+      <version>${spring-security.version}</version>
+      <optional>true</optional>
+    </dependency>
+
     <!-- Tests. -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
       <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Spring Boot test harness: MockMvc, ApplicationContextRunner, assertj. -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <version>${spring-boot.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- DispatcherServlet + @RestController for the MockMvc slice. -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-webmvc</artifactId>
+      <version>${spring.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
