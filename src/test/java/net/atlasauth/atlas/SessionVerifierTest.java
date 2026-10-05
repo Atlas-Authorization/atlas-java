@@ -163,9 +163,15 @@ class SessionVerifierTest {
     @Test
     void rejectsTamperedSignature() throws Exception {
         String token = signSession(ISSUER, NOW_MILLIS + 60_000, Map.of());
-        // Flip the last character of the signature segment.
-        char last = token.charAt(token.length() - 1);
-        String tampered = token.substring(0, token.length() - 1) + (last == 'A' ? 'B' : 'A');
+        // Flip the FIRST character of the signature segment. (Flipping the LAST
+        // char is unreliable: an RS256 signature is 256 bytes, so its final
+        // base64url char carries only 2 significant bits — the low bits are
+        // padding, and changing them can decode to the same signature. The first
+        // char always carries significant bits, so this always alters the sig.)
+        int sigStart = token.lastIndexOf('.') + 1;
+        char c = token.charAt(sigStart);
+        String tampered =
+            token.substring(0, sigStart) + (c == 'A' ? 'B' : 'A') + token.substring(sigStart + 1);
 
         VerifyResult result = verifier(ISSUER).verify(tampered);
 

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.function.Function;
 
 /**
  * Walk every page of a cursor-paginated Backend API list.
@@ -72,17 +71,16 @@ public final class Pagination {
         };
     }
 
-    /** Collect every page into a single list. */
+    /**
+     * Collect every page into a single list. The {@link PageFetcher} is a plain
+     * {@code String -> CursorPage<T>} function, so a lambda
+     * {@code cursor -> client.users().list(...)} works directly.
+     */
     public static <T> List<T> collect(PageFetcher<T> fetcher) {
         List<T> out = new ArrayList<>();
         for (T item : iterate(fetcher)) {
             out.add(item);
         }
         return out;
-    }
-
-    /** Adapt a fetcher expressed as a plain {@link Function}. */
-    public static <T> List<T> collect(Function<String, CursorPage<T>> fetch) {
-        return collect(fetch::apply);
     }
 }
