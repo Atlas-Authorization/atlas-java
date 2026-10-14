@@ -2,7 +2,11 @@ package net.atlasauth.atlas.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-/** A session as returned by the {@code /v1/sessions} routes. */
+/**
+ * A session as returned by the {@code /v1/sessions} routes. {@code idleExpiresAt} is the
+ * epoch ms the session ends from inactivity unless there is activity first (same value
+ * as {@code abandonAt}); see {@link net.atlasauth.atlas.resources.Sessions#touch(String)}.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record Session(
         String object,
@@ -14,5 +18,13 @@ public record Session(
         long lastActiveAt,
         long expireAt,
         long abandonAt,
-        long createdAt) {
+        long createdAt,
+        Long idleExpiresAt) {
+
+    /** The 1.1 shape, without {@code idleExpiresAt}. */
+    public Session(String object, String id, String userId, String status, String lastActiveOrganizationId,
+                   String impersonatedBy, long lastActiveAt, long expireAt, long abandonAt, long createdAt) {
+        this(object, id, userId, status, lastActiveOrganizationId, impersonatedBy, lastActiveAt, expireAt, abandonAt,
+                createdAt, null);
+    }
 }

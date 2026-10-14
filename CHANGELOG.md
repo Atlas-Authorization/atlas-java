@@ -1,5 +1,39 @@
 # Changelog
 
+## 1.2.0
+
+### Added
+
+- `sessions().touch(id)` — `POST /v1/sessions/{id}/touch`, backend session keep-alive;
+  returns `SessionTouch` (the session plus `extended` and `idleExpiresAt`).
+- `Session.idleExpiresAt` (epoch ms, nullable).
+- API key spend caps: `ApiKeyLimit` (`unit`, `amount`, `period`: `request` | `day` |
+  `month` | `total`), `CreateApiKeyBody.limits`, `UpdateApiKeyBody.limits` and
+  `UpdateApiKeyBody.clearLimits()` (sends `"limits": null`), plus `UpdateApiKeyBody.set(key, value)`.
+- `ApiKey`, `ApiKeyWithSecret`: `limits` and `usage` (`List<ApiKeyLimitState>`:
+  `unit`, `period`, `amount`, `used`, `remaining`, `windowStart`, `resetsAt`).
+- `ApiKeyVerification`: `name`, `scopes`, `constraints`, `limits`, `usage`.
+- `apiKeys().recordUsage(id, body)` / `recordUsage(id, amount, unit)` —
+  `POST /v1/api_keys/{id}/usage`, returns `ApiKeyUsageDebit` (`keyId`, `unit`,
+  `amount`, `allowed`, `code`, `exceeded`, `usage`, `counters`, `idempotentReplay`);
+  body `RecordApiKeyUsageBody` (`amount`, `unit`, `idempotencyKey`).
+- `apiKeys().getUsage(id)` — `GET /v1/api_keys/{id}/usage`, returns `ApiKeyUsage`
+  (`keyId`, `limits`, `usage`, `counters`); `ApiKeyUsageCounter` (`unit`, `period`,
+  `used`, `windowStart`, `resetsAt`).
+- `CreateUserBody.notify` and `ImportExportImportUsersBody.notify`.
+- `ApiKeyWebhookData` — the `data` of the `api_key.created`, `api_key.updated`,
+  `api_key.revoked` and `api_key.limit_reached` webhook events (`name`, `claims`,
+  `scopes`, `constraints`, `limits`, `maxTokenLifetimeSeconds`, `expiresAt`,
+  `createdAt`, `updatedAt`, and `limit` on `api_key.limit_reached`).
+- `ErrorCodes.LIMIT_EXCEEDED`, `SESSION_REVOKED`, `SESSION_IDLE_EXPIRED`, `SESSION_EXPIRED`.
+
+### Changed
+
+- `ApiKey`, `ApiKeyWithSecret`, `ApiKeyVerification` and `Session` gained record
+  components; the previous constructors are kept as overloads.
+- `AtlasIdAppCopy.signInTitle` / `signUpTitle` Javadoc states the current defaults
+  ("Sign in", "Create your Atlas Account"); no API change.
+
 ## 1.1.0
 
 ### Added

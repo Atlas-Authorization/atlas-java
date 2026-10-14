@@ -8,6 +8,7 @@ import net.atlasauth.atlas.models.ListPage;
 import net.atlasauth.atlas.models.MintedSession;
 import net.atlasauth.atlas.models.Session;
 import net.atlasauth.atlas.models.SessionTemplateToken;
+import net.atlasauth.atlas.models.SessionTouch;
 
 import java.util.Map;
 
@@ -54,6 +55,18 @@ public final class Sessions {
 
     public JsonNode revoke(String id) {
         return t.post("/v1/sessions/" + enc(id) + "/revoke", null, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code POST /v1/sessions/{id}/touch} — keep a session alive from your backend:
+     * slides its inactivity window as if the user had just loaded a page, never past
+     * the absolute expiry. {@code extended} is false when a touch within the last minute
+     * already moved it, so calling it on every request is safe. An ended session is a
+     * 409 ({@code SESSION_REVOKED}, {@code SESSION_IDLE_EXPIRED} or {@code SESSION_EXPIRED}).
+     */
+    public SessionTouch touch(String id) {
+        return t.post("/v1/sessions/" + enc(id) + "/touch", null, new TypeReference<>() {
         });
     }
 

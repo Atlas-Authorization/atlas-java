@@ -36,4 +36,12 @@ public final class ErrorCodes {
     public static final String LAST_ADMIN = "LAST_ADMIN";
     public static final String IDENTIFIER_EXISTS = "IDENTIFIER_EXISTS";
     public static final String IDENTIFIER_NOT_FOUND = "IDENTIFIER_NOT_FOUND";
+    /** A usage debit would exceed one of the API key's spend caps (the {@code code} of a refused debit). */
+    public static final String LIMIT_EXCEEDED = "LIMIT_EXCEEDED";
+    /** The session was revoked. */
+    public static final String SESSION_REVOKED = "SESSION_REVOKED";
+    /** The session timed out from inactivity. */
+    public static final String SESSION_IDLE_EXPIRED = "SESSION_IDLE_EXPIRED";
+    /** The session passed its absolute expiry. */
+    public static final String SESSION_EXPIRED = "SESSION_EXPIRED";
 }

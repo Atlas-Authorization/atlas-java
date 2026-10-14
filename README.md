@@ -22,14 +22,14 @@ Maven:
 <dependency>
   <groupId>net.atlasauth</groupId>
   <artifactId>atlas-java</artifactId>
-  <version>1.1.0</version>
+  <version>1.2.0</version>
 </dependency>
 ```
 
 Gradle:
 
 ```kotlin
-implementation("net.atlasauth:atlas-java:1.1.0")
+implementation("net.atlasauth:atlas-java:1.2.0")
 ```
 
 ## The management client
@@ -188,6 +188,57 @@ atlas.design().update(new AtlasDesign().logo(new AtlasDesignLogo().assetId(logo.
   retries a past delivery.
 - `atlas.entitlementOverrides()` grants a plan, features or limits to a user or
   organization outside of billing.
+
+### API key spend caps
+
+Give an end-user API key caps in your own units, then meter what your API consumed
+against them. A refused debit records nothing and is not an exception, so you
+enforce it inside your own transaction:
+
+```java
+ApiKeyWithSecret key = atlas.apiKeys().create(new CreateApiKeyBody("user", "user_123")
+        .name("CI")
+        .limits(List.of(
+                new ApiKeyLimit("requests", 10_000, ApiKeyLimit.PERIOD_DAY),        // UTC calendar day
+                new ApiKeyLimit("usd_cents", 500, ApiKeyLimit.PERIOD_REQUEST))));  // caps one debit
+
+ApiKeyUsageDebit debit = atlas.apiKeys().recordUsage(key.id(),
+        new RecordApiKeyUsageBody(1, "requests").idempotencyKey(requestId));
+if (!debit.allowed()) {                      // debit.code() == ErrorCodes.LIMIT_EXCEEDED
+    return ResponseEntity.status(429).build();
+}
+
+ApiKeyUsage usage = atlas.apiKeys().getUsage(key.id()); // caps with used/remaining/resetsAt + counters
+atlas.apiKeys().update(key.id(), new UpdateApiKeyBody().clearLimits());
+```
+
+Periods are `request` (caps a single debit), `day` and `month` (UTC calendar
+windows) and `total` (never resets). Reusing an idempotency key replays the first
+outcome (`idempotentReplay()`) without counting again; reusing it with a different
+unit or amount throws `ConflictException` with `IDEMPOTENCY_CONFLICT`.
+`apiKeys().verify(...)` also returns the key's `name`, `scopes`, `constraints`,
+`limits` and `usage`. The `api_key.created`, `api_key.updated` and
+`api_key.limit_reached` webhooks carry the key's configuration; decode their `data`
+as `ApiKeyWebhookData`.
+
+### Session keep-alive
+
+If your app loads Atlas on only some pages, keep the session's inactivity window
+moving from your backend:
+
+```java
+SessionTouch s = atlas.sessions().touch(sessionId);
+s.extended();       // false when a touch within the last minute already moved it
+s.idleExpiresAt();  // epoch ms the session ends from inactivity
+```
+
+It never extends past the absolute expiry and never revives an ended session
+(`ConflictException` with `SESSION_REVOKED`, `SESSION_IDLE_EXPIRED` or
+`SESSION_EXPIRED`). Calling it on every request is safe.
+
+`CreateUserBody.notify(false)` and `ImportExportImportUsersBody.notify(false)` (the
+default) guarantee the user is sent no email, SMS or push as a consequence of the
+create.
 
 ## Back-channel logout
 

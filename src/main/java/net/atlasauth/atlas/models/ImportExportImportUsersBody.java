@@ -7,6 +7,8 @@ public final class ImportExportImportUsersBody {
     public List<ImportExportUserRow> users;
     /** Update an existing user matched by verified email instead of skipping it. */
     public Boolean upsert;
+    /** {@code false} (the default) guarantees the imported users are sent nothing. */
+    public Boolean notify;
 
     public ImportExportImportUsersBody() {
     }
@@ -17,4 +19,5 @@ public final class ImportExportImportUsersBody {
 
     public ImportExportImportUsersBody users(List<ImportExportUserRow> v) { this.users = v; return this; }
     public ImportExportImportUsersBody upsert(Boolean v) { this.upsert = v; return this; }
+    public ImportExportImportUsersBody notify(Boolean v) { this.notify = v; return this; }
 }

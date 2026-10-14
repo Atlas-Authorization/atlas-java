@@ -6,11 +6,14 @@ import net.atlasauth.atlas.Params;
 import net.atlasauth.atlas.http.Transport;
 import net.atlasauth.atlas.models.ApiKey;
 import net.atlasauth.atlas.models.ApiKeyToken;
+import net.atlasauth.atlas.models.ApiKeyUsage;
+import net.atlasauth.atlas.models.ApiKeyUsageDebit;
 import net.atlasauth.atlas.models.ApiKeyVerification;
 import net.atlasauth.atlas.models.ApiKeyWithSecret;
 import net.atlasauth.atlas.models.CreateApiKeyBody;
 import net.atlasauth.atlas.models.ListPage;
 import net.atlasauth.atlas.models.MintApiKeyTokenBody;
+import net.atlasauth.atlas.models.RecordApiKeyUsageBody;
 import net.atlasauth.atlas.models.RevokedApiKey;
 import net.atlasauth.atlas.models.UpdateApiKeyBody;
 
@@ -45,7 +48,7 @@ public final class ApiKeys {
         return create(body, null);
     }
 
-    /** Mint a key. The secret is returned once, here. */
+    /** Mint a key. The secret is returned once, here. {@code body.limits} sets per-key spend caps. */
     public ApiKeyWithSecret create(CreateApiKeyBody body, String idempotencyKey) {
         return t.post("/v1/api_keys", body, idempotencyKey, new TypeReference<>() {
         });
@@ -86,6 +89,33 @@ public final class ApiKeys {
     /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
     public ApiKeyToken mintToken(MintApiKeyTokenBody body, String idempotencyKey) {
         return t.post("/v1/api_keys/token", body, idempotencyKey, new TypeReference<>() {
+        });
+    }
+
+    /** Meter {@code amount} of {@code unit} against the key's spend caps. See {@link #recordUsage(String, RecordApiKeyUsageBody)}. */
+    public ApiKeyUsageDebit recordUsage(String id, long amount, String unit) {
+        return recordUsage(id, new RecordApiKeyUsageBody(amount, unit));
+    }
+
+    /**
+     * {@code POST /v1/api_keys/{id}/usage} — meter usage against the key's spend caps,
+     * atomically. When the debit fits every cap it is recorded and {@code allowed} is
+     * true; when it would exceed a cap nothing is recorded and the result is
+     * {@code allowed=false} with {@code code="LIMIT_EXCEEDED"} (a 200, not an exception).
+     * The body's {@code idempotencyKey} replays the first outcome without counting again;
+     * reusing it with a different unit or amount is a 409 {@code IDEMPOTENCY_CONFLICT}.
+     */
+    public ApiKeyUsageDebit recordUsage(String id, RecordApiKeyUsageBody body) {
+        return t.post("/v1/api_keys/" + enc(id) + "/usage", body, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code GET /v1/api_keys/{id}/usage} — each cap with used/remaining/resets_at, plus
+     * the day, month and total counters of every unit the key has been debited in.
+     */
+    public ApiKeyUsage getUsage(String id) {
+        return t.get("/v1/api_keys/" + enc(id) + "/usage", new TypeReference<>() {
         });
     }
 

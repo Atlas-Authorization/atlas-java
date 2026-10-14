@@ -1,5 +1,6 @@
 package net.atlasauth.atlas.models;
 
+import java.util.List;
 import java.util.Map;
 
 /** Body for {@code POST /v1/api_keys}. */
@@ -11,6 +12,8 @@ public final class CreateApiKeyBody {
     public Map<String, Object> claims;
     /** Epoch ms; null (or omitted) never expires. */
     public Long expiresAt;
+    /** Per-key spend caps, metered with {@code ApiKeys.recordUsage}. */
+    public List<ApiKeyLimit> limits;
 
     public CreateApiKeyBody() {
     }
@@ -25,4 +28,5 @@ public final class CreateApiKeyBody {
     public CreateApiKeyBody name(String v) { this.name = v; return this; }
     public CreateApiKeyBody claims(Map<String, Object> v) { this.claims = v; return this; }
     public CreateApiKeyBody expiresAt(Long v) { this.expiresAt = v; return this; }
+    public CreateApiKeyBody limits(List<ApiKeyLimit> v) { this.limits = v; return this; }
 }

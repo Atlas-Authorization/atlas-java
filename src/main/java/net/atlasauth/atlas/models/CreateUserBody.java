@@ -15,6 +15,11 @@ public final class CreateUserBody {
     public Map<String, Object> publicMetadata;
     public Map<String, Object> privateMetadata;
     public Map<String, Object> unsafeMetadata;
+    /**
+     * {@code false} (the default) guarantees no email, SMS or push is sent to the user
+     * as a consequence of the create.
+     */
+    public Boolean notify;
 
     public CreateUserBody() {
     }
@@ -31,4 +36,5 @@ public final class CreateUserBody {
     public CreateUserBody publicMetadata(Map<String, Object> v) { this.publicMetadata = v; return this; }
     public CreateUserBody privateMetadata(Map<String, Object> v) { this.privateMetadata = v; return this; }
     public CreateUserBody unsafeMetadata(Map<String, Object> v) { this.unsafeMetadata = v; return this; }
+    public CreateUserBody notify(Boolean v) { this.notify = v; return this; }
 }

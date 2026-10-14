@@ -10,10 +10,10 @@ import java.util.Map;
 /** Page text. Plain text only (shown as typed, never as HTML), one line, no control characters; empty or null uses the default. `{app}` is replaced with the app name. Merged per field on PATCH. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AtlasIdAppCopy {
-    /** Default "Sign in to continue to {app}". */
+    /** Default "Sign in" (the app is named on the "to continue to {app}" line under it). */
     public String signInTitle;
     public String signInSubtitle;
-    /** Default "Create your account to continue to {app}". */
+    /** Default "Create your Atlas Account". */
     public String signUpTitle;
     public String signUpSubtitle;
     /** Shown on the consent screen above the list of permissions. */
