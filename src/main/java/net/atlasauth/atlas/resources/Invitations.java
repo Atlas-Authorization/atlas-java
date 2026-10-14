@@ -4,9 +4,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import net.atlasauth.atlas.Params;
 import net.atlasauth.atlas.http.Transport;
 import net.atlasauth.atlas.models.AppInvitation;
+import net.atlasauth.atlas.models.BulkInvitationsBody;
 import net.atlasauth.atlas.models.CreateAppInvitationBody;
 import net.atlasauth.atlas.models.CursorPage;
+import net.atlasauth.atlas.models.DataList;
 
+import java.util.List;
 import java.util.Map;
 
 import static net.atlasauth.atlas.http.Transport.enc;
@@ -44,6 +47,18 @@ public final class Invitations {
 
     public AppInvitation revoke(String id) {
         return t.post("/v1/invitations/" + enc(id) + "/revoke", null, new TypeReference<>() {
+        });
+    }
+
+    /** {@code POST /v1/invitations/bulk} — Bulk-create instance invitations (≤100). */
+    public DataList<AppInvitation> createBulk(BulkInvitationsBody body) {
+        return t.post("/v1/invitations/bulk", body, new TypeReference<>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public DataList<AppInvitation> createBulk(BulkInvitationsBody body, String idempotencyKey) {
+        return t.post("/v1/invitations/bulk", body, idempotencyKey, new TypeReference<>() {
         });
     }
 }

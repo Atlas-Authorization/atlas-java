@@ -3,7 +3,10 @@ package net.atlasauth.atlas.resources;
 import com.fasterxml.jackson.core.type.TypeReference;
 import net.atlasauth.atlas.http.Transport;
 import net.atlasauth.atlas.models.CreateSignInTokenBody;
+import net.atlasauth.atlas.models.RevokedSignInToken;
 import net.atlasauth.atlas.models.SignInToken;
+
+import static net.atlasauth.atlas.http.Transport.enc;
 
 /**
  * The {@code /v1/sign_in_tokens} resource — one-time sign-in tokens.
@@ -27,6 +30,12 @@ public final class SignInTokens {
 
     public SignInToken create(CreateSignInTokenBody body, String idempotencyKey) {
         return t.post("/v1/sign_in_tokens", body, idempotencyKey, new TypeReference<>() {
+        });
+    }
+
+    /** {@code POST /v1/sign_in_tokens/{id}/revoke} — DEPRECATED (Sunset 2027-04-01) — revoke an unused sign-in token before its 60s window elapses. */
+    public RevokedSignInToken revoke(String id) {
+        return t.post("/v1/sign_in_tokens/" + enc(id) + "/revoke", null, new TypeReference<>() {
         });
     }
 }

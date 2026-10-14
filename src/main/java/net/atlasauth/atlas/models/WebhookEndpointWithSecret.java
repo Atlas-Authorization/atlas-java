@@ -14,5 +14,7 @@ public record WebhookEndpointWithSecret(
         boolean active,
         Long disabledAt,
         long createdAt,
-        String secret) {
+        String secret,
+        /** Epoch ms since deliveries started failing, or null while healthy. */
+        Long failingSince) {
 }

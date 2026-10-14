@@ -5,10 +5,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.atlasauth.atlas.Params;
 import net.atlasauth.atlas.http.Transport;
 import net.atlasauth.atlas.models.ApiKey;
+import net.atlasauth.atlas.models.ApiKeyToken;
 import net.atlasauth.atlas.models.ApiKeyVerification;
 import net.atlasauth.atlas.models.ApiKeyWithSecret;
 import net.atlasauth.atlas.models.CreateApiKeyBody;
 import net.atlasauth.atlas.models.ListPage;
+import net.atlasauth.atlas.models.MintApiKeyTokenBody;
+import net.atlasauth.atlas.models.RevokedApiKey;
 import net.atlasauth.atlas.models.UpdateApiKeyBody;
 
 import java.util.Map;
@@ -71,6 +74,29 @@ public final class ApiKeys {
      */
     public JsonNode delete(String id) {
         return t.delete("/v1/api_keys/" + enc(id), new TypeReference<>() {
+        });
+    }
+
+    /** {@code POST /v1/api_keys/token} — Mint a short-lived, JWKS-signed access JWT (token_use:api_key, jti) whose exp is clamped to the smallest of the request, the key expiry and the org ceiling; scopes + constraints are embedded so a resource verifies it OFFLINE against the instance JWKS. */
+    public ApiKeyToken mintToken(MintApiKeyTokenBody body) {
+        return t.post("/v1/api_keys/token", body, new TypeReference<>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ApiKeyToken mintToken(MintApiKeyTokenBody body, String idempotencyKey) {
+        return t.post("/v1/api_keys/token", body, idempotencyKey, new TypeReference<>() {
+        });
+    }
+
+    public ListPage<RevokedApiKey> listRevoked() {
+        return listRevoked(null, null);
+    }
+
+    /** {@code GET /v1/api_keys/revoked} — Revocation feed: the keys revoked since a cursor (since=&lt;iso|cursor&gt;), so a resource can deny-list revoked key ids while their short-lived delegated tokens are still live. */
+    public ListPage<RevokedApiKey> listRevoked(String since, Long limit) {
+        Map<String, Object> q = Params.of().set("since", since).set("limit", limit).map();
+        return t.get("/v1/api_keys/revoked", q, new TypeReference<>() {
         });
     }
 }

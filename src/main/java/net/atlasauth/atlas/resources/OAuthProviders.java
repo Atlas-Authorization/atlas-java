@@ -9,6 +9,7 @@ import net.atlasauth.atlas.models.OAuthConnectionTest;
 import net.atlasauth.atlas.models.OAuthProvider;
 import net.atlasauth.atlas.models.UpsertOAuthProviderBody;
 
+import java.util.List;
 import java.util.Map;
 
 import static net.atlasauth.atlas.http.Transport.enc;
@@ -25,6 +26,19 @@ public final class OAuthProviders {
     /** The whole catalog, configured or not. */
     public ListPage<OAuthProvider> list() {
         return t.get("/v1/oauth_providers", new TypeReference<>() {
+        });
+    }
+
+    /**
+     * The catalog narrowed to the given provider keys and/or configured state. Either
+     * argument may be {@code null} to skip that filter.
+     *
+     * @param providers  provider keys to include (e.g. {@code List.of("google", "github")})
+     * @param configured {@code true} for configured providers only, {@code false} for unconfigured
+     */
+    public ListPage<OAuthProvider> list(List<String> providers, Boolean configured) {
+        Map<String, Object> q = Params.of().set("provider", providers).set("configured", configured).map();
+        return t.get("/v1/oauth_providers", q, new TypeReference<>() {
         });
     }
 

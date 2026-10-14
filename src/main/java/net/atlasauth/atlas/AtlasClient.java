@@ -6,51 +6,77 @@ import net.atlasauth.atlas.http.Transport;
 import net.atlasauth.atlas.resources.Actions;
 import net.atlasauth.atlas.resources.ActorTokens;
 import net.atlasauth.atlas.resources.Allowlist;
+import net.atlasauth.atlas.resources.Analytics;
 import net.atlasauth.atlas.resources.ApiKeys;
 import net.atlasauth.atlas.resources.AttackProtection;
+import net.atlasauth.atlas.resources.AuditEvents;
 import net.atlasauth.atlas.resources.AuditLogs;
 import net.atlasauth.atlas.resources.Billing;
 import net.atlasauth.atlas.resources.Blocklist;
 import net.atlasauth.atlas.resources.BotSignals;
 import net.atlasauth.atlas.resources.Branding;
+import net.atlasauth.atlas.resources.Captcha;
+import net.atlasauth.atlas.resources.ConfigChangelog;
+import net.atlasauth.atlas.resources.Connectors;
 import net.atlasauth.atlas.resources.DataSubjectRequests;
+import net.atlasauth.atlas.resources.Design;
+import net.atlasauth.atlas.resources.Diagnostics;
 import net.atlasauth.atlas.resources.Domains;
+import net.atlasauth.atlas.resources.EmailAddresses;
 import net.atlasauth.atlas.resources.EmailTemplates;
+import net.atlasauth.atlas.resources.EntitlementOverrides;
 import net.atlasauth.atlas.resources.Fga;
 import net.atlasauth.atlas.resources.ImportExport;
 import net.atlasauth.atlas.resources.Instance;
 import net.atlasauth.atlas.resources.InstanceSecurity;
 import net.atlasauth.atlas.resources.Invitations;
 import net.atlasauth.atlas.resources.JwtTemplates;
+import net.atlasauth.atlas.resources.LegacyAuthConnection;
 import net.atlasauth.atlas.resources.Localizations;
 import net.atlasauth.atlas.resources.LogStreams;
 import net.atlasauth.atlas.resources.LtiPlatforms;
+import net.atlasauth.atlas.resources.Machines;
 import net.atlasauth.atlas.resources.ManagedWaf;
+import net.atlasauth.atlas.resources.Mcp;
+import net.atlasauth.atlas.resources.McpConnector;
 import net.atlasauth.atlas.resources.Messaging;
 import net.atlasauth.atlas.resources.NetworkAcls;
+import net.atlasauth.atlas.resources.Notifications;
 import net.atlasauth.atlas.resources.OAuthClients;
 import net.atlasauth.atlas.resources.OAuthProviders;
+import net.atlasauth.atlas.resources.OpenFga;
+import net.atlasauth.atlas.resources.OrgLdapConnections;
+import net.atlasauth.atlas.resources.OrganizationSettingsSchema;
 import net.atlasauth.atlas.resources.Organizations;
+import net.atlasauth.atlas.resources.Pca;
 import net.atlasauth.atlas.resources.Permissions;
+import net.atlasauth.atlas.resources.Platform;
 import net.atlasauth.atlas.resources.RadiusClients;
 import net.atlasauth.atlas.resources.RateLimitPolicy;
+import net.atlasauth.atlas.resources.RedirectUrls;
 import net.atlasauth.atlas.resources.ResourceServers;
 import net.atlasauth.atlas.resources.RiskBasedMfa;
 import net.atlasauth.atlas.resources.Roles;
 import net.atlasauth.atlas.resources.ScimProvisioning;
 import net.atlasauth.atlas.resources.ScimTokens;
+import net.atlasauth.atlas.resources.SessionExchangeApps;
 import net.atlasauth.atlas.resources.Sessions;
 import net.atlasauth.atlas.resources.SignInTokens;
 import net.atlasauth.atlas.resources.SmsTemplates;
 import net.atlasauth.atlas.resources.SsoConnections;
 import net.atlasauth.atlas.resources.SsoOnboarding;
+import net.atlasauth.atlas.resources.Testing;
+import net.atlasauth.atlas.resources.Tickets;
 import net.atlasauth.atlas.resources.Tokens;
 import net.atlasauth.atlas.resources.Users;
 import net.atlasauth.atlas.resources.Waitlist;
 import net.atlasauth.atlas.resources.Webhooks;
 
+import net.atlasauth.atlas.http.UnknownFieldsWarning;
+
 import java.net.http.HttpClient;
 import java.time.Duration;
+import java.util.function.Consumer;
 
 /**
  * The typed management client for the Atlas Backend API — the secret-key
@@ -122,17 +148,54 @@ public final class AtlasClient {
     private final Instance instance;
     private final InstanceSecurity instanceSecurity;
     private final Tokens tokens;
+    private final Design design;
+    private final Platform platform;
+    private final EmailAddresses emailAddresses;
+    private final Tickets tickets;
+    private final OrganizationSettingsSchema organizationSettingsSchema;
+    private final Notifications notifications;
+    private final Analytics analytics;
+    private final LegacyAuthConnection legacyAuthConnection;
+    private final Mcp mcp;
+    private final Pca pca;
+    private final McpConnector mcpConnector;
+    private final OrgLdapConnections orgLdapConnections;
+    private final SessionExchangeApps sessionExchangeApps;
+    private final Diagnostics diagnostics;
+    private final ConfigChangelog configChangelog;
+    private final RedirectUrls redirectUrls;
+    private final Machines machines;
+    private final EntitlementOverrides entitlementOverrides;
+    private final Connectors connectors;
+    private final AuditEvents auditEvents;
+    private final Testing testing;
+    private final OpenFga openFga;
+    private final Captcha captcha;
+
+    private final Builder config;
 
     private AtlasClient(Builder b) {
-        if (b.secretKey == null || b.secretKey.isEmpty()) {
-            throw new IllegalArgumentException("AtlasClient requires a secretKey (sk_...).");
+        boolean hasSecret = b.secretKey != null && !b.secretKey.isEmpty();
+        boolean hasPlatform = b.platformKey != null && !b.platformKey.isEmpty();
+        if (!hasSecret && !hasPlatform) {
+            throw new IllegalArgumentException("AtlasClient requires a secretKey (sk_...) or a platformKey (psk_...).");
         }
+        this.config = b.copy();
         String apiUrl = b.apiUrl != null ? b.apiUrl : DEFAULT_API_URL;
-        HttpClient http = b.httpClient != null ? b.httpClient : HttpClient.newHttpClient();
+        // Build the HttpClient once and keep it on the config, so withStrict() copies share it.
+        if (b.httpClient == null) {
+            b.httpClient = HttpClient.newHttpClient();
+            this.config.httpClient = b.httpClient;
+        }
+        HttpClient http = b.httpClient;
         ObjectMapper mapper = b.mapper != null ? b.mapper : Json.mapper();
         Duration timeout = b.timeout != null ? b.timeout : Duration.ofSeconds(30);
 
-        this.transport = new Transport(b.secretKey, apiUrl, http, mapper, timeout);
+        this.transport = new Transport(b.secretKey, apiUrl, http, mapper, timeout, b.strict, b.onUnknownFields,
+                "This call needs an instance secret key: set AtlasClient.builder().secretKey(\"sk_...\").");
+        Transport platformTransport = new Transport(b.platformKey, apiUrl, http, mapper, timeout, b.strict,
+                b.onUnknownFields,
+                "Platform calls need a platform key: set AtlasClient.builder().platformKey(\"psk_...\").");
 
         this.users = new Users(transport);
         this.sessions = new Sessions(transport);
@@ -179,6 +242,45 @@ public final class AtlasClient {
         this.instance = new Instance(transport);
         this.instanceSecurity = new InstanceSecurity(transport);
         this.tokens = new Tokens(transport);
+        this.design = new Design(transport);
+        this.platform = new Platform(platformTransport);
+        this.emailAddresses = new EmailAddresses(transport);
+        this.tickets = new Tickets(transport);
+        this.organizationSettingsSchema = new OrganizationSettingsSchema(transport);
+        this.notifications = new Notifications(transport);
+        this.analytics = new Analytics(transport);
+        this.legacyAuthConnection = new LegacyAuthConnection(transport);
+        this.mcp = new Mcp(transport);
+        this.pca = new Pca(transport);
+        this.mcpConnector = new McpConnector(transport);
+        this.orgLdapConnections = new OrgLdapConnections(transport);
+        this.sessionExchangeApps = new SessionExchangeApps(transport);
+        this.diagnostics = new Diagnostics(transport);
+        this.configChangelog = new ConfigChangelog(transport);
+        this.redirectUrls = new RedirectUrls(transport);
+        this.machines = new Machines(transport);
+        this.entitlementOverrides = new EntitlementOverrides(transport);
+        this.connectors = new Connectors(transport);
+        this.auditEvents = new AuditEvents(transport);
+        this.testing = new Testing(transport);
+        this.openFga = new OpenFga(transport);
+        this.captcha = new Captcha(transport);
+    }
+
+    /**
+     * A copy of this client that sends {@code Atlas-Strict: <strict>} on every write
+     * (a per-call override of the client default). {@code true} turns unknown body
+     * fields into a {@code 422 UNKNOWN_FIELD}; {@code false} opts out of an instance
+     * whose strict mode is on. The copy shares this client's HTTP connection pool.
+     *
+     * <pre>{@code
+     * atlas.withStrict(true).users().update("usr_123", body);
+     * }</pre>
+     */
+    public AtlasClient withStrict(boolean strict) {
+        Builder b = config.copy();
+        b.strict = strict;
+        return new AtlasClient(b);
     }
 
     public static Builder builder() {
@@ -375,13 +477,156 @@ public final class AtlasClient {
         return tokens;
     }
 
-    /** Fluent builder for {@link AtlasClient}. Only {@code secretKey} is required. */
+    public Design design() {
+        return design;
+    }
+
+    public Platform platform() {
+        return platform;
+    }
+
+    public EmailAddresses emailAddresses() {
+        return emailAddresses;
+    }
+
+    public Tickets tickets() {
+        return tickets;
+    }
+
+    public OrganizationSettingsSchema organizationSettingsSchema() {
+        return organizationSettingsSchema;
+    }
+
+    public Notifications notifications() {
+        return notifications;
+    }
+
+    public Analytics analytics() {
+        return analytics;
+    }
+
+    public LegacyAuthConnection legacyAuthConnection() {
+        return legacyAuthConnection;
+    }
+
+    public Mcp mcp() {
+        return mcp;
+    }
+
+    public Pca pca() {
+        return pca;
+    }
+
+    public McpConnector mcpConnector() {
+        return mcpConnector;
+    }
+
+    public OrgLdapConnections orgLdapConnections() {
+        return orgLdapConnections;
+    }
+
+    public SessionExchangeApps sessionExchangeApps() {
+        return sessionExchangeApps;
+    }
+
+    public Diagnostics diagnostics() {
+        return diagnostics;
+    }
+
+    public ConfigChangelog configChangelog() {
+        return configChangelog;
+    }
+
+    public RedirectUrls redirectUrls() {
+        return redirectUrls;
+    }
+
+    public Machines machines() {
+        return machines;
+    }
+
+    public EntitlementOverrides entitlementOverrides() {
+        return entitlementOverrides;
+    }
+
+    public Connectors connectors() {
+        return connectors;
+    }
+
+    public AuditEvents auditEvents() {
+        return auditEvents;
+    }
+
+    public Testing testing() {
+        return testing;
+    }
+
+    public OpenFga openFga() {
+        return openFga;
+    }
+
+    public Captcha captcha() {
+        return captcha;
+    }
+
+    /**
+     * Fluent builder for {@link AtlasClient}. Set {@code secretKey} for the instance
+     * API, {@code platformKey} for {@link #platform()}, or both.
+     */
     public static final class Builder {
         private String secretKey;
+        private String platformKey;
         private String apiUrl;
         private HttpClient httpClient;
         private ObjectMapper mapper;
         private Duration timeout;
+        private Boolean strict;
+        private Consumer<UnknownFieldsWarning> onUnknownFields;
+
+        private Builder copy() {
+            Builder b = new Builder();
+            b.secretKey = secretKey;
+            b.platformKey = platformKey;
+            b.apiUrl = apiUrl;
+            b.httpClient = httpClient;
+            b.mapper = mapper;
+            b.timeout = timeout;
+            b.strict = strict;
+            b.onUnknownFields = onUnknownFields;
+            return b;
+        }
+
+        /**
+         * The platform key ({@code psk_...}) used by {@link AtlasClient#platform()} to
+         * provision apps and register Sign in with Atlas apps. Sent as a Bearer token on
+         * platform calls only, never logged.
+         */
+        public Builder platformKey(String platformKey) {
+            this.platformKey = platformKey;
+            return this;
+        }
+
+        /**
+         * Strict request bodies: {@code true} sends {@code Atlas-Strict: true} on every
+         * write, so a body field the endpoint does not accept is a {@code 422
+         * UNKNOWN_FIELD} (naming the field) before anything changes; {@code false} sends
+         * {@code Atlas-Strict: false} to opt out of an instance that defaults to strict.
+         * Unset sends no header. Override per call with {@link AtlasClient#withStrict(boolean)}.
+         */
+        public Builder strict(boolean strict) {
+            this.strict = strict;
+            return this;
+        }
+
+        /**
+         * Called when a successful write ignored body fields the endpoint does not
+         * accept (the {@code Atlas-Unknown-Fields} response header). Defaults to a
+         * {@code WARNING} on the {@code net.atlasauth.atlas} {@link System.Logger}.
+         */
+        public Builder onUnknownFields(Consumer<UnknownFieldsWarning> onUnknownFields) {
+            this.onUnknownFields = onUnknownFields;
+            return this;
+        }
 
         /** The instance secret key ({@code sk_...}). Sent as a Bearer token, never logged. */
         public Builder secretKey(String secretKey) {

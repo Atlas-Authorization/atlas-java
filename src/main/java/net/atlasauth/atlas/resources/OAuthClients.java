@@ -6,6 +6,8 @@ import net.atlasauth.atlas.Params;
 import net.atlasauth.atlas.http.Transport;
 import net.atlasauth.atlas.models.CreateOAuthClientBody;
 import net.atlasauth.atlas.models.DeletedObject;
+import net.atlasauth.atlas.models.ImportOAuthClientsBody;
+import net.atlasauth.atlas.models.ImportedOAuthClient;
 import net.atlasauth.atlas.models.ListPage;
 import net.atlasauth.atlas.models.OAuthClient;
 import net.atlasauth.atlas.models.OAuthClientGrant;
@@ -97,5 +99,17 @@ public final class OAuthClients {
                     new TypeReference<>() {
                     });
         }
+    }
+
+    /** {@code POST /v1/oauth_clients/import} — Bulk-import OAuth clients for a migration, optionally with a pre-hashed client secret. */
+    public ListPage<ImportedOAuthClient> importClients(ImportOAuthClientsBody body) {
+        return t.post("/v1/oauth_clients/import", body, new TypeReference<>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ListPage<ImportedOAuthClient> importClients(ImportOAuthClientsBody body, String idempotencyKey) {
+        return t.post("/v1/oauth_clients/import", body, idempotencyKey, new TypeReference<>() {
+        });
     }
 }

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import net.atlasauth.atlas.Params;
 import net.atlasauth.atlas.http.Transport;
 import net.atlasauth.atlas.models.DeletedMessagingProvider;
+import net.atlasauth.atlas.models.EmailProviderConfig;
+import net.atlasauth.atlas.models.SmsProviderConfig;
 import net.atlasauth.atlas.models.MessagingProvider;
 import net.atlasauth.atlas.models.MessagingProviderInput;
 import net.atlasauth.atlas.models.MessagingProviders;
@@ -28,11 +30,41 @@ public final class Messaging {
         });
     }
 
+    /**
+     * Configure (or update) the email provider with typed, per-transport settings.
+     * On an update of the same transport, null components keep their stored values
+     * (including stored secrets).
+     *
+     * @param fromAddress the From address, e.g. {@code "Acme <no-reply@acme.com>"}; may be null
+     * @param config      the transport's settings, e.g. {@code new EmailProviderConfig.Resend("re_…")}
+     */
+    public MessagingProvider setEmail(String fromAddress, EmailProviderConfig config) {
+        return setEmail(new MessagingProviderInput(config.transport())
+                .fromAddress(fromAddress)
+                .config(config.toConfig()));
+    }
+
+    /**
+     * Configure (or update) the SMS provider with typed, per-transport settings.
+     * On an update of the same transport, null components keep their stored values
+     * (including stored secrets).
+     *
+     * @param fromAddress the sender number in E.164 format, e.g. {@code +15551234567}; may be null
+     * @param config      the transport's settings, e.g. {@code new SmsProviderConfig.Twilio(...)}
+     */
+    public MessagingProvider setSms(String fromAddress, SmsProviderConfig config) {
+        return setSms(new MessagingProviderInput(config.transport())
+                .fromAddress(fromAddress)
+                .config(config.toConfig()));
+    }
+
+    /** Set the email provider from an untyped body. Prefer {@link #setEmail(String, EmailProviderConfig)}. */
     public MessagingProvider setEmail(MessagingProviderInput body) {
         return t.put("/v1/messaging_providers/email", body, new TypeReference<>() {
         });
     }
 
+    /** Set the SMS provider from an untyped body. Prefer {@link #setSms(String, SmsProviderConfig)}. */
     public MessagingProvider setSms(MessagingProviderInput body) {
         return t.put("/v1/messaging_providers/sms", body, new TypeReference<>() {
         });

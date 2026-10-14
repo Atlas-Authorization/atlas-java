@@ -7,6 +7,7 @@ import net.atlasauth.atlas.http.Transport;
 import net.atlasauth.atlas.models.ListPage;
 import net.atlasauth.atlas.models.MintedSession;
 import net.atlasauth.atlas.models.Session;
+import net.atlasauth.atlas.models.SessionTemplateToken;
 
 import java.util.Map;
 
@@ -53,6 +54,12 @@ public final class Sessions {
 
     public JsonNode revoke(String id) {
         return t.post("/v1/sessions/" + enc(id) + "/revoke", null, new TypeReference<>() {
+        });
+    }
+
+    /** {@code POST /v1/sessions/{id}/tokens/{template}} — Mint a named JWT-template token for a session (Clerk SessionApi.getToken). */
+    public SessionTemplateToken createToken(String id, String template) {
+        return t.post("/v1/sessions/" + enc(id) + "/tokens/" + enc(template), null, new TypeReference<>() {
         });
     }
 }

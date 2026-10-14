@@ -3,6 +3,7 @@ package net.atlasauth.atlas.resources;
 import com.fasterxml.jackson.core.type.TypeReference;
 import net.atlasauth.atlas.Params;
 import net.atlasauth.atlas.http.Transport;
+import net.atlasauth.atlas.models.CreateDataSubjectRequestBody;
 import net.atlasauth.atlas.models.CursorPage;
 import net.atlasauth.atlas.models.DataSubjectRequest;
 
@@ -66,5 +67,23 @@ public final class DataSubjectRequests {
         return t.post("/v1/data_subject_requests/" + enc(id) + "/reject", body, idempotencyKey,
                 new TypeReference<>() {
                 });
+    }
+
+    /** {@code POST /v1/data_subject_requests} — Create a DSAR (export or erasure) for a user from the backend — the twin of the self-service /client/me flows, for a DSAR orchestrator. */
+    public DataSubjectRequest create(CreateDataSubjectRequestBody body) {
+        return t.post("/v1/data_subject_requests", body, new TypeReference<>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public DataSubjectRequest create(CreateDataSubjectRequestBody body, String idempotencyKey) {
+        return t.post("/v1/data_subject_requests", body, idempotencyKey, new TypeReference<>() {
+        });
+    }
+
+    /** {@code POST /v1/data_subject_requests/{id}/cancel} — Cancel a scheduled erasure within its grace window — the sibling to /fulfill (which expedites). */
+    public DataSubjectRequest cancel(String id) {
+        return t.post("/v1/data_subject_requests/" + enc(id) + "/cancel", null, new TypeReference<>() {
+        });
     }
 }

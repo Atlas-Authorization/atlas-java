@@ -12,5 +12,7 @@ public record WebhookEndpoint(
         List<String> enabledEvents,
         boolean active,
         Long disabledAt,
-        long createdAt) {
+        long createdAt,
+        /** Epoch ms since deliveries started failing, or null while healthy. */
+        Long failingSince) {
 }

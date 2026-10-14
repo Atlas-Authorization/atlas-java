@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Map;
 
 /**
- * A §BYOK messaging provider config. A provider SECRET is write-only: it goes in
+ * A configured messaging provider. A provider SECRET is write-only: it goes in
  * through {@code config} and is never read back — a response reports only WHICH
  * secret keys are set ({@code secrets_set}).
  */

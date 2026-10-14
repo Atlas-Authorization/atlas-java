@@ -24,6 +24,9 @@ final class MockBackend implements AutoCloseable {
     volatile String authorization;
     volatile String idempotencyKey;
     volatile String requestBody;
+    volatile byte[] requestBytes;
+    volatile com.sun.net.httpserver.Headers requestHeaders;
+    final java.util.Map<String, String> responseHeaders = new java.util.concurrent.ConcurrentHashMap<>();
 
     volatile int status = 200;
     volatile String responseBody = "{}";
@@ -47,7 +50,10 @@ final class MockBackend implements AutoCloseable {
         this.rawQuery = exchange.getRequestURI().getRawQuery();
         this.authorization = exchange.getRequestHeaders().getFirst("authorization");
         this.idempotencyKey = exchange.getRequestHeaders().getFirst("idempotency-key");
-        this.requestBody = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+        this.requestHeaders = exchange.getRequestHeaders();
+        this.requestBytes = exchange.getRequestBody().readAllBytes();
+        this.requestBody = new String(requestBytes, StandardCharsets.UTF_8);
+        responseHeaders.forEach((k, v) -> exchange.getResponseHeaders().add(k, v));
 
         byte[] payload = responseBody.getBytes(StandardCharsets.UTF_8);
         if (status == 204 || payload.length == 0) {
@@ -60,6 +66,11 @@ final class MockBackend implements AutoCloseable {
             }
         }
         exchange.close();
+    }
+
+    /** A request header as received (case-insensitive), or null. */
+    String header(String name) {
+        return requestHeaders == null ? null : requestHeaders.getFirst(name);
     }
 
     void reply(int status, String body) {

@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
  * mapping) overrides the strategy with an explicit {@code @JsonProperty}.
  *
  * <ul>
- *   <li>{@code NON_NULL} inclusion — a request body serializes only the fields a
+ *   <li>{@code NON_NULL} property inclusion — a request body serializes only the fields a
  *       caller actually set, matching how optionals are omitted on the wire.</li>
  *   <li>Unknown properties are ignored — a new server field never breaks an old
  *       client.</li>
@@ -31,7 +31,10 @@ public final class Json {
     public static ObjectMapper mapper() {
         return new ObjectMapper()
                 .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
-                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                // Unset (null) properties are omitted, but a null placed in a map is kept:
+                // that is how a caller sends an explicit null to clear a stored value.
+                .setDefaultPropertyInclusion(
+                        JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.ALWAYS))
                 .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }

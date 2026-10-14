@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * The shared HTTP core every resource calls. One place decides how a Backend API
@@ -32,22 +33,57 @@ import java.util.Map;
  */
 public final class Transport {
 
+    /** The request header that turns unknown body fields into a {@code 422 UNKNOWN_FIELD}. */
+    public static final String STRICT_HEADER = "Atlas-Strict";
+    /** The response header listing body fields the server ignored. */
+    public static final String UNKNOWN_FIELDS_HEADER = "Atlas-Unknown-Fields";
+
+    private static final System.Logger LOG = System.getLogger("net.atlasauth.atlas");
+
     private final String secretKey;
     private final String baseUrl;
     private final HttpClient http;
     private final ObjectMapper mapper;
     private final Duration timeout;
+    private final Boolean strict;
+    private final Consumer<UnknownFieldsWarning> onUnknownFields;
+    private final String missingKeyMessage;
 
     public Transport(String secretKey, String baseUrl, HttpClient http, ObjectMapper mapper, Duration timeout) {
+        this(secretKey, baseUrl, http, mapper, timeout, null, null, null);
+    }
+
+    /**
+     * @param strict          {@code true}/{@code false} sends {@code Atlas-Strict} on every write;
+     *                        {@code null} sends nothing (the instance default applies)
+     * @param onUnknownFields called when a response carries {@code Atlas-Unknown-Fields};
+     *                        {@code null} logs a warning through {@link System.Logger}
+     * @param missingKeyMessage the error raised when {@code secretKey} is absent
+     */
+    public Transport(String secretKey, String baseUrl, HttpClient http, ObjectMapper mapper, Duration timeout,
+                     Boolean strict, Consumer<UnknownFieldsWarning> onUnknownFields, String missingKeyMessage) {
         this.secretKey = secretKey;
         this.baseUrl = baseUrl.replaceAll("/+$", "");
         this.http = http;
         this.mapper = mapper;
         this.timeout = timeout;
+        this.strict = strict;
+        this.onUnknownFields = onUnknownFields;
+        this.missingKeyMessage = missingKeyMessage;
     }
 
     public ObjectMapper mapper() {
         return mapper;
+    }
+
+    /** The strict-body setting this transport sends ({@code null} = header not sent). */
+    public Boolean strict() {
+        return strict;
+    }
+
+    /** A copy of this transport that sends {@code Atlas-Strict: <strict>} on writes ({@code null} = never). */
+    public Transport withStrict(Boolean strict) {
+        return new Transport(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage);
     }
 
     // ---- Convenience verbs -------------------------------------------------
@@ -86,8 +122,28 @@ public final class Transport {
 
     /** Return a raw text body (e.g. SAML metadata XML) rather than parsed JSON. */
     public String getRaw(String path) {
-        return request("GET", path, null, null, null, true, new TypeReference<String>() {
+        return getRaw(path, null);
+    }
+
+    /** Return a raw text body (e.g. an NDJSON or CSV export) for a GET with a query. */
+    public String getRaw(String path, Map<String, Object> query) {
+        return request("GET", path, query, null, null, true, new TypeReference<String>() {
         });
+    }
+
+    /**
+     * Send raw bytes (an image upload) with the given {@code Content-Type} instead
+     * of a JSON body; the response is decoded as JSON like any other call.
+     */
+    public <T> T requestBytes(String method, String path, Map<String, Object> query, byte[] data,
+                              String contentType, TypeReference<T> type) {
+        if (data == null) {
+            throw new IllegalArgumentException("data must not be null");
+        }
+        if (contentType == null || contentType.isEmpty()) {
+            throw new IllegalArgumentException("contentType is required (e.g. image/png)");
+        }
+        return send(method, path, query, HttpRequest.BodyPublishers.ofByteArray(data), contentType, null, false, type);
     }
 
     // ---- The one request path ---------------------------------------------
@@ -99,6 +155,26 @@ public final class Transport {
                          String idempotencyKey,
                          boolean raw,
                          TypeReference<T> type) {
+        if (body != null) {
+            String json = writeBody(body);
+            return send(method, path, query, HttpRequest.BodyPublishers.ofString(json, StandardCharsets.UTF_8),
+                    "application/json", idempotencyKey, raw, type);
+        }
+        return send(method, path, query, HttpRequest.BodyPublishers.noBody(), null, idempotencyKey, raw, type);
+    }
+
+    private <T> T send(String method,
+                       String path,
+                       Map<String, Object> query,
+                       HttpRequest.BodyPublisher publisher,
+                       String contentType,
+                       String idempotencyKey,
+                       boolean raw,
+                       TypeReference<T> type) {
+        if (secretKey == null || secretKey.isEmpty()) {
+            throw new IllegalStateException(missingKeyMessage != null ? missingKeyMessage
+                    : "No API key is configured for this call.");
+        }
         URI uri = URI.create(baseUrl + (path.startsWith("/") ? path : "/" + path) + serializeQuery(query));
 
         HttpRequest.Builder builder = HttpRequest.newBuilder(uri)
@@ -106,16 +182,14 @@ public final class Transport {
                 .header("authorization", "Bearer " + secretKey)
                 .header("accept", "application/json");
 
-        HttpRequest.BodyPublisher publisher;
-        if (body != null) {
-            String json = writeBody(body);
-            publisher = HttpRequest.BodyPublishers.ofString(json, StandardCharsets.UTF_8);
-            builder.header("content-type", "application/json");
-        } else {
-            publisher = HttpRequest.BodyPublishers.noBody();
+        if (contentType != null) {
+            builder.header("content-type", contentType);
         }
         if (idempotencyKey != null && !idempotencyKey.isEmpty()) {
             builder.header("idempotency-key", idempotencyKey);
+        }
+        if (strict != null && !"GET".equalsIgnoreCase(method)) {
+            builder.header(STRICT_HEADER, strict ? "true" : "false");
         }
         builder.method(method, publisher);
 
@@ -131,6 +205,7 @@ public final class Transport {
 
         int status = response.statusCode();
         String text = response.body();
+        response.headers().firstValue(UNKNOWN_FIELDS_HEADER).ifPresent(v -> reportUnknown(method, path, v));
 
         if (status < 200 || status >= 300) {
             throw toApiError(status, text);
@@ -148,6 +223,26 @@ public final class Transport {
             return mapper.readValue(text, jt);
         } catch (IOException e) {
             throw new AtlasConnectionException("Failed to decode Atlas API response from " + uri, e);
+        }
+    }
+
+    private void reportUnknown(String method, String path, String header) {
+        List<String> fields = new ArrayList<>();
+        for (String f : header.split(",")) {
+            String trimmed = f.trim();
+            if (!trimmed.isEmpty()) {
+                fields.add(trimmed);
+            }
+        }
+        if (fields.isEmpty()) {
+            return;
+        }
+        UnknownFieldsWarning warning = new UnknownFieldsWarning(method, path, List.copyOf(fields));
+        if (onUnknownFields != null) {
+            onUnknownFields.accept(warning);
+        } else {
+            LOG.log(System.Logger.Level.WARNING, "Atlas ignored unknown body field(s) on {0} {1}: {2}",
+                    method, path, String.join(", ", fields));
         }
     }
 
