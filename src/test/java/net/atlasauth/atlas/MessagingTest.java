@@ -2,6 +2,7 @@ package net.atlasauth.atlas;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.atlasauth.atlas.models.DeletedMessagingProvider;
 import net.atlasauth.atlas.models.EmailProviderConfig;
 import net.atlasauth.atlas.models.MessagingProviderInput;
 import net.atlasauth.atlas.models.SmsProviderConfig;
@@ -10,11 +11,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** Request-shape tests for the typed messaging provider config. */
 class MessagingTest {
@@ -91,5 +95,57 @@ class MessagingTest {
         JsonNode body = om.readTree(mock.requestBody);
         assertEquals("resend", body.get("transport").asText());
         assertEquals("re_x", body.get("config").get("api_key").asText());
+    }
+
+    private static final String DELETED = "{\"object\":\"messaging_provider\",\"channel\":\"email\",\"deleted\":true}";
+
+    @Test
+    void deleteChannelSendsNoQueryByDefault() {
+        mock.reply(200, DELETED);
+        DeletedMessagingProvider d = atlas.messaging().deleteChannel("email");
+
+        assertEquals("DELETE", mock.method);
+        assertEquals("/v1/messaging_providers/email", mock.path);
+        assertNull(mock.rawQuery);
+        assertEquals("messaging_provider", d.object());
+        assertEquals("email", d.channel());
+        assertTrue(d.deleted());
+    }
+
+    @Test
+    void deleteChannelWithoutForceSendsNoQuery() {
+        mock.reply(200, DELETED);
+        atlas.messaging().deleteChannel("sms", false);
+
+        assertEquals("/v1/messaging_providers/sms", mock.path);
+        assertNull(mock.rawQuery);
+    }
+
+    @Test
+    void deleteChannelWithForceSendsForceTrue() {
+        mock.reply(200, DELETED);
+        assertTrue(atlas.messaging().deleteChannel("email", true).deleted());
+
+        assertEquals("DELETE", mock.method);
+        assertEquals("/v1/messaging_providers/email", mock.path);
+        assertEquals("force=true", mock.rawQuery);
+    }
+
+    @Test
+    void deleteEmailProviderInUseIsAConflictListingFeatures() {
+        mock.reply(409, "{\"errors\":[{\"code\":\"EMAIL_PROVIDER_IN_USE\",\"message\":\"in use\","
+                + "\"meta\":{\"features\":[\"emailCode\",\"passwordReset\"]}}]}");
+
+        ConflictException ex = assertThrows(ConflictException.class,
+                () -> atlas.messaging().deleteChannel("email"));
+
+        assertTrue(ex.hasCode(ErrorCodes.EMAIL_PROVIDER_IN_USE));
+        assertEquals(List.of("emailCode", "passwordReset"), ex.errors().get(0).meta().get("features"));
+    }
+
+    @Test
+    void emailProviderErrorCodes() {
+        assertEquals("EMAIL_PROVIDER_IN_USE", ErrorCodes.EMAIL_PROVIDER_IN_USE);
+        assertEquals("EMAIL_PROVIDER_REQUIRED", ErrorCodes.EMAIL_PROVIDER_REQUIRED);
     }
 }

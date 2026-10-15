@@ -22,14 +22,14 @@ Maven:
 <dependency>
   <groupId>net.atlasauth</groupId>
   <artifactId>atlas-java</artifactId>
-  <version>1.2.0</version>
+  <version>1.3.0</version>
 </dependency>
 ```
 
 Gradle:
 
 ```kotlin
-implementation("net.atlasauth:atlas-java:1.2.0")
+implementation("net.atlasauth:atlas-java:1.3.0")
 ```
 
 ## The management client
@@ -179,7 +179,25 @@ atlas.design().update(new AtlasDesign().logo(new AtlasDesignLogo().assetId(logo.
 - `atlas.instance().preflight()` lists configuration problems, each with a
   `severity`, `code`, `message`, `fix` and `subject`.
 - `atlas.instance().getCookieConsent()` / `replaceCookieConsent(...)` /
-  `deleteCookieConsent()` manage the cookie-consent script on the hosted pages.
+  `deleteCookieConsent()` manage the cookie-consent script on the hosted pages,
+  including an optional "Cookie settings" link (a preset or your own attributes):
+
+  ```java
+  atlas.instance().replaceCookieConsent(new CookieConsentBody()
+          .scriptUrl("https://consent.cookiebot.com/uc.js")
+          .siteId("your-cbid")
+          .settingsLink(new CookieConsentSettingsLinkInput("Cookie settings")
+                  .preset(CookieConsentSettingsLink.PRESET_COOKIEBOT)));
+  ```
+
+  The response's `settingsLink().renderedAttributes()` shows the attributes the link
+  carries: yours plus the preset's trigger.
+- `atlas.messaging().deleteChannel("email")` is refused with `ConflictException`
+  (`EMAIL_PROVIDER_IN_USE`, `meta.features` lists the features that need email) while
+  nothing else would deliver email; `deleteChannel("email", true)` removes it anyway.
+- `CreateOAuthClientBody` / `UpdateOAuthClientBody.skipLogoutConfirmation(true)` (first-party
+  clients only) lets logout from that client with an exactly registered post-logout redirect
+  URI return straight to your app without the confirmation page.
 - `atlas.oauthProviders().list(List.of("google"), true)` filters the catalog; the
   upsert body takes `displayName`, `iconUrl`, `mode`, and wallet settings
   (`UpsertOAuthProviderBody.siwe(domain, chainIds, rpcUrl)`, `siws(...)`, `siwf(...)`).
@@ -340,7 +358,7 @@ Connectivity failures throw `AtlasConnectionException`.
 
 `ErrorCodes` names the stable codes you are most likely to branch on, for example
 `ErrorCodes.UNKNOWN_FIELD`, `EMAIL_DELIVERY_NOT_CONFIGURED`,
-`EMAIL_PROVIDER_REQUIRED`, `PLAN_IN_USE`, `WRONG_KEY_SURFACE` and `INVALID_KEY`:
+`EMAIL_PROVIDER_REQUIRED`, `EMAIL_PROVIDER_IN_USE`, `PLAN_IN_USE`, `WRONG_KEY_SURFACE` and `INVALID_KEY`:
 
 ```java
 if (e.hasCode(ErrorCodes.EMAIL_DELIVERY_NOT_CONFIGURED)) { ... }

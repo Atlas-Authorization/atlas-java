@@ -70,8 +70,22 @@ public final class Messaging {
         });
     }
 
+    /** Remove the channel's provider. See {@link #deleteChannel(String, boolean)}. */
     public DeletedMessagingProvider deleteChannel(String channel) {
-        return t.delete("/v1/messaging_providers/" + enc(channel), new TypeReference<>() {
+        return deleteChannel(channel, false);
+    }
+
+    /**
+     * Remove the channel's provider. Removing the email provider while nothing else
+     * would deliver email is refused with 409 {@code EMAIL_PROVIDER_IN_USE}; the error's
+     * {@code meta.features} lists the email-dependent features that are on (e.g.
+     * {@code emailCode}, {@code emailLink}, {@code emailVerification}, {@code passwordReset}).
+     *
+     * @param force true sends {@code ?force=true} to remove the email provider anyway
+     */
+    public DeletedMessagingProvider deleteChannel(String channel, boolean force) {
+        Map<String, Object> q = Params.of().set("force", force ? Boolean.TRUE : null).map();
+        return t.delete("/v1/messaging_providers/" + enc(channel), q, new TypeReference<>() {
         });
     }
 

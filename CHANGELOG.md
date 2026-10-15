@@ -1,5 +1,38 @@
 # Changelog
 
+## 1.3.0
+
+All changes are backward compatible: new record components have the previous
+constructors kept as overloads, and new request fields and parameters are optional.
+
+### Added
+
+- `OAuthClient.skipLogoutConfirmation` and `OAuthClientWithSecret.skipLogoutConfirmation`
+  (boolean, default false), plus `CreateOAuthClientBody.skipLogoutConfirmation` and
+  `UpdateOAuthClientBody.skipLogoutConfirmation` (optional `Boolean`). First-party clients
+  only (a third-party client gets 422 `VALIDATION_FAILED`, param `skip_logout_confirmation`).
+  When true, RP-initiated logout (`/oauth2/logout`) with the client's `client_id` and an
+  exactly registered `post_logout_redirect_uri` ends the session and redirects straight
+  back with `state`, without the confirmation page.
+- Cookie-consent settings link: `CookieConsentBody.settingsLink`
+  (`CookieConsentSettingsLinkInput`: `label`, `preset`, `attributes`; unset = no link) and
+  `CookieConsent.settingsLink` (`CookieConsentSettingsLink`: `label`, `preset`,
+  `attributes`, `renderedAttributes`, or null). Preset constants
+  `CookieConsentSettingsLink.PRESET_COOKIEMUNCH`, `PRESET_COOKIEBOT`, `PRESET_ONETRUST`,
+  `PRESET_CUSTOM`; `preset` stays a string so new values still decode.
+- `messaging().deleteChannel(channel, force)` — `force = true` sends `?force=true` to
+  remove the email provider even while email-dependent features are on;
+  `deleteChannel(channel)` is unchanged and sends no query.
+- `ErrorCodes.EMAIL_PROVIDER_IN_USE` — removing the email provider was refused (409);
+  the error's `meta.features` lists the email-dependent features that are on.
+- `UserSession.lastActiveOrganizationId`, `UserSession.impersonatedBy` and
+  `UserSession.idleExpiresAt` (epoch ms, nullable) on `users().listSessions(id)`.
+
+### Changed
+
+- `OAuthClient`, `OAuthClientWithSecret`, `CookieConsent` and `UserSession` gained record
+  components; the previous constructors are kept as overloads.
+
 ## 1.2.0
 
 ### Added

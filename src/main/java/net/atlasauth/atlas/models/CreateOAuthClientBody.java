@@ -11,6 +11,14 @@ public final class CreateOAuthClientBody {
     public String tokenEndpointAuthMethod;
     public String logoUrl;
     public Boolean firstParty;
+    /**
+     * First-party clients only (a third-party client is refused with 422
+     * {@code VALIDATION_FAILED}, param {@code skip_logout_confirmation}). When true,
+     * RP-initiated logout ({@code /oauth2/logout}) with this client's {@code client_id}
+     * and an exactly registered {@code post_logout_redirect_uri} ends the session and
+     * redirects straight back (with {@code state}) without the confirmation page.
+     */
+    public Boolean skipLogoutConfirmation;
 
     public CreateOAuthClientBody() {
     }
@@ -27,4 +35,5 @@ public final class CreateOAuthClientBody {
     public CreateOAuthClientBody tokenEndpointAuthMethod(String v) { this.tokenEndpointAuthMethod = v; return this; }
     public CreateOAuthClientBody logoUrl(String v) { this.logoUrl = v; return this; }
     public CreateOAuthClientBody firstParty(Boolean v) { this.firstParty = v; return this; }
+    public CreateOAuthClientBody skipLogoutConfirmation(Boolean v) { this.skipLogoutConfirmation = v; return this; }
 }

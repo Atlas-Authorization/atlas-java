@@ -13,10 +13,12 @@ import net.atlasauth.atlas.models.ApiKeyWithSecret;
 import net.atlasauth.atlas.models.CreateApiKeyBody;
 import net.atlasauth.atlas.models.CreateUserBody;
 import net.atlasauth.atlas.models.ImportExportImportUsersBody;
+import net.atlasauth.atlas.models.ListPage;
 import net.atlasauth.atlas.models.RecordApiKeyUsageBody;
 import net.atlasauth.atlas.models.Session;
 import net.atlasauth.atlas.models.SessionTouch;
 import net.atlasauth.atlas.models.UpdateApiKeyBody;
+import net.atlasauth.atlas.models.UserSession;
 import net.atlasauth.atlas.models.WebhookPayload;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -207,6 +209,29 @@ class ApiKeyLimitsTest {
     }
 
     @Test
+    void userSessionListCarriesIdleExpiresAtOrgAndImpersonator() {
+        mock.reply(200, "{\"object\":\"list\",\"data\":[{\"object\":\"session\",\"id\":\"sess_1\","
+                + "\"user_id\":\"user_1\",\"status\":\"active\",\"last_active_organization_id\":\"org_1\","
+                + "\"impersonated_by\":\"user_admin\",\"last_active_at\":5,\"expire_at\":9,\"abandon_at\":7,"
+                + "\"idle_expires_at\":7,\"created_at\":1},{\"object\":\"session\",\"id\":\"sess_2\","
+                + "\"last_active_organization_id\":null,\"impersonated_by\":null,\"created_at\":1}],\"has_more\":false}");
+
+        ListPage<UserSession> page = atlas.users().listSessions("user_1");
+
+        assertEquals("GET", mock.method);
+        assertEquals("/v1/users/user_1/sessions", mock.path);
+        UserSession s = page.data().get(0);
+        assertEquals(7L, s.idleExpiresAt());
+        assertEquals(7L, s.abandonAt());
+        assertEquals("org_1", s.lastActiveOrganizationId());
+        assertEquals("user_admin", s.impersonatedBy());
+        UserSession bare = page.data().get(1);
+        assertNull(bare.idleExpiresAt());
+        assertNull(bare.lastActiveOrganizationId());
+        assertNull(bare.impersonatedBy());
+    }
+
+    @Test
     void userCreateAndImportSendNotify() throws IOException {
         mock.reply(201, "{\"object\":\"user\",\"id\":\"user_1\"}");
         atlas.users().create(new CreateUserBody("ada@example.com").notify(false));
@@ -225,6 +250,10 @@ class ApiKeyLimitsTest {
         assertNull(new ApiKeyWithSecret("api_key", "ak_1", "user", "u", null, "ak_x", null, null, null, null, 1L,
                 "ak_s", null).usage());
         assertNull(new Session("session", "s", "u", "active", null, null, 1, 2, 3, 4).idleExpiresAt());
+        UserSession legacy = new UserSession("session", "s", "u", "active", 1, 2, 3, 4);
+        assertNull(legacy.idleExpiresAt());
+        assertNull(legacy.lastActiveOrganizationId());
+        assertNull(legacy.impersonatedBy());
     }
 
     @Test

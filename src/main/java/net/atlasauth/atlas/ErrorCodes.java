@@ -31,6 +31,12 @@ public final class ErrorCodes {
     public static final String EMAIL_DELIVERY_NOT_CONFIGURED = "EMAIL_DELIVERY_NOT_CONFIGURED";
     /** The operation needs an email provider to be configured first. */
     public static final String EMAIL_PROVIDER_REQUIRED = "EMAIL_PROVIDER_REQUIRED";
+    /**
+     * The email provider cannot be removed while email-dependent features are on and
+     * nothing else would deliver email ({@code meta.features} lists them); delete with
+     * {@code force=true} to remove it anyway.
+     */
+    public static final String EMAIL_PROVIDER_IN_USE = "EMAIL_PROVIDER_IN_USE";
     /** A billing plan cannot be changed or removed while subscriptions use it. */
     public static final String PLAN_IN_USE = "PLAN_IN_USE";
     public static final String LAST_ADMIN = "LAST_ADMIN";

@@ -10,6 +10,8 @@ import net.atlasauth.atlas.models.AtlasIdAppCopy;
 import net.atlasauth.atlas.models.AtlasIdAppWithSecret;
 import net.atlasauth.atlas.models.CookieConsent;
 import net.atlasauth.atlas.models.CookieConsentBody;
+import net.atlasauth.atlas.models.CookieConsentSettingsLink;
+import net.atlasauth.atlas.models.CookieConsentSettingsLinkInput;
 import net.atlasauth.atlas.models.CreateAtlasIdAppBody;
 import net.atlasauth.atlas.models.CreateEntitlementOverrideBody;
 import net.atlasauth.atlas.models.CursorPage;
@@ -377,6 +379,47 @@ class NewSurfaceTest {
         mock.reply(200, "{\"object\":\"cookie_consent\",\"enabled\":false}");
         assertFalse(atlas.instance().deleteCookieConsent().enabled());
         assertEquals("DELETE", mock.method);
+    }
+
+    @Test
+    void cookieConsentSettingsLinkRoundTrip() throws IOException {
+        mock.reply(200, "{\"object\":\"cookie_consent\",\"enabled\":true,\"script_url\":\"https://cmp.test/s.js\","
+                + "\"settings_link\":{\"label\":\"Cookie settings\",\"preset\":\"cookiebot\","
+                + "\"attributes\":{\"data-track\":\"footer\"},"
+                + "\"rendered_attributes\":{\"data-track\":\"footer\",\"onclick\":\"Cookiebot.renew()\"}}}");
+        CookieConsent cc = atlas.instance().replaceCookieConsent(new CookieConsentBody()
+                .scriptUrl("https://cmp.test/s.js")
+                .settingsLink(new CookieConsentSettingsLinkInput("Cookie settings")
+                        .preset(CookieConsentSettingsLink.PRESET_COOKIEBOT)
+                        .attributes(Map.of("data-track", "footer"))));
+
+        assertEquals(JSON.readTree("{\"label\":\"Cookie settings\",\"preset\":\"cookiebot\","
+                + "\"attributes\":{\"data-track\":\"footer\"}}"), sent().get("settings_link"));
+        CookieConsentSettingsLink link = cc.settingsLink();
+        assertEquals("Cookie settings", link.label());
+        assertEquals("cookiebot", link.preset());
+        assertEquals(Map.of("data-track", "footer"), link.attributes());
+        assertEquals("Cookiebot.renew()", link.renderedAttributes().get("onclick"));
+
+        // An attributes-only link with no preset; the label setter and a null preset decode cleanly.
+        mock.reply(200, "{\"object\":\"cookie_consent\",\"enabled\":true,\"settings_link\":{\"label\":\"Prefs\","
+                + "\"preset\":null,\"attributes\":{\"href\":\"#prefs\"},\"rendered_attributes\":{\"href\":\"#prefs\"}}}");
+        cc = atlas.instance().replaceCookieConsent(new CookieConsentBody()
+                .settingsLink(new CookieConsentSettingsLinkInput().label("Prefs").attributes(Map.of("href", "#prefs"))));
+        assertEquals(JSON.readTree("{\"label\":\"Prefs\",\"attributes\":{\"href\":\"#prefs\"}}"),
+                sent().get("settings_link"));
+        assertNull(cc.settingsLink().preset());
+
+        // No link: the field is omitted on the wire and decodes as null.
+        mock.reply(200, "{\"object\":\"cookie_consent\",\"enabled\":true,\"settings_link\":null}");
+        cc = atlas.instance().replaceCookieConsent(new CookieConsentBody().scriptUrl("https://cmp.test/s.js"));
+        assertFalse(sent().has("settings_link"));
+        assertNull(cc.settingsLink());
+
+        assertEquals(List.of("cookiemunch", "cookiebot", "onetrust", "custom"), List.of(
+                CookieConsentSettingsLink.PRESET_COOKIEMUNCH, CookieConsentSettingsLink.PRESET_COOKIEBOT,
+                CookieConsentSettingsLink.PRESET_ONETRUST, CookieConsentSettingsLink.PRESET_CUSTOM));
+        assertNull(new CookieConsent("cookie_consent", false, null, null, null, null, null).settingsLink());
     }
 
     // ---- oauth providers ---------------------------------------------------

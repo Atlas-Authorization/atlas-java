@@ -4,7 +4,15 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.List;
 
-/** A registered OAuth client (relying application) of this instance. */
+/**
+ * A registered OAuth client (relying application) of this instance.
+ *
+ * @param skipLogoutConfirmation first-party clients only: when true, RP-initiated logout
+ *                               ({@code /oauth2/logout}) with this client's {@code client_id} and an
+ *                               exactly registered {@code post_logout_redirect_uri} ends the session and
+ *                               redirects straight back (with {@code state}) without the confirmation page.
+ *                               False by default.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record OAuthClient(
         String object,
@@ -20,5 +28,15 @@ public record OAuthClient(
         boolean isPublic,
         boolean firstParty,
         long createdAt,
-        long updatedAt) {
+        long updatedAt,
+        boolean skipLogoutConfirmation) {
+
+    /** The 1.2 shape, without {@code skipLogoutConfirmation}. */
+    public OAuthClient(String object, String id, String clientId, String name, String logoUrl,
+                       List<String> redirectUris, List<String> allowedScopes, List<String> grantTypes,
+                       String tokenEndpointAuthMethod, String secretPrefix, boolean isPublic, boolean firstParty,
+                       long createdAt, long updatedAt) {
+        this(object, id, clientId, name, logoUrl, redirectUris, allowedScopes, grantTypes, tokenEndpointAuthMethod,
+                secretPrefix, isPublic, firstParty, createdAt, updatedAt, false);
+    }
 }
