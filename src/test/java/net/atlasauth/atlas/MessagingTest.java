@@ -148,4 +148,33 @@ class MessagingTest {
         assertEquals("EMAIL_PROVIDER_IN_USE", ErrorCodes.EMAIL_PROVIDER_IN_USE);
         assertEquals("EMAIL_PROVIDER_REQUIRED", ErrorCodes.EMAIL_PROVIDER_REQUIRED);
     }
+
+    @Test
+    void captchaSecretIsBringYourOwnKeys() throws IOException {
+        mock.reply(200, "{\"object\":\"captcha_secret\",\"provider\":\"turnstile\",\"set\":true}");
+        atlas.instanceSecurity().setCaptchaSecret("s3cret", "turnstile");
+        assertEquals("PUT", mock.method);
+        assertEquals("/v1/instance/captcha_secret", mock.path);
+        JsonNode body = new ObjectMapper().readTree(mock.requestBody);
+        assertEquals("turnstile", body.get("provider").asText());
+        assertEquals("s3cret", body.get("secret").asText());
+
+        mock.reply(200, "{\"object\":\"captcha_secret\",\"provider\":\"hcaptcha\",\"deleted\":true,\"flows_turned_off\":[\"signUp\"]}");
+        JsonNode out = atlas.instanceSecurity().deleteCaptchaSecret("hcaptcha", true);
+        assertEquals("DELETE", mock.method);
+        assertEquals("provider=hcaptcha&force=true", mock.rawQuery);
+        assertEquals("signUp", out.get("flows_turned_off").get(0).asText());
+
+        mock.reply(200, "{\"object\":\"captcha_secret\",\"provider\":\"hcaptcha\",\"deleted\":true}");
+        atlas.instanceSecurity().deleteCaptchaSecret();
+        assertNull(mock.rawQuery);
+    }
+
+    @Test
+    void captchaInUseIsAConflict() {
+        mock.reply(409, "{\"errors\":[{\"code\":\"CAPTCHA_IN_USE\",\"message\":\"in use\",\"meta\":{\"flows\":[\"signUp\"]}}]}");
+        ConflictException ex = assertThrows(ConflictException.class, () -> atlas.instanceSecurity().deleteCaptchaSecret());
+        assertTrue(ex.hasCode(ErrorCodes.CAPTCHA_IN_USE));
+        assertEquals("CAPTCHA_KEYS_REQUIRED", ErrorCodes.CAPTCHA_KEYS_REQUIRED);
+    }
 }

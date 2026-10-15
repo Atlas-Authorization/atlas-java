@@ -22,14 +22,14 @@ Maven:
 <dependency>
   <groupId>net.atlasauth</groupId>
   <artifactId>atlas-java</artifactId>
-  <version>1.3.0</version>
+  <version>1.3.1</version>
 </dependency>
 ```
 
 Gradle:
 
 ```kotlin
-implementation("net.atlasauth:atlas-java:1.3.0")
+implementation("net.atlasauth:atlas-java:1.3.1")
 ```
 
 ## The management client

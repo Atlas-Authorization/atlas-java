@@ -35,15 +35,35 @@ public final class InstanceSecurity {
         });
     }
 
-    /** Store the captcha provider secret. Refused while the provider is {@code none}. */
+    /** Store the captcha secret for the configured provider. */
     public JsonNode setCaptchaSecret(String secret) {
-        Map<String, Object> body = Params.of("secret", secret).map();
+        return setCaptchaSecret(secret, null);
+    }
+
+    /**
+     * Store a captcha provider secret. {@code provider} (null: the configured one) lets you
+     * store it BEFORE turning captcha on: captcha is bring-your-own-keys, and enabling it
+     * without a site key and secret is refused with 422 {@code CAPTCHA_KEYS_REQUIRED}.
+     */
+    public JsonNode setCaptchaSecret(String secret, String provider) {
+        Map<String, Object> body = Params.of("secret", secret).set("provider", provider).map();
         return t.put("/v1/instance/captcha_secret", body, new TypeReference<>() {
         });
     }
 
+    /** Remove the configured provider's captcha secret. */
     public JsonNode deleteCaptchaSecret() {
-        return t.delete("/v1/instance/captcha_secret", new TypeReference<>() {
+        return deleteCaptchaSecret(null, false);
+    }
+
+    /**
+     * Remove a captcha secret. Refused with 409 {@code CAPTCHA_IN_USE} while a flow uses it
+     * ({@code meta.flows}); {@code force} removes it anyway and turns those flows off
+     * (returned as {@code flows_turned_off}).
+     */
+    public JsonNode deleteCaptchaSecret(String provider, boolean force) {
+        Map<String, Object> q = Params.of().set("provider", provider).set("force", force ? Boolean.TRUE : null).map();
+        return t.delete("/v1/instance/captcha_secret", q, new TypeReference<>() {
         });
     }
 

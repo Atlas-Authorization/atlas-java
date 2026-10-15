@@ -37,6 +37,16 @@ public final class ErrorCodes {
      * {@code force=true} to remove it anyway.
      */
     public static final String EMAIL_PROVIDER_IN_USE = "EMAIL_PROVIDER_IN_USE";
+    /**
+     * Captcha is bring-your-own-keys: turning it on (or switching provider) needs that
+     * provider's site key and secret stored first.
+     */
+    public static final String CAPTCHA_KEYS_REQUIRED = "CAPTCHA_KEYS_REQUIRED";
+    /**
+     * A captcha key a live flow uses cannot be removed ({@code meta.flows}); delete with
+     * {@code force=true} to remove it anyway.
+     */
+    public static final String CAPTCHA_IN_USE = "CAPTCHA_IN_USE";
     /** A billing plan cannot be changed or removed while subscriptions use it. */
     public static final String PLAN_IN_USE = "PLAN_IN_USE";
     public static final String LAST_ADMIN = "LAST_ADMIN";

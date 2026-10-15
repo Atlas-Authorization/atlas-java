@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.1
+
+### Added
+
+- **Captcha is bring-your-own-keys.** `ErrorCodes.CAPTCHA_KEYS_REQUIRED` (422) and `ErrorCodes.CAPTCHA_IN_USE` (409, `meta.flows`).
+- `instanceSecurity().setCaptchaSecret(secret, provider)` stores the secret for a named provider before captcha is turned on.
+- `instanceSecurity().deleteCaptchaSecret(provider, force)` removes a secret a flow uses and turns those flows off (`flows_turned_off`).
+
 ## 1.3.0
 
 All changes are backward compatible: new record components have the previous
