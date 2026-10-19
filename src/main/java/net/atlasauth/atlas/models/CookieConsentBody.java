@@ -22,6 +22,8 @@ public final class CookieConsentBody {
     public List<String> extraOrigins;
     /** The "Cookie settings" link to show on the hosted pages; leave unset (or null) for no link. */
     public CookieConsentSettingsLinkInput settingsLink;
+    /** {@code page} (default: the script tag carries the page language) or {@code browser}. */
+    public String culture;
 
     @JsonIgnore
     private final Map<String, Object> additionalFields = new LinkedHashMap<>();
@@ -35,6 +37,7 @@ public final class CookieConsentBody {
     public CookieConsentBody blockingMode(String v) { this.blockingMode = v; return this; }
     public CookieConsentBody extraOrigins(List<String> v) { this.extraOrigins = v; return this; }
     public CookieConsentBody settingsLink(CookieConsentSettingsLinkInput v) { this.settingsLink = v; return this; }
+    public CookieConsentBody culture(String v) { this.culture = v; return this; }
 
     /**
      * Set any field by its wire name, including an explicit {@code null} (which

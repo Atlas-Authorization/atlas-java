@@ -1,6 +1,10 @@
 package net.atlasauth.atlas.verify;
 
-/** Thrown by {@link LogoutTokenVerifier} when a {@code logout_token} is not valid. Answer the request with 400. */
+/**
+ * Thrown by {@link LogoutTokenVerifier} when a {@code logout_token} is not valid. Answer the request
+ * with 400, or with 503 and {@code Retry-After} when {@link #retryable()} is true (Atlas then retries
+ * the delivery; it never retries a 400).
+ */
 public final class LogoutTokenException extends RuntimeException {
 
     /** Why the token was refused. */
@@ -30,5 +34,13 @@ public final class LogoutTokenException extends RuntimeException {
 
     public Reason reason() {
         return reason;
+    }
+
+    /**
+     * True when the failure is temporary and on your side: {@link Reason#NO_KEYS}, the issuer's keys
+     * could not be fetched (a network error or a JWKS outage).
+     */
+    public boolean retryable() {
+        return reason == Reason.NO_KEYS;
     }
 }

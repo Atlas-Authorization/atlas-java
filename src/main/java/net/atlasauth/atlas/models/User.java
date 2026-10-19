@@ -19,5 +19,11 @@ public record User(
         boolean locked,
         Long lastSignInAt,
         long createdAt,
-        long updatedAt) {
+        long updatedAt,
+        /** Strictly increases with every change to the user; webhook payloads carry the same value. */ Long version) {
+
+    /** The previous shape, without {@code version}. */
+    public User(String object, String id, String username, String firstName, String lastName, String imageUrl, Map<String, Object> publicMetadata, boolean mfaEnabled, boolean banned, boolean locked, Long lastSignInAt, long createdAt, long updatedAt) {
+        this(object, id, username, firstName, lastName, imageUrl, publicMetadata, mfaEnabled, banned, locked, lastSignInAt, createdAt, updatedAt, null);
+    }
 }

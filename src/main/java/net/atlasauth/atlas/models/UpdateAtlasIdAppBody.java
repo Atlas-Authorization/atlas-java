@@ -27,6 +27,8 @@ public final class UpdateAtlasIdAppBody {
     public List<String> allowedScopes;
     /** How the Sign in with Atlas page and consent screen look for this app. On PATCH each field merges with what is stored; a field set to null clears it, and branding: null clears all of them. The Atlas header and the app domain are always shown. */
     public AtlasIdAppBrandingInput branding;
+    /** Per-app webhook (public https): user.updated, user.deleted and grant.revoked for this app's users. The first set returns webhook_secret once; {@code set("webhook_url", null)} removes it. */
+    public String webhookUrl;
 
     @JsonIgnore
     private final Map<String, Object> additionalFields = new LinkedHashMap<>();
@@ -45,6 +47,7 @@ public final class UpdateAtlasIdAppBody {
     public UpdateAtlasIdAppBody homepageUrl(String v) { this.homepageUrl = v; return this; }
     public UpdateAtlasIdAppBody allowedScopes(List<String> v) { this.allowedScopes = v; return this; }
     public UpdateAtlasIdAppBody branding(AtlasIdAppBrandingInput v) { this.branding = v; return this; }
+    public UpdateAtlasIdAppBody webhookUrl(String v) { this.webhookUrl = v; return this; }
 
     /**
      * Set any field by its wire name, including an explicit {@code null} (which

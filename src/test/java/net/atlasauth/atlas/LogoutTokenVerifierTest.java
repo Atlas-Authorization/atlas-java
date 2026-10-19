@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -183,5 +185,26 @@ class LogoutTokenVerifierTest {
     void garbageIsMalformed() {
         assertReason(Reason.MALFORMED, "not-a-jwt");
         assertReason(Reason.MALFORMED, null);
+    }
+
+    @Test
+    void unreachableJwksIsNoKeysAndRetryable() throws Exception {
+        LogoutTokenVerifier unreachable = LogoutTokenVerifier.builder()
+                .jwksUrl("http://127.0.0.1:1/v1/jwks")
+                .issuer(ISSUER)
+                .clientId(CLIENT)
+                .now(() -> NOW_MS)
+                .build();
+        String t = token(b -> { });
+        LogoutTokenException e = assertThrows(LogoutTokenException.class, () -> unreachable.verify(t));
+        assertEquals(Reason.NO_KEYS, e.reason());
+        assertTrue(e.retryable());
+    }
+
+    @Test
+    void aBadTokenIsNotRetryable() throws Exception {
+        String t = token(b -> b.audience("someone-else"));
+        LogoutTokenException e = assertThrows(LogoutTokenException.class, () -> verifier.verify(t));
+        assertFalse(e.retryable());
     }
 }

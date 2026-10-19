@@ -22,14 +22,14 @@ Maven:
 <dependency>
   <groupId>net.atlasauth</groupId>
   <artifactId>atlas-java</artifactId>
-  <version>1.3.1</version>
+  <version>1.4.0</version>
 </dependency>
 ```
 
 Gradle:
 
 ```kotlin
-implementation("net.atlasauth:atlas-java:1.3.1")
+implementation("net.atlasauth:atlas-java:1.4.0")
 ```
 
 ## The management client
@@ -206,6 +206,25 @@ atlas.design().update(new AtlasDesign().logo(new AtlasDesignLogo().assetId(logo.
   retries a past delivery.
 - `atlas.entitlementOverrides()` grants a plan, features or limits to a user or
   organization outside of billing.
+
+### Domain moves, logout fan-out and managed email
+
+```java
+// Move every URL from the old origin to the new one. dryRun first shows the diff.
+OriginMove preview = atlas.instance().moveOrigin(
+        new OriginMoveBody().from("https://old.example.com").to("https://example.com").dryRun(true));
+preview.changes().forEach(c -> System.out.println(c.object() + " " + c.field() + ": " + c.before() + " -> " + c.after()));
+
+// Send the same logout_token your OIDC apps get to another service.
+atlas.logoutNotifyEndpoints().create(new LogoutNotifyEndpointBody().url("https://api.example.com/atlas/logout"));
+
+// Send email from your own domain through Atlas, then publish the returned DNS records.
+ManagedEmail managed = atlas.messaging().createManagedEmail(new ManagedEmailBody().fromAddress("Acme <no-reply@example.com>"));
+```
+
+With a platform key, `platform().atlasIdApps().findUsers(id, email)` answers a privacy request for one app,
+`revokeGrant(id, grantId)` revokes one person's approval, and `platform().atlasIdPublisher()` claims and verifies
+the publisher name shown on consent screens.
 
 ### API key spend caps
 

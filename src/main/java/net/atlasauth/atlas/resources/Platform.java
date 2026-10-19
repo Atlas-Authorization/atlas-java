@@ -8,6 +8,18 @@ import net.atlasauth.atlas.models.AcceptedPlatformApp;
 import net.atlasauth.atlas.models.AccountlessApp;
 import net.atlasauth.atlas.models.AtlasDesign;
 import net.atlasauth.atlas.models.AtlasIdApp;
+import net.atlasauth.atlas.models.AtlasIdAppPreflight;
+import net.atlasauth.atlas.models.AtlasIdAppUser;
+import net.atlasauth.atlas.models.AtlasIdGrantRevocation;
+import net.atlasauth.atlas.models.AtlasIdPublisher;
+import net.atlasauth.atlas.models.AtlasIdPublisherBody;
+import net.atlasauth.atlas.models.BackchannelLogoutDelivery;
+import net.atlasauth.atlas.models.BackchannelLogoutTest;
+import net.atlasauth.atlas.models.ConfigChangelogEntry;
+import net.atlasauth.atlas.models.ListConfigChangelogParams;
+import net.atlasauth.atlas.models.ListPage;
+import net.atlasauth.atlas.models.OriginMove;
+import net.atlasauth.atlas.models.OriginMoveBody;
 import net.atlasauth.atlas.models.AtlasIdAppWithSecret;
 import net.atlasauth.atlas.models.CreateAccountlessAppBody;
 import net.atlasauth.atlas.models.CreateAtlasIdAppBody;
@@ -45,12 +57,71 @@ public final class Platform {
     private final DesignAssets designAssets;
     private final AtlasIdApps atlasIdApps;
     private final Apps apps;
+    private final AtlasIdPublisherResource atlasIdPublisher;
 
     public Platform(Transport t) {
         this.t = t;
         this.designAssets = new DesignAssets(t);
         this.atlasIdApps = new AtlasIdApps(t);
         this.apps = new Apps(t);
+        this.atlasIdPublisher = new AtlasIdPublisherResource(t);
+    }
+
+    /** The account's Sign in with Atlas publisher ({@code /v1/platform/atlas_id_publisher}). */
+    public AtlasIdPublisherResource atlasIdPublisher() {
+        return atlasIdPublisher;
+    }
+
+    public CursorPage<ConfigChangelogEntry> configChangelog() {
+        return configChangelog(null);
+    }
+
+    /** {@code GET /v1/platform/config_changelog} — Config change history for the account's Sign in with Atlas apps. */
+    public CursorPage<ConfigChangelogEntry> configChangelog(ListConfigChangelogParams params) {
+        return t.get("/v1/platform/config_changelog", params == null ? null : params.toQuery(), new TypeReference<>() {
+        });
+    }
+
+    // ---- AtlasIdPublisher ---------------------------------------------
+
+    /** The account's Sign in with Atlas publisher name and DNS-verified domain. */
+    public static final class AtlasIdPublisherResource {
+
+        private final Transport t;
+
+        public AtlasIdPublisherResource(Transport t) {
+            this.t = t;
+        }
+
+        /** {@code GET /v1/platform/atlas_id_publisher} — The publisher (404 until claimed). */
+        public AtlasIdPublisher get() {
+            return t.get("/v1/platform/atlas_id_publisher", new TypeReference<>() {
+            });
+        }
+
+        /** {@code PUT /v1/platform/atlas_id_publisher} — Claim a publisher name and domain; returns the TXT record to publish. */
+        public AtlasIdPublisher set(AtlasIdPublisherBody body) {
+            return t.put("/v1/platform/atlas_id_publisher", body, new TypeReference<>() {
+            });
+        }
+
+        /** {@code PATCH /v1/platform/atlas_id_publisher} — Turn publisher-wide consent on or off. */
+        public AtlasIdPublisher setSkipConsent(boolean skipConsent) {
+            return t.patch("/v1/platform/atlas_id_publisher", Map.of("skip_consent", skipConsent), new TypeReference<>() {
+            });
+        }
+
+        /** {@code DELETE /v1/platform/atlas_id_publisher} — Remove the publisher claim. */
+        public JsonNode delete() {
+            return t.delete("/v1/platform/atlas_id_publisher", new TypeReference<>() {
+            });
+        }
+
+        /** {@code POST /v1/platform/atlas_id_publisher/verify} — Look up the TXT record now. */
+        public AtlasIdPublisher verify() {
+            return t.post("/v1/platform/atlas_id_publisher/verify", null, new TypeReference<>() {
+            });
+        }
     }
 
     /** Design images owned by the platform account ({@code /v1/platform/design/assets}). */
@@ -167,6 +238,54 @@ public final class Platform {
         }
 
         /** {@code POST /v1/platform/atlas_id_apps/{id}/rotate_secret} — Rotate a confidential app's client_secret. */
+        public CursorPage<BackchannelLogoutDelivery> listBackchannelDeliveries(String id) {
+            return listBackchannelDeliveries(id, null, null);
+        }
+
+        /** {@code GET /v1/platform/atlas_id_apps/{id}/backchannel_deliveries} — The app's back-channel logout delivery log, newest first. */
+        public CursorPage<BackchannelLogoutDelivery> listBackchannelDeliveries(String id, Integer limit, String startingAfter) {
+            return t.get("/v1/platform/atlas_id_apps/" + enc(id) + "/backchannel_deliveries",
+                    Params.of().set("limit", limit).set("starting_after", startingAfter).map(), new TypeReference<>() {
+                    });
+        }
+
+        /** {@code POST /v1/platform/atlas_id_apps/{id}/backchannel_logout/test} — Send a test back-channel logout to the app now. */
+        public BackchannelLogoutTest testBackchannelLogout(String id) {
+            return t.post("/v1/platform/atlas_id_apps/" + enc(id) + "/backchannel_logout/test", null, new TypeReference<>() {
+            });
+        }
+
+        /** {@code GET /v1/platform/atlas_id_apps/{id}/preflight} — Check one app's setup. */
+        public AtlasIdAppPreflight preflight(String id) {
+            return t.get("/v1/platform/atlas_id_apps/" + enc(id) + "/preflight", new TypeReference<>() {
+            });
+        }
+
+        /** {@code GET /v1/platform/atlas_id_apps/{id}/users} — Privacy requests: is this person (verified email, exact match) one of the app's users? Anyone else gets an empty list. */
+        public ListPage<AtlasIdAppUser> findUsers(String id, String email) {
+            return t.get("/v1/platform/atlas_id_apps/" + enc(id) + "/users", Params.of().set("email", email).map(),
+                    new TypeReference<>() {
+                    });
+        }
+
+        /** {@code DELETE /v1/platform/atlas_id_apps/{id}/grants/{grantId}} — Revoke one user's grant; the next sign-in shows the consent screen again. */
+        public AtlasIdGrantRevocation revokeGrant(String id, String grantId) {
+            return t.delete("/v1/platform/atlas_id_apps/" + enc(id) + "/grants/" + enc(grantId), new TypeReference<>() {
+            });
+        }
+
+        /** {@code POST /v1/platform/atlas_id_apps/{id}/move_origin} — Move the app's URLs from one origin to another. */
+        public OriginMove moveOrigin(String id, OriginMoveBody body) {
+            return t.post("/v1/platform/atlas_id_apps/" + enc(id) + "/move_origin", body, new TypeReference<>() {
+            });
+        }
+
+        /** {@code POST /v1/platform/atlas_id_apps/{id}/webhook/rotate_secret} — Rotate the app's webhook signing secret (returned once). */
+        public AtlasIdAppWithSecret rotateWebhookSecret(String id) {
+            return t.post("/v1/platform/atlas_id_apps/" + enc(id) + "/webhook/rotate_secret", null, new TypeReference<>() {
+            });
+        }
+
         public AtlasIdAppWithSecret rotateSecret(String id) {
             return t.post("/v1/platform/atlas_id_apps/" + enc(id) + "/rotate_secret", null, new TypeReference<>() {
             });

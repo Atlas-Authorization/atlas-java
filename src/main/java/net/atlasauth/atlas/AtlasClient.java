@@ -34,6 +34,7 @@ import net.atlasauth.atlas.resources.JwtTemplates;
 import net.atlasauth.atlas.resources.LegacyAuthConnection;
 import net.atlasauth.atlas.resources.Localizations;
 import net.atlasauth.atlas.resources.LogStreams;
+import net.atlasauth.atlas.resources.LogoutNotifyEndpoints;
 import net.atlasauth.atlas.resources.LtiPlatforms;
 import net.atlasauth.atlas.resources.Machines;
 import net.atlasauth.atlas.resources.ManagedWaf;
@@ -134,6 +135,7 @@ public final class AtlasClient {
     private final NetworkAcls networkAcls;
     private final ManagedWaf managedWaf;
     private final LogStreams logStreams;
+    private final LogoutNotifyEndpoints logoutNotifyEndpoints;
     private final Branding branding;
     private final EmailTemplates emailTemplates;
     private final SmsTemplates smsTemplates;
@@ -228,6 +230,7 @@ public final class AtlasClient {
         this.networkAcls = new NetworkAcls(transport);
         this.managedWaf = new ManagedWaf(transport);
         this.logStreams = new LogStreams(transport);
+        this.logoutNotifyEndpoints = new LogoutNotifyEndpoints(transport);
         this.branding = new Branding(transport);
         this.emailTemplates = new EmailTemplates(transport);
         this.smsTemplates = new SmsTemplates(transport);
@@ -419,6 +422,11 @@ public final class AtlasClient {
 
     public LogStreams logStreams() {
         return logStreams;
+    }
+
+    /** Logout fan-out endpoints ({@code /v1/logout_notify_endpoints}). */
+    public LogoutNotifyEndpoints logoutNotifyEndpoints() {
+        return logoutNotifyEndpoints;
     }
 
     public Branding branding() {

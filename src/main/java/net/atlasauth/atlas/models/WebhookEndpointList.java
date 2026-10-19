@@ -17,5 +17,12 @@ public record WebhookEndpointList(
         List<String> availableEvents,
         /** Delay before each retry, in milliseconds. */
         List<Long> retryScheduleMs,
-        int maxAttempts) {
+        int maxAttempts,
+        /** The same events as availableEvents, each described. */ List<WebhookEventCatalogEntry> eventCatalog,
+        /** Every value relevantFor can hold. */ List<String> eventAudiences) {
+
+    /** The previous shape, without {@code eventCatalog}, {@code eventAudiences}. */
+    public WebhookEndpointList(String object, List<WebhookEndpoint> data, Boolean hasMore, List<String> availableEvents, List<Long> retryScheduleMs, int maxAttempts) {
+        this(object, data, hasMore, availableEvents, retryScheduleMs, maxAttempts, null, null);
+    }
 }

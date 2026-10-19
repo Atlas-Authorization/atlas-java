@@ -37,8 +37,13 @@ import java.util.function.LongSupplier;
  *     .clientId("atlas_client_123")
  *     .build();
  *
- * LogoutTokenClaims claims = verifier.verify(logoutToken); // throws LogoutTokenException
- * sessions.endBySid(claims.sid());
+ * try {
+ *     LogoutTokenClaims claims = verifier.verify(logoutToken);
+ *     sessions.endBySid(claims.sid());
+ * } catch (LogoutTokenException e) {
+ *     // 503 + Retry-After makes Atlas retry (keys unreachable); 400 is final.
+ *     response.setStatus(e.retryable() ? 503 : 400);
+ * }
  * }</pre>
  *
  * <p>The verifier does not remember tokens. To reject a replayed token, record each
@@ -140,6 +145,10 @@ public final class LogoutTokenVerifier {
         JWKSet keys = jwks.get(kid);
         if (keys == null || keys.getKeys().isEmpty()) {
             throw new LogoutTokenException(LogoutTokenException.Reason.NO_KEYS, "no signing keys available");
+        }
+        // A key Atlas just rotated to, whose refetch failed: temporary.
+        if (kid != null && jwks.lastOutcome() == JwksCache.Outcome.FAILED && keys.getKeyByKeyId(kid) == null) {
+            throw new LogoutTokenException(LogoutTokenException.Reason.NO_KEYS, "signing key " + kid + " could not be fetched");
         }
         if (!signatureValid(jwt, keys, kid)) {
             throw new LogoutTokenException(LogoutTokenException.Reason.BAD_SIGNATURE, "logout_token signature is invalid");

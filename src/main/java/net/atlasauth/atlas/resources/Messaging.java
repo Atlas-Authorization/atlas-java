@@ -3,6 +3,9 @@ package net.atlasauth.atlas.resources;
 import com.fasterxml.jackson.core.type.TypeReference;
 import net.atlasauth.atlas.Params;
 import net.atlasauth.atlas.http.Transport;
+import net.atlasauth.atlas.models.ManagedEmail;
+import net.atlasauth.atlas.models.ManagedEmailBody;
+import net.atlasauth.atlas.models.ManagedEmailDeleted;
 import net.atlasauth.atlas.models.DeletedMessagingProvider;
 import net.atlasauth.atlas.models.EmailProviderConfig;
 import net.atlasauth.atlas.models.SmsProviderConfig;
@@ -86,6 +89,40 @@ public final class Messaging {
     public DeletedMessagingProvider deleteChannel(String channel, boolean force) {
         Map<String, Object> q = Params.of().set("force", force ? Boolean.TRUE : null).map();
         return t.delete("/v1/messaging_providers/" + enc(channel), q, new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/messaging_providers/email/managed} — The Atlas-managed sending domain (404 when none). */
+    public ManagedEmail getManagedEmail() {
+        return t.get("/v1/messaging_providers/email/managed", new TypeReference<>() {
+        });
+    }
+
+    /** {@code POST /v1/messaging_providers/email/managed} — Send from your own domain through Atlas's email account; returns the DNS records to publish. */
+    public ManagedEmail createManagedEmail(ManagedEmailBody body) {
+        return t.post("/v1/messaging_providers/email/managed", body, new TypeReference<>() {
+        });
+    }
+
+    /** {@code POST /v1/messaging_providers/email/managed/verify} — Re-check the DNS records now. */
+    public ManagedEmail verifyManagedEmail() {
+        return t.post("/v1/messaging_providers/email/managed/verify", null, new TypeReference<>() {
+        });
+    }
+
+    public ManagedEmailDeleted deleteManagedEmail() {
+        return deleteManagedEmail(false);
+    }
+
+    /**
+     * {@code DELETE /v1/messaging_providers/email/managed} — Stop using managed email (DNS records stay).
+     * Refused with 409 {@code EMAIL_PROVIDER_IN_USE} while it is the only way to send email.
+     *
+     * @param force true sends {@code ?force=true} to remove it anyway
+     */
+    public ManagedEmailDeleted deleteManagedEmail(boolean force) {
+        Map<String, Object> q = Params.of().set("force", force ? Boolean.TRUE : null).map();
+        return t.delete("/v1/messaging_providers/email/managed", q, new TypeReference<>() {
         });
     }
 

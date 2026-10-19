@@ -4,7 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.atlasauth.atlas.Params;
 import net.atlasauth.atlas.http.Transport;
+import net.atlasauth.atlas.models.BackchannelLogoutDelivery;
+import net.atlasauth.atlas.models.BackchannelLogoutTest;
 import net.atlasauth.atlas.models.CreateOAuthClientBody;
+import net.atlasauth.atlas.models.CursorPage;
 import net.atlasauth.atlas.models.DeletedObject;
 import net.atlasauth.atlas.models.ImportOAuthClientsBody;
 import net.atlasauth.atlas.models.ImportedOAuthClient;
@@ -63,6 +66,23 @@ public final class OAuthClients {
     /** Returns {@code {object,id,deleted,note}}. */
     public JsonNode delete(String id) {
         return t.delete("/v1/oauth_clients/" + enc(id), new TypeReference<>() {
+        });
+    }
+
+    public CursorPage<BackchannelLogoutDelivery> listBackchannelDeliveries(String id) {
+        return listBackchannelDeliveries(id, null, null);
+    }
+
+    /** {@code GET /v1/oauth_clients/{id}/backchannel_deliveries} — The client's back-channel logout delivery log, newest first. */
+    public CursorPage<BackchannelLogoutDelivery> listBackchannelDeliveries(String id, Integer limit, String startingAfter) {
+        return t.get("/v1/oauth_clients/" + enc(id) + "/backchannel_deliveries",
+                Params.of().set("limit", limit).set("starting_after", startingAfter).map(), new TypeReference<>() {
+                });
+    }
+
+    /** {@code POST /v1/oauth_clients/{id}/backchannel_logout/test} — Send a test back-channel logout now and return what the receiver answered. */
+    public BackchannelLogoutTest testBackchannelLogout(String id) {
+        return t.post("/v1/oauth_clients/" + enc(id) + "/backchannel_logout/test", null, new TypeReference<>() {
         });
     }
 

@@ -1,5 +1,39 @@
 # Changelog
 
+## 1.4.0
+
+### Added
+
+- **Back-channel logout, retryable failures.** `LogoutTokenException.retryable()` is true for
+  `Reason.NO_KEYS`: the issuer's keys could not be fetched (a network error, a JWKS outage, or a
+  just-rotated key whose refetch failed). Answer `503` with `Retry-After` then, so Atlas retries the
+  delivery, and `400` otherwise. A token whose `kid` is unknown after a failed JWKS refetch is now
+  `NO_KEYS` (was `BAD_SIGNATURE`).
+- **Webhook verification.** `new WebhookVerifier(secret).verify(rawBody, headers[, nowMs])` (package
+  `net.atlasauth.atlas.webhook`) returns a `WebhookVerification` record (`verified`, `reason`, `event`,
+  `deliveryId`, `timestamp`). `deliveryId` is the signed `atlas-id` header, the same on every retry of one
+  event: deduplicate on it.
+- **Domain moves.** `instance().moveOrigin(new OriginMoveBody().from(..).to(..).dryRun(true))` returns `OriginMove`;
+  `platform().atlasIdApps().moveOrigin(id, body)` does it for one app.
+- **Connections and integrations.** `instance().connections()` (`InstanceConnections`), and
+  `instance().get/set/deleteChatlyIntegration()` and `…ForumulateIntegration()`.
+- **Logout fan-out.** New `logoutNotifyEndpoints()` resource: `list`, `create`, `get`, `update`, `delete`,
+  `listDeliveries` (`LogoutNotifyEndpoint`, `LogoutNotifyDelivery`).
+- **Managed email.** `messaging().getManagedEmail()`, `createManagedEmail(ManagedEmailBody)`,
+  `verifyManagedEmail()`, `deleteManagedEmail(force)` (`ManagedEmail`).
+- **Back-channel logout logs.** `oauthClients().listBackchannelDeliveries(..)` / `testBackchannelLogout(id)` and the
+  same on `platform().atlasIdApps()` (`BackchannelLogoutDelivery`, `BackchannelLogoutTest`).
+- **Sign in with Atlas apps.** `platform().atlasIdApps().preflight(id)`, `findUsers(id, email)`,
+  `revokeGrant(id, grantId)`, `rotateWebhookSecret(id)`. `AtlasIdApp` / `AtlasIdAppWithSecret` gain
+  `webhookUrl`, `webhookEvents`, `webhookActive` (and `webhookSecret`); `UpdateAtlasIdAppBody.webhookUrl`.
+- **Publisher.** `platform().atlasIdPublisher()`: `get`, `set`, `setSkipConsent`, `delete`, `verify`; and
+  `platform().configChangelog(params)`.
+- **More fields.** `User.version`; `CookieConsent.culture` / `declaredCookies`; `CookieConsentBody.culture`;
+  `Preflight.sdkVersionsSeen`; `WebhookDelivery.error` / `location`; `WebhookEndpointList.eventCatalog` /
+  `eventAudiences`; `CustomDomain.dns` and `domains().create(host, role, dns, idempotencyKey)`;
+  `ConfigChangelogEntry.target`; `MessagingProviders.managedEmail`. Each extended record keeps a constructor with
+  its previous components.
+
 ## 1.3.1
 
 ### Added

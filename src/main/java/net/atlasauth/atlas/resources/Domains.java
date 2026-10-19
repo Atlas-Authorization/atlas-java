@@ -37,6 +37,16 @@ public final class Domains {
         });
     }
 
+    /**
+     * @param dns optional DNS automation: {@code provider} ("cloudflare"), {@code api_token}
+     *            (write-only) and {@code overwrite}; Atlas then writes the record itself.
+     */
+    public CustomDomain create(String host, String role, java.util.Map<String, Object> dns, String idempotencyKey) {
+        var body = Params.of().set("host", host).set("role", role).set("dns", dns).map();
+        return t.post("/v1/domains", body, idempotencyKey, new TypeReference<>() {
+        });
+    }
+
     public CustomDomain verify(String id) {
         return t.post("/v1/domains/" + enc(id) + "/verify", null, new TypeReference<>() {
         });
