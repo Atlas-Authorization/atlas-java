@@ -22,14 +22,14 @@ Maven:
 <dependency>
   <groupId>net.atlasauth</groupId>
   <artifactId>atlas-java</artifactId>
-  <version>1.6.0</version>
+  <version>1.7.0</version>
 </dependency>
 ```
 
 Gradle:
 
 ```kotlin
-implementation("net.atlasauth:atlas-java:1.6.0")
+implementation("net.atlasauth:atlas-java:1.7.0")
 ```
 
 ## The management client
@@ -277,6 +277,30 @@ new RotatePlatformSecretBody().overlapSeconds(0), null)` (default 72 hours), and
 With a platform key, `platform().atlasIdApps().findUsers(id, email)` answers a privacy request for one app,
 `revokeGrant(id, grantId)` revokes one person's approval, and `platform().atlasIdPublisher()` claims and verifies
 the publisher name shown on consent screens.
+
+### Referral attribution
+
+With referral attribution on, Atlas reports every interactive sign-up to your referral platform before
+`user.created` is sent. `User` gains `referral()` (who referred them, or null), `referralCode()` and `referralLink()`.
+
+```java
+atlas.referrals().update(new UpdateReferralSettingsBody()
+        .enabled(true)
+        .provider("webhook") // the Atlas referral protocol; or a built-in vendor adapter
+        .endpointUrl("https://referrals.example.com/atlas")
+        .signingSecret(System.getenv("REFERRAL_SIGNING_SECRET"))
+        .security(new UpdateReferralSecurityBody().onHighRisk("hold"))
+        .clear("link_template")); // sent as null
+ReferralConnectionTest test = atlas.referrals().test(); // ok(), httpStatus(), latencyMs(), error()
+ListPage<ReferralCall> failed = atlas.referrals().listCalls(20, "failed", null, null);
+atlas.referrals().retryCall(failed.data().get(0).id());
+
+atlas.users().update("user_123", new UpdateUserBody().referralCode("ada-1")); // 409 REFERRAL_CODE_TAKEN if held
+atlas.users().flagReferral("user_123", "self-referral", null);
+```
+
+Enabling without what the provider needs is `422 REFERRALS_NOT_CONFIGURED`. A late answer from the platform arrives
+as the `user.referral_attributed` webhook (`UserReferralAttributedEvent`).
 
 ### API key spend caps
 

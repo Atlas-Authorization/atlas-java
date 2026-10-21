@@ -20,6 +20,10 @@ public final class CreateUserBody {
      * as a consequence of the create.
      */
     public Boolean notify;
+    /** Import a referral (how the user arrived); with referral attribution on, the user is reported to the referral platform. */
+    public CreateUserReferral referral;
+    /** The user's own referral code, unique per instance (409 {@code REFERRAL_CODE_TAKEN}). */
+    public String referralCode;
 
     public CreateUserBody() {
     }
@@ -37,4 +41,6 @@ public final class CreateUserBody {
     public CreateUserBody privateMetadata(Map<String, Object> v) { this.privateMetadata = v; return this; }
     public CreateUserBody unsafeMetadata(Map<String, Object> v) { this.unsafeMetadata = v; return this; }
     public CreateUserBody notify(Boolean v) { this.notify = v; return this; }
+    public CreateUserBody referral(CreateUserReferral v) { this.referral = v; return this; }
+    public CreateUserBody referralCode(String v) { this.referralCode = v; return this; }
 }

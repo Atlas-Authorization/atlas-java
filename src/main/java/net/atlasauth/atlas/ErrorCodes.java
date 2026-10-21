@@ -57,6 +57,10 @@ public final class ErrorCodes {
     public static final String DEVELOPMENT_EMAIL_LIMIT_REACHED = "DEVELOPMENT_EMAIL_LIMIT_REACHED";
     /** The development sender sends only Atlas's own sign-in emails (422). */
     public static final String DEVELOPMENT_EMAIL_TEMPLATE_NOT_ALLOWED = "DEVELOPMENT_EMAIL_TEMPLATE_NOT_ALLOWED";
+    /** Referrals cannot be enabled until the provider's needs are set (422; {@code meta} names what is missing). */
+    public static final String REFERRALS_NOT_CONFIGURED = "REFERRALS_NOT_CONFIGURED";
+    /** Another user on the instance already holds that referral code (409). */
+    public static final String REFERRAL_CODE_TAKEN = "REFERRAL_CODE_TAKEN";
     /** A billing plan cannot be changed or removed while subscriptions use it. */
     public static final String PLAN_IN_USE = "PLAN_IN_USE";
     public static final String LAST_ADMIN = "LAST_ADMIN";

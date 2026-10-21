@@ -55,6 +55,7 @@ import net.atlasauth.atlas.resources.Platform;
 import net.atlasauth.atlas.resources.RadiusClients;
 import net.atlasauth.atlas.resources.RateLimitPolicy;
 import net.atlasauth.atlas.resources.RedirectUrls;
+import net.atlasauth.atlas.resources.Referrals;
 import net.atlasauth.atlas.resources.ResourceServers;
 import net.atlasauth.atlas.resources.RiskBasedMfa;
 import net.atlasauth.atlas.resources.Roles;
@@ -149,6 +150,7 @@ public final class AtlasClient {
     private final LtiPlatforms ltiPlatforms;
     private final Instance instance;
     private final InstanceSecurity instanceSecurity;
+    private final Referrals referrals;
     private final Tokens tokens;
     private final Design design;
     private final Platform platform;
@@ -244,6 +246,7 @@ public final class AtlasClient {
         this.ltiPlatforms = new LtiPlatforms(transport);
         this.instance = new Instance(transport);
         this.instanceSecurity = new InstanceSecurity(transport);
+        this.referrals = new Referrals(transport);
         this.tokens = new Tokens(transport);
         this.design = new Design(transport);
         this.platform = new Platform(platformTransport);
@@ -479,6 +482,11 @@ public final class AtlasClient {
 
     public InstanceSecurity instanceSecurity() {
         return instanceSecurity;
+    }
+
+    /** Referral attribution: the instance's referral platform connection, connection test and call log. */
+    public Referrals referrals() {
+        return referrals;
     }
 
     public Tokens tokens() {

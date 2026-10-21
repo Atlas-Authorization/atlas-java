@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.7.0
+
+### Added
+
+- **Referral attribution settings.** New `referrals()` namespace: `get()` and `update(UpdateReferralSettingsBody[,
+  idempotencyKey])` (`GET`/`PATCH /v1/instance/referrals`; `ReferralSettings` with nested `Connection`, `LastTest`,
+  `Provider`, `Capabilities`; `security` as `ReferralSecuritySettings` on read and `UpdateReferralSecurityBody` on
+  write; `clear(key)` sends a nullable field as null), `test()` (`ReferralConnectionTest`), `listCalls()` /
+  `listCalls(limit, status, kind, userId)` (`ReferralCall`, `ReferralRisk`) and `retryCall(id[, idempotencyKey])`.
+- **Users.** `User` gains `referral` (`UserReferral`: `partnerId`, `referrerExternalId`, `referrerUserId`,
+  `matchedVia`, `status`, `riskLevel`, `flagged`), `referralCode` and `referralLink`. `CreateUserBody` gains
+  `referral` (`CreateUserReferral`: `code`, `clickId`, `anonId`) and `referralCode`; `UpdateUserBody` gains
+  `referralCode` and `clearReferralCode()`. New `users().flagReferral(id[, reason, idempotencyKey])`
+  (`UserReferralFlag`).
+- **Webhooks.** `UserReferralAttributedEvent` types the `data` of the new `user.referral_attributed` event.
+- **Error codes.** `ErrorCodes.REFERRALS_NOT_CONFIGURED` (422) and `ErrorCodes.REFERRAL_CODE_TAKEN` (409). Preflight
+  can report `referrals_enabled_unverified` and `referrals_without_bot_protection`.
+
+### Compatibility
+
+- `User` has three more record components; the 13- and 14-argument constructors are kept.
+
 ## 1.6.0
 
 ### Added

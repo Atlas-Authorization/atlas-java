@@ -40,9 +40,11 @@ import net.atlasauth.atlas.models.UserEmailMatch;
 import net.atlasauth.atlas.models.UserErasureAck;
 import net.atlasauth.atlas.models.UserErasureExport;
 import net.atlasauth.atlas.models.UserOrganizationMembership;
+import net.atlasauth.atlas.models.UserReferralFlag;
 import net.atlasauth.atlas.models.UserSession;
 import net.atlasauth.atlas.models.UserState;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -115,6 +117,27 @@ public final class Users {
 
     public User unlock(String id) {
         return t.post("/v1/users/" + enc(id) + "/unlock", null, new TypeReference<>() {
+        });
+    }
+
+    /** {@code POST /v1/users/:id/referral/flag} without a reason. */
+    public UserReferralFlag flagReferral(String id) {
+        return flagReferral(id, null, null);
+    }
+
+    /**
+     * {@code POST /v1/users/:id/referral/flag} — mark the user's referral fraudulent. The
+     * referral reads {@code flagged}, the referral platform is sent a {@code fraud_confirmed}
+     * signal (when referrals are on) and the action is audited; the account is not changed.
+     * 404 when the user has no referral. {@code reason} (at most 500 characters, or null) is
+     * sent to the platform.
+     */
+    public UserReferralFlag flagReferral(String id, String reason, String idempotencyKey) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        if (reason != null) {
+            body.put("reason", reason);
+        }
+        return t.post("/v1/users/" + enc(id) + "/referral/flag", body, idempotencyKey, new TypeReference<>() {
         });
     }
 
