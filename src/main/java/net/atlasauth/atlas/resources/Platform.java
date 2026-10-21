@@ -10,17 +10,13 @@ import net.atlasauth.atlas.models.AtlasDesign;
 import net.atlasauth.atlas.models.AtlasIdApp;
 import net.atlasauth.atlas.models.AtlasIdAppPreflight;
 import net.atlasauth.atlas.models.AtlasIdAppUser;
+import net.atlasauth.atlas.models.AtlasIdAppWithSecret;
 import net.atlasauth.atlas.models.AtlasIdGrantRevocation;
 import net.atlasauth.atlas.models.AtlasIdPublisher;
 import net.atlasauth.atlas.models.AtlasIdPublisherBody;
 import net.atlasauth.atlas.models.BackchannelLogoutDelivery;
 import net.atlasauth.atlas.models.BackchannelLogoutTest;
 import net.atlasauth.atlas.models.ConfigChangelogEntry;
-import net.atlasauth.atlas.models.ListConfigChangelogParams;
-import net.atlasauth.atlas.models.ListPage;
-import net.atlasauth.atlas.models.OriginMove;
-import net.atlasauth.atlas.models.OriginMoveBody;
-import net.atlasauth.atlas.models.AtlasIdAppWithSecret;
 import net.atlasauth.atlas.models.CreateAccountlessAppBody;
 import net.atlasauth.atlas.models.CreateAtlasIdAppBody;
 import net.atlasauth.atlas.models.CreatePlatformAppBody;
@@ -32,7 +28,11 @@ import net.atlasauth.atlas.models.DeletedObject;
 import net.atlasauth.atlas.models.DesignAsset;
 import net.atlasauth.atlas.models.DesignBody;
 import net.atlasauth.atlas.models.DesignPreview;
+import net.atlasauth.atlas.models.ListConfigChangelogParams;
+import net.atlasauth.atlas.models.ListPage;
 import net.atlasauth.atlas.models.ListPlatformAppsParams;
+import net.atlasauth.atlas.models.OriginMove;
+import net.atlasauth.atlas.models.OriginMoveBody;
 import net.atlasauth.atlas.models.PlatformApp;
 import net.atlasauth.atlas.models.PlatformAppBulkDeleteResult;
 import net.atlasauth.atlas.models.PlatformAppDisabled;
@@ -42,6 +42,8 @@ import net.atlasauth.atlas.models.PlatformAppTransfer;
 import net.atlasauth.atlas.models.PlatformAppWithSecret;
 import net.atlasauth.atlas.models.PlatformInstanceSecret;
 import net.atlasauth.atlas.models.PlatformSecretKey;
+import net.atlasauth.atlas.models.RotateAtlasIdAppSecretBody;
+import net.atlasauth.atlas.models.RotatePlatformSecretBody;
 import net.atlasauth.atlas.models.UpdateAtlasIdAppBody;
 import net.atlasauth.atlas.models.UpdatePlatformAppBody;
 
@@ -286,8 +288,28 @@ public final class Platform {
             });
         }
 
+        /**
+         * {@code POST /v1/platform/atlas_id_apps/{id}/webhook/rotate_secret} — Rotate the webhook
+         * signing secret with a chosen overlap: the previous secret signs each delivery too until
+         * {@code webhookPreviousSecretExpiresAt}. Default 0 (it stops at once).
+         */
+        public AtlasIdAppWithSecret rotateWebhookSecret(String id, RotateAtlasIdAppSecretBody body) {
+            return t.post("/v1/platform/atlas_id_apps/" + enc(id) + "/webhook/rotate_secret", body, new TypeReference<>() {
+            });
+        }
+
+        /** {@code POST /v1/platform/atlas_id_apps/{id}/rotate_secret} — Rotate a confidential app's client_secret; the previous one keeps working for 24 hours. */
         public AtlasIdAppWithSecret rotateSecret(String id) {
             return t.post("/v1/platform/atlas_id_apps/" + enc(id) + "/rotate_secret", null, new TypeReference<>() {
+            });
+        }
+
+        /**
+         * {@code POST /v1/platform/atlas_id_apps/{id}/rotate_secret} — Rotate a confidential app's
+         * client_secret with a chosen overlap (default 86400; 0 revokes the previous one now).
+         */
+        public AtlasIdAppWithSecret rotateSecret(String id, RotateAtlasIdAppSecretBody body) {
+            return t.post("/v1/platform/atlas_id_apps/" + enc(id) + "/rotate_secret", body, new TypeReference<>() {
             });
         }
     }
@@ -396,9 +418,21 @@ public final class Platform {
             });
         }
 
-        /** {@code POST /v1/platform/apps/{id}/instances/{instanceId}/rotate_secret} — Rotate one specific instance's secret under an owned app: revoke its prior keys and mint a new one, revealed once. */
+        /** {@code POST /v1/platform/apps/{id}/instances/{instanceId}/rotate_secret} — Mint a new secret key for one instance under an owned app, revealed once; the prior keys stay valid for the default overlap (72 hours). */
         public PlatformInstanceSecret rotateInstanceSecret(String id, String instanceId) {
             return t.post("/v1/platform/apps/" + enc(id) + "/instances/" + enc(instanceId) + "/rotate_secret", null, new TypeReference<>() {
+            });
+        }
+
+        /**
+         * {@code POST /v1/platform/apps/{id}/instances/{instanceId}/rotate_secret} — Rotate one
+         * instance's secret key with a chosen overlap: the prior keys stay valid for
+         * {@code overlapSeconds} (default 259200, at most 604800; 0 revokes them now).
+         *
+         * @param idempotencyKey optional Idempotency-Key (null for none)
+         */
+        public PlatformInstanceSecret rotateInstanceSecret(String id, String instanceId, RotatePlatformSecretBody body, String idempotencyKey) {
+            return t.post("/v1/platform/apps/" + enc(id) + "/instances/" + enc(instanceId) + "/rotate_secret", body, idempotencyKey, new TypeReference<>() {
             });
         }
 

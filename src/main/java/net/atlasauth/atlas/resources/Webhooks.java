@@ -6,6 +6,7 @@ import net.atlasauth.atlas.http.Transport;
 import net.atlasauth.atlas.models.CreateWebhookEndpointBody;
 import net.atlasauth.atlas.models.DeletedObject;
 import net.atlasauth.atlas.models.ListPage;
+import net.atlasauth.atlas.models.RotateWebhookSecretBody;
 import net.atlasauth.atlas.models.UpdateWebhookEndpointBody;
 import net.atlasauth.atlas.models.WebhookDelivery;
 import net.atlasauth.atlas.models.WebhookDeliveryQueued;
@@ -95,6 +96,16 @@ public final class Webhooks {
         /** {@code POST /v1/webhook_endpoints/{id}/rotate_secret} — Rotate the endpoint signing secret. */
         public WebhookSecret rotateSecret(String id) {
             return t.post("/v1/webhook_endpoints/" + enc(id) + "/rotate_secret", null, new TypeReference<>() {
+            });
+        }
+
+        /**
+         * {@code POST /v1/webhook_endpoints/{id}/rotate_secret} — Rotate the signing secret with a
+         * chosen overlap: for {@code overlapSeconds} (at most 604800) every delivery is signed with
+         * both secrets, so a verifier holding either passes. Null or 0 stops the old one at once.
+         */
+        public WebhookSecret rotateSecret(String id, RotateWebhookSecretBody body) {
+            return t.post("/v1/webhook_endpoints/" + enc(id) + "/rotate_secret", body, new TypeReference<>() {
             });
         }
 

@@ -22,14 +22,14 @@ Maven:
 <dependency>
   <groupId>net.atlasauth</groupId>
   <artifactId>atlas-java</artifactId>
-  <version>1.5.0</version>
+  <version>1.6.0</version>
 </dependency>
 ```
 
 Gradle:
 
 ```kotlin
-implementation("net.atlasauth:atlas-java:1.5.0")
+implementation("net.atlasauth:atlas-java:1.6.0")
 ```
 
 ## The management client
@@ -244,6 +244,35 @@ rotated.previousSecretExpiresAt();  // epoch ms, or null when the old secret alr
 `WebhookVerifier` accepts an `atlas-signature` header that carries several signatures separated by spaces
 (`v1,<sig> v1,<sig>`). While an endpoint secret rotates, Atlas may sign each delivery with the old and the new
 secret; the delivery verifies when any one signature matches.
+
+A rotation stops the old secret at once by default. Pass an overlap (at most 7 days) to keep it signing each
+delivery next to the new one while you deploy; choose an overlap only once every receiver accepts several
+signatures:
+
+```java
+WebhookSecret rotated = atlas.webhooks().endpoints().rotateSecret(endpointId,
+        new RotateWebhookSecretBody().overlapSeconds(3600));
+rotated.previousSecretExpiresAt();  // epoch ms, or null when the old secret already stopped
+```
+
+### Trusted reverse proxy
+
+If a reverse proxy serves the Frontend API from your own origin, give it a proxy secret. It sends the secret in
+`X-Atlas-Proxy-Secret` and the browser's IP in `X-Atlas-Client-IP`; Atlas then uses that IP for rate limits,
+lockout, risk signals and audit logs.
+
+```java
+ProxySecretCreated created = atlas.instanceSecurity().createProxySecret();
+created.secret();                                   // shown once; store it in your proxy's environment
+atlas.instanceSecurity().getProxySecret();          // set, createdAt, previousExpiresAt (never the secret)
+atlas.instanceSecurity().createProxySecret(new CreateProxySecretBody().overlapSeconds(3600)); // rotate
+atlas.instanceSecurity().deleteProxySecret();
+```
+
+Platform rotations take an overlap too: `platform().apps().rotateInstanceSecret(appId, instanceId,
+new RotatePlatformSecretBody().overlapSeconds(0), null)` (default 72 hours), and
+`platform().atlasIdApps().rotateSecret(id, new RotateAtlasIdAppSecretBody().overlapSeconds(3600))` (default
+24 hours) / `rotateWebhookSecret(id, body)` (default 0).
 
 With a platform key, `platform().atlasIdApps().findUsers(id, email)` answers a privacy request for one app,
 `revokeGrant(id, grantId)` revokes one person's approval, and `platform().atlasIdPublisher()` claims and verifies

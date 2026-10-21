@@ -1,5 +1,32 @@
 # Changelog
 
+## 1.6.0
+
+### Added
+
+- **Trusted reverse proxy secret.** `instanceSecurity().getProxySecret()` (`ProxySecret`: `set`, `createdAt`,
+  `previousExpiresAt`, `secretHeader`, `clientIpHeader`), `createProxySecret()` /
+  `createProxySecret(CreateProxySecretBody)` (`overlapSeconds` on a rotation: default 86400, `0` stops the old
+  secret now, at most 604800; returns `ProxySecretCreated` with `secret`, shown once, and `rotated`) and
+  `deleteProxySecret()`.
+- **Webhook secret rotation with an overlap.** `webhooks().endpoints().rotateSecret(id, RotateWebhookSecretBody)`
+  (`overlapSeconds`, default 0, at most 604800). `WebhookSecret` gains `warning`, `overlapSeconds` and
+  `previousSecretExpiresAt`; `WebhookEndpoint` gains `previousSecretExpiresAt`.
+- **Per-instance platform rotation with an overlap.** `platform().apps().rotateInstanceSecret(id, instanceId,
+  RotatePlatformSecretBody, idempotencyKey)` (`overlapSeconds`, default 259200, `0` revokes the prior keys now).
+  `PlatformInstanceSecret` gains `appId`, `instanceId`, `overlapSeconds` and `previousKeysExpireAt`.
+- **Sign in with Atlas apps.** `platform().atlasIdApps().rotateSecret(id, RotateAtlasIdAppSecretBody)` (default
+  24 hours) and `rotateWebhookSecret(id, RotateAtlasIdAppSecretBody)` (default 0). `AtlasIdApp` and
+  `AtlasIdAppWithSecret` gain `previousSecretExpiresAt`, `secretIssuedAt` and `webhookPreviousSecretExpiresAt`;
+  `AtlasIdAppWithSecret` also gains `overlapSeconds`.
+
+### Changed
+
+- `PlatformInstanceSecret.id` is deprecated: the API never sent it; read `instanceId`.
+- `platform().apps().rotateInstanceSecret(id, instanceId)` now keeps the prior keys valid for 72 hours (the
+  server's new default). Pass `new RotatePlatformSecretBody().overlapSeconds(0)` for the old behaviour.
+- Records that gained components keep their 1.5 constructors.
+
 ## 1.5.0
 
 ### Added

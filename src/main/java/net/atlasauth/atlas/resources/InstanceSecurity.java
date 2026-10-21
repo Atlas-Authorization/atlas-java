@@ -4,8 +4,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.atlasauth.atlas.Params;
 import net.atlasauth.atlas.http.Transport;
+import net.atlasauth.atlas.models.CreateProxySecretBody;
 import net.atlasauth.atlas.models.InstanceSecurityConfig;
 import net.atlasauth.atlas.models.InstanceSecurityResult;
+import net.atlasauth.atlas.models.ProxySecret;
+import net.atlasauth.atlas.models.ProxySecretCreated;
 import net.atlasauth.atlas.models.UpdateInstanceSecurityBody;
 
 import java.util.Map;
@@ -76,6 +79,33 @@ public final class InstanceSecurity {
 
     public JsonNode deleteKerberosSecret() {
         return t.delete("/v1/instance/kerberos_secret", new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/instance/proxy_secret} — whether a trusted reverse proxy secret is set, and since when (never the secret). */
+    public ProxySecret getProxySecret() {
+        return t.get("/v1/instance/proxy_secret", new TypeReference<>() {
+        });
+    }
+
+    /** {@code POST /v1/instance/proxy_secret} — create the trusted reverse proxy secret, or rotate it with the default overlap (24 hours). The secret is returned once. */
+    public ProxySecretCreated createProxySecret() {
+        return createProxySecret(new CreateProxySecretBody());
+    }
+
+    /**
+     * {@code POST /v1/instance/proxy_secret} — create, or rotate, the trusted reverse proxy
+     * secret; it is returned once. On a rotation the replaced secret keeps working for
+     * {@code overlapSeconds} (default 86400, 0 stops it now, at most 604800).
+     */
+    public ProxySecretCreated createProxySecret(CreateProxySecretBody body) {
+        return t.post("/v1/instance/proxy_secret", body, new TypeReference<>() {
+        });
+    }
+
+    /** {@code DELETE /v1/instance/proxy_secret} — remove the proxy secret: X-Atlas-Client-IP is ignored again. Returns {@code {object, deleted}}. */
+    public JsonNode deleteProxySecret() {
+        return t.delete("/v1/instance/proxy_secret", new TypeReference<>() {
         });
     }
 
