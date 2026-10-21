@@ -8,7 +8,12 @@ public record MessagingProviders(
         String object,
         MessagingProvider email,
         MessagingProvider sms,
-        /** The Atlas-managed sending domain, or null. */ ManagedEmailSummary managedEmail) {
+        /** The Atlas-managed sending domain, or null. */ ManagedEmailSummary managedEmail,
+        /** The email provider in development mode, or null. */ DevelopmentEmailSummary developmentEmail) {
+    /** The 1.4 shape, without {@code developmentEmail}. */
+    public MessagingProviders(String object, MessagingProvider email, MessagingProvider sms, ManagedEmailSummary managedEmail) {
+        this(object, email, sms, managedEmail, null);
+    }
 
     /** The previous shape, without {@code managedEmail}. */
     public MessagingProviders(String object, MessagingProvider email, MessagingProvider sms) {

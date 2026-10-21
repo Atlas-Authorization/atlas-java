@@ -7,6 +7,9 @@ import net.atlasauth.atlas.models.ManagedEmail;
 import net.atlasauth.atlas.models.ManagedEmailBody;
 import net.atlasauth.atlas.models.ManagedEmailDeleted;
 import net.atlasauth.atlas.models.DeletedMessagingProvider;
+import net.atlasauth.atlas.models.DevelopmentEmail;
+import net.atlasauth.atlas.models.DevelopmentEmailBody;
+import net.atlasauth.atlas.models.DevelopmentEmailDisabled;
 import net.atlasauth.atlas.models.EmailProviderConfig;
 import net.atlasauth.atlas.models.SmsProviderConfig;
 import net.atlasauth.atlas.models.MessagingProvider;
@@ -92,13 +95,52 @@ public final class Messaging {
         });
     }
 
-    /** {@code GET /v1/messaging_providers/email/managed} — The Atlas-managed sending domain (404 when none). */
+    /**
+     * Configure (or update) the email provider with typed settings and a mode:
+     * {@code development} lets a development instance send without a verified domain (409 on a
+     * production instance); {@code standard} sends normally; null keeps the stored mode.
+     */
+    public MessagingProvider setEmail(String fromAddress, String mode, EmailProviderConfig config) {
+        return setEmail(new MessagingProviderInput(config.transport())
+                .fromAddress(fromAddress)
+                .mode(mode)
+                .config(config.toConfig()));
+    }
+
+    /** {@code GET /v1/messaging_providers/email/development} — The email provider in development mode (404 when it is not). */
+    public DevelopmentEmail getDevelopmentEmail() {
+        return t.get("/v1/messaging_providers/email/development", new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code POST /v1/messaging_providers/email/development} — Put your own email provider in
+     * development mode, so a development instance sends Atlas's sign-in emails without a verified
+     * domain ({@code [Atlas test] } subjects, capped). 409 {@code DEVELOPMENT_EMAIL_NOT_ALLOWED} on a
+     * production instance.
+     */
+    public DevelopmentEmail enableDevelopmentEmail(DevelopmentEmailBody body) {
+        return t.post("/v1/messaging_providers/email/development", body, new TypeReference<>() {
+        });
+    }
+
+    /** {@code DELETE /v1/messaging_providers/email/development} — Back to standard mode (the provider and its key stay). */
+    public DevelopmentEmailDisabled disableDevelopmentEmail() {
+        return t.delete("/v1/messaging_providers/email/development", new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/messaging_providers/email/managed} — The managed sending domain (404 when none). */
     public ManagedEmail getManagedEmail() {
         return t.get("/v1/messaging_providers/email/managed", new TypeReference<>() {
         });
     }
 
-    /** {@code POST /v1/messaging_providers/email/managed} — Send from your own domain through Atlas's email account; returns the DNS records to publish. */
+    /**
+     * {@code POST /v1/messaging_providers/email/managed} — Set your sending domain up on your own
+     * Resend or Brevo account ({@code transport} + {@code apiKey}, or {@code providerId}); returns the
+     * DNS records to publish.
+     */
     public ManagedEmail createManagedEmail(ManagedEmailBody body) {
         return t.post("/v1/messaging_providers/email/managed", body, new TypeReference<>() {
         });

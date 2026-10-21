@@ -60,4 +60,19 @@ class WebhookVerifierTest {
         bad.put("Atlas-Signature", "v2,abc");
         assertEquals("malformed_signature", verify(BODY, bad).reason());
     }
+
+    @Test
+    void severalSignaturesVerifyWhenOneMatches() throws Exception {
+        Map<String, Object> headers = sign("evt_1", NOW, BODY, SECRET);
+        String fresh = ((List<?>) headers.get("Atlas-Signature")).get(0).toString();
+        String stale = ((List<?>) sign("evt_1", NOW, BODY, "whsec_old_secret").get("Atlas-Signature")).get(0).toString();
+        for (String value : List.of(stale + " " + fresh, fresh + " " + stale, "v2,abc " + fresh)) {
+            headers.put("Atlas-Signature", value);
+            assertTrue(verify(BODY, headers).verified(), value);
+        }
+        headers.put("Atlas-Signature", stale + " " + stale);
+        assertEquals("signature_mismatch", verify(BODY, headers).reason());
+        headers.put("Atlas-Signature", "v2,abc v0,def");
+        assertEquals("malformed_signature", verify(BODY, headers).reason());
+    }
 }

@@ -56,6 +56,13 @@ public class BrandingSettings {
     /** How a verification code is entered — segmented {@code boxes} (default) or {@code single}. */
     @JsonProperty("codeInput")
     public String codeInput;
+    /**
+     * Per-audience hosted-page branding keyed by audience hint ({@code [a-z0-9_-]{1,32}}, at most
+     * 20). A sign-in started with {@code audience_hint=<hint>} uses that entry. An update merges per
+     * hint; a null entry deletes that hint.
+     */
+    @JsonProperty("audiences")
+    public Map<String, BrandingAudience> audiences;
     public Card card;
     public Typography typography;
     @JsonProperty("buttonShape")

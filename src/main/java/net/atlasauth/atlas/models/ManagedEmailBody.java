@@ -13,7 +13,13 @@ import java.util.Map;
 public final class ManagedEmailBody {
     /** Bare or "Name <address>"; its domain becomes the sending domain. */
     public String fromAddress;
-    /** us-east-1, eu-west-1, sa-east-1 or ap-northeast-1. */
+    /** Your own provider account Atlas sets the domain up on: resend or brevo. With {@link #apiKey(String)}, unless {@code providerId} is set. */
+    public String transport;
+    /** {@code api_key}: your Resend or Brevo API key (write-only). */
+    public Map<String, Object> config;
+    /** Instead of transport + config: your configured Resend or Brevo email provider. */
+    public String providerId;
+    /** us-east-1, eu-west-1, sa-east-1 or ap-northeast-1 (Resend only). */
     public String region;
     /** Let Atlas write the DNS records: provider ("cloudflare"), api_token (write-only), overwrite. */
     public Map<String, Object> dns;
@@ -25,6 +31,10 @@ public final class ManagedEmailBody {
     }
 
     public ManagedEmailBody fromAddress(String v) { this.fromAddress = v; return this; }
+    public ManagedEmailBody transport(String v) { this.transport = v; return this; }
+    /** Sets {@code config.api_key}. */
+    public ManagedEmailBody apiKey(String v) { this.config = Map.of("api_key", v); return this; }
+    public ManagedEmailBody providerId(String v) { this.providerId = v; return this; }
     public ManagedEmailBody region(String v) { this.region = v; return this; }
     public ManagedEmailBody dns(Map<String, Object> v) { this.dns = v; return this; }
 

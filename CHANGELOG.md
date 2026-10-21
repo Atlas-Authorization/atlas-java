@@ -1,5 +1,42 @@
 # Changelog
 
+## 1.5.0
+
+### Added
+
+- **OAuth client secret rotation with overlap.** `oauthClients().rotateSecret(id, RotateOAuthClientSecretBody, idempotencyKey)`
+  takes `overlapSeconds` (default 86400, `0` revokes the old secret now, at most 604800). `OAuthClientWithSecret`
+  gains `previousSecretExpiresAt` and `overlapSeconds`; `OAuthClient` gains `previousSecretExpiresAt`.
+- **Development email sender.** `messaging().getDevelopmentEmail()`, `enableDevelopmentEmail(DevelopmentEmailBody)` and
+  `disableDevelopmentEmail()` (`DevelopmentEmail`, `DevelopmentEmailDisabled`). `MessagingProviders` gains
+  `developmentEmail` (`DevelopmentEmailSummary`).
+- **Managed email on your own provider account.** `ManagedEmailBody` gains `transport`, `config` (`apiKey(...)`) and
+  `providerId`. `ManagedEmail` gains `backend`, `providerId` and `feedbackWebhook`; `limits` is now null and
+  `reputation` is `your_provider_account`. `ManagedEmailDeleted` gains `providerRemoved`.
+- **Provider mode.** `MessagingProvider` gains `id` and `mode`; `MessagingProviderInput` gains `mode`; new
+  `messaging().setEmail(fromAddress, mode, EmailProviderConfig)`.
+- **Allowed origins with an integration.** `allowedOriginEntries(List<AllowedOriginEntry>)` on `UpdateInstanceBody`,
+  `CreatePlatformAppBody`, `UpdatePlatformAppBody`, `CreatePlatformInstanceBody` and `CreateAccountlessAppBody`
+  (`AllowedOriginEntry.of(origin, REDIRECT | EMBEDDED | AUTO)`). `UpdateInstanceBody` gains `set(key, value)`.
+- **Issuer and verification endpoints.** `InstanceConfig` gains `issuer`, `discoveryUrl`, `jwksUri` and
+  `allowedOriginIntegrations`; `InstanceUpdateResult` gains `allowedOriginIntegrations`; `PlatformApp`,
+  `PlatformAppWithSecret`, `PlatformAppProvisioned` and `AcceptedPlatformApp` gain `frontendApiHost`, `issuer`,
+  `discoveryUrl`, `jwksUri` and `allowedOriginIntegrations`.
+- **Login readiness.** `LoginReadiness` gains `integration` (`LoginReadinessIntegration`); `LoginReadinessChecks`
+  gains `applies`.
+- **Email verification.** `EmailAddress` gains `verification` (`EmailAddressVerification`: `status`, `strategy`).
+- **Branding audiences.** `BrandingSettings` gains `audiences` and `BrandingResolved` gains `audiences`
+  (`BrandingAudience`).
+- **Error codes.** `ErrorCodes` adds `READ_ONLY_FIELD`, `DEVELOPMENT_EMAIL_NOT_ALLOWED`,
+  `DEVELOPMENT_EMAIL_UNAVAILABLE`, `DEVELOPMENT_EMAIL_LIMIT_REACHED` and `DEVELOPMENT_EMAIL_TEMPLATE_NOT_ALLOWED`.
+- **Webhooks, several signatures.** `WebhookVerifier` accepts an `atlas-signature` header with several
+  space-separated `v1,<signature>` entries and verifies when any one matches (each compared in constant time).
+  A single signature works as before.
+
+### Compatibility
+
+- Every extended record keeps a constructor with its previous components.
+
 ## 1.4.0
 
 ### Added

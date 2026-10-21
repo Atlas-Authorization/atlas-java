@@ -25,6 +25,16 @@ public final class CreatePlatformAppBody {
     public CreatePlatformAppBody name(String v) { this.name = v; return this; }
     public CreatePlatformAppBody environment(String v) { this.environment = v; return this; }
     public CreatePlatformAppBody allowedOrigins(List<String> v) { this.allowedOrigins = v; return this; }
+
+    /**
+     * Send {@code allowed_origins} as entries that may also declare how each origin signs in
+     * ({@link AllowedOriginEntry}); replaces {@link #allowedOrigins(List)}.
+     */
+    public CreatePlatformAppBody allowedOriginEntries(List<AllowedOriginEntry> v) {
+        this.allowedOrigins = null;
+        this.additionalFields.put("allowed_origins", v);
+        return this;
+    }
     public CreatePlatformAppBody createDevelopmentSibling(Boolean v) { this.createDevelopmentSibling = v; return this; }
     public CreatePlatformAppBody tags(List<String> v) { this.tags = v; return this; }
 

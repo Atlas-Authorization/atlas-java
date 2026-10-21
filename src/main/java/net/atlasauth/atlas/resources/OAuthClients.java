@@ -15,6 +15,7 @@ import net.atlasauth.atlas.models.ListPage;
 import net.atlasauth.atlas.models.OAuthClient;
 import net.atlasauth.atlas.models.OAuthClientGrant;
 import net.atlasauth.atlas.models.OAuthClientWithSecret;
+import net.atlasauth.atlas.models.RotateOAuthClientSecretBody;
 import net.atlasauth.atlas.models.UpdateOAuthClientBody;
 
 import java.util.List;
@@ -57,9 +58,24 @@ public final class OAuthClients {
         });
     }
 
-    /** Rotate the client secret; the new secret is revealed exactly once. */
+    /**
+     * Rotate the client secret; the new secret is revealed exactly once. The previous secret keeps
+     * working for the default overlap (24 hours); see {@link #rotateSecret(String, RotateOAuthClientSecretBody, String)}.
+     */
     public OAuthClientWithSecret rotateSecret(String id) {
         return t.post("/v1/oauth_clients/" + enc(id) + "/rotate_secret", null, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * Rotate the client secret with a chosen overlap: the previous secret keeps working for
+     * {@code overlapSeconds} (default 86400, at most 604800; 0 revokes it now, e.g. after a leak).
+     * {@link OAuthClientWithSecret#previousSecretExpiresAt()} says when it stops.
+     *
+     * @param idempotencyKey optional Idempotency-Key (null for none)
+     */
+    public OAuthClientWithSecret rotateSecret(String id, RotateOAuthClientSecretBody body, String idempotencyKey) {
+        return t.post("/v1/oauth_clients/" + enc(id) + "/rotate_secret", body, idempotencyKey, new TypeReference<>() {
         });
     }
 

@@ -11,5 +11,10 @@ public record InstanceUpdateResult(
         String object,
         String id,
         List<String> allowedOrigins,
-        Map<String, Object> authConfig) {
+        Map<String, Object> authConfig,
+        /** The declared integration per allowed origin. */ Map<String, String> allowedOriginIntegrations) {
+    /** The 1.4 shape, without {@code allowedOriginIntegrations}. */
+    public InstanceUpdateResult(String object, String id, List<String> allowedOrigins, Map<String, Object> authConfig) {
+        this(object, id, allowedOrigins, authConfig, null);
+    }
 }

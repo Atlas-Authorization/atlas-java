@@ -30,7 +30,13 @@ public record OAuthClientWithSecret(
         /** Revealed exactly once at create/rotate. */
         String clientSecret,
         String note,
-        boolean skipLogoutConfirmation) {
+        boolean skipLogoutConfirmation,
+        /** On a rotation: when the previous secret stops working (epoch ms), or null when it already has. */ Long previousSecretExpiresAt,
+        /** On a rotation: how long the previous secret keeps working, in seconds (echoed). */ Integer overlapSeconds) {
+    /** The 1.4 shape, without {@code previousSecretExpiresAt}, {@code overlapSeconds}. */
+    public OAuthClientWithSecret(String object, String id, String clientId, String name, String logoUrl, List<String> redirectUris, List<String> allowedScopes, List<String> grantTypes, String tokenEndpointAuthMethod, String secretPrefix, boolean isPublic, boolean firstParty, long createdAt, long updatedAt, String clientSecret, String note, boolean skipLogoutConfirmation) {
+        this(object, id, clientId, name, logoUrl, redirectUris, allowedScopes, grantTypes, tokenEndpointAuthMethod, secretPrefix, isPublic, firstParty, createdAt, updatedAt, clientSecret, note, skipLogoutConfirmation, null, null);
+    }
 
     /** The 1.2 shape, without {@code skipLogoutConfirmation}. */
     public OAuthClientWithSecret(String object, String id, String clientId, String name, String logoUrl,

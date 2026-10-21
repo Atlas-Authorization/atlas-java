@@ -14,6 +14,8 @@ public final class ErrorCodes {
     public static final String VALIDATION_FAILED = "VALIDATION_FAILED";
     /** A strict-mode write sent a body field the endpoint does not accept. */
     public static final String UNKNOWN_FIELD = "UNKNOWN_FIELD";
+    /** The body set a field that is not writable on this endpoint ({@code param} names it). */
+    public static final String READ_ONLY_FIELD = "READ_ONLY_FIELD";
     public static final String NOT_FOUND = "NOT_FOUND";
     public static final String RATE_LIMITED = "RATE_LIMITED";
     /** An Idempotency-Key was reused with different parameters. */
@@ -47,6 +49,14 @@ public final class ErrorCodes {
      * {@code force=true} to remove it anyway.
      */
     public static final String CAPTCHA_IN_USE = "CAPTCHA_IN_USE";
+    /** The development email sender is not available on a production instance (409). */
+    public static final String DEVELOPMENT_EMAIL_NOT_ALLOWED = "DEVELOPMENT_EMAIL_NOT_ALLOWED";
+    /** The development email sender is not available on this deployment (503). */
+    public static final String DEVELOPMENT_EMAIL_UNAVAILABLE = "DEVELOPMENT_EMAIL_UNAVAILABLE";
+    /** The development sender's daily or per-recipient hourly cap is spent (429; {@code meta.window}, {@code meta.retry_after_seconds}). */
+    public static final String DEVELOPMENT_EMAIL_LIMIT_REACHED = "DEVELOPMENT_EMAIL_LIMIT_REACHED";
+    /** The development sender sends only Atlas's own sign-in emails (422). */
+    public static final String DEVELOPMENT_EMAIL_TEMPLATE_NOT_ALLOWED = "DEVELOPMENT_EMAIL_TEMPLATE_NOT_ALLOWED";
     /** A billing plan cannot be changed or removed while subscriptions use it. */
     public static final String PLAN_IN_USE = "PLAN_IN_USE";
     public static final String LAST_ADMIN = "LAST_ADMIN";

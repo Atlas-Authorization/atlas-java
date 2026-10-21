@@ -18,5 +18,11 @@ public record MessagingProvider(
         String status,
         Map<String, Object> config,
         Map<String, Boolean> secretsSet,
-        long updatedAt) {
+        long updatedAt,
+        /** The provider id: pass it as {@code provider_id} to managed email or the development sender. */ String id,
+        /** {@code standard}, {@code development} or {@code managed_domain}. */ String mode) {
+    /** The 1.4 shape, without {@code id}, {@code mode}. */
+    public MessagingProvider(String object, String channel, String transport, String fromAddress, String status, Map<String, Object> config, Map<String, Boolean> secretsSet, long updatedAt) {
+        this(object, channel, transport, fromAddress, status, config, secretsSet, updatedAt, null, null);
+    }
 }

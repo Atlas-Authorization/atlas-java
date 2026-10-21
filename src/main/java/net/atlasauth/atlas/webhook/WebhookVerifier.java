@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,9 @@ import javax.crypto.spec.SecretKeySpec;
  * <p>Atlas signs every delivery: {@code atlas-signature: v1,<base64>} is HMAC-SHA256 over
  * {@code <id>.<timestamp>.<raw body>} keyed with the endpoint secret ({@code whsec_...}), sent with
  * {@code atlas-id} and {@code atlas-timestamp} (epoch ms). A delivery more than five minutes from
- * now, in either direction, is refused. Verify the RAW body, before any JSON parse. Matches
+ * now, in either direction, is refused. The header may carry several space-separated
+ * {@code v1,<base64>} entries (one per secret while a secret rotates with an overlap); the delivery
+ * verifies when any one matches. Verify the RAW body, before any JSON parse. Matches
  * {@code verifyWebhook} in {@code @atlasauth/backend}.
  *
  * <pre>{@code
@@ -55,11 +58,10 @@ public final class WebhookVerifier {
         if (isBlank(id) || isBlank(tsRaw) || isBlank(signature)) {
             return WebhookVerification.failure("missing_headers");
         }
-        int comma = signature.indexOf(',');
-        if (comma < 0 || !"v1".equals(signature.substring(0, comma)) || comma == signature.length() - 1) {
+        List<String> provided = signatures(signature);
+        if (provided.isEmpty()) {
             return WebhookVerification.failure("malformed_signature");
         }
-        String provided = signature.substring(comma + 1);
 
         long timestamp;
         try {
@@ -81,8 +83,13 @@ public final class WebhookVerifier {
         } catch (Exception e) {
             throw new IllegalStateException("HmacSHA256 is unavailable", e);
         }
-        if (!MessageDigest.isEqual(
-                expected.getBytes(StandardCharsets.UTF_8), provided.getBytes(StandardCharsets.UTF_8))) {
+        // Compare every entry (no early exit), each in constant time.
+        byte[] want = expected.getBytes(StandardCharsets.UTF_8);
+        boolean matched = false;
+        for (String candidate : provided) {
+            if (MessageDigest.isEqual(want, candidate.getBytes(StandardCharsets.UTF_8))) matched = true;
+        }
+        if (!matched) {
             return WebhookVerification.failure("signature_mismatch");
         }
 
@@ -94,6 +101,22 @@ public final class WebhookVerifier {
             // A valid signature over a non-JSON body: verified, with no event.
         }
         return new WebhookVerification(true, null, event, id, timestamp);
+    }
+
+    /**
+     * The {@code v1} signatures in an {@code atlas-signature} header: one {@code v1,<base64>}
+     * entry, or several separated by spaces (while an endpoint secret rotates, Atlas signs with the
+     * old and the new secret). Entries of another version are skipped.
+     */
+    private static List<String> signatures(String header) {
+        List<String> out = new ArrayList<>();
+        for (String entry : header.trim().split("\\s+")) {
+            int comma = entry.indexOf(',');
+            if (comma > 0 && comma < entry.length() - 1 && "v1".equals(entry.substring(0, comma))) {
+                out.add(entry.substring(comma + 1));
+            }
+        }
+        return out;
     }
 
     private static String header(Map<String, ?> headers, String name) {

@@ -25,6 +25,16 @@ public final class CreateAccountlessAppBody {
     public CreateAccountlessAppBody allowedOrigins(List<String> v) { this.allowedOrigins = v; return this; }
 
     /**
+     * Send {@code allowed_origins} as entries that may also declare how each origin signs in
+     * ({@link AllowedOriginEntry}); replaces {@link #allowedOrigins(List)}.
+     */
+    public CreateAccountlessAppBody allowedOriginEntries(List<AllowedOriginEntry> v) {
+        this.allowedOrigins = null;
+        this.additionalFields.put("allowed_origins", v);
+        return this;
+    }
+
+    /**
      * Set any field by its wire name, including an explicit {@code null} (which
      * clears a stored value on a partial update) or a field this SDK does not model yet.
      */

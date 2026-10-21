@@ -22,14 +22,14 @@ Maven:
 <dependency>
   <groupId>net.atlasauth</groupId>
   <artifactId>atlas-java</artifactId>
-  <version>1.4.0</version>
+  <version>1.5.0</version>
 </dependency>
 ```
 
 Gradle:
 
 ```kotlin
-implementation("net.atlasauth:atlas-java:1.4.0")
+implementation("net.atlasauth:atlas-java:1.5.0")
 ```
 
 ## The management client
@@ -218,9 +218,32 @@ preview.changes().forEach(c -> System.out.println(c.object() + " " + c.field() +
 // Send the same logout_token your OIDC apps get to another service.
 atlas.logoutNotifyEndpoints().create(new LogoutNotifyEndpointBody().url("https://api.example.com/atlas/logout"));
 
-// Send email from your own domain through Atlas, then publish the returned DNS records.
-ManagedEmail managed = atlas.messaging().createManagedEmail(new ManagedEmailBody().fromAddress("Acme <no-reply@example.com>"));
+// Set your domain up on your own Resend or Brevo account, then publish the returned DNS records.
+ManagedEmail managed = atlas.messaging().createManagedEmail(new ManagedEmailBody()
+        .fromAddress("Acme <no-reply@example.com>").transport("resend").apiKey(System.getenv("RESEND_API_KEY")));
+
+// A development instance can send sign-in emails through your provider without a verified domain.
+atlas.messaging().enableDevelopmentEmail(new DevelopmentEmailBody().providerId("mp_123"));
+atlas.messaging().disableDevelopmentEmail();
 ```
+
+### OAuth client secret rotation
+
+The previous secret keeps working for `overlapSeconds` (default 24 hours, at most 7 days), so you can deploy the
+new one without downtime. Pass `0` to revoke it now, for example after a leak:
+
+```java
+OAuthClientWithSecret rotated = atlas.oauthClients().rotateSecret(clientId,
+        new RotateOAuthClientSecretBody().overlapSeconds(3600), null);
+rotated.clientSecret();             // shown once
+rotated.previousSecretExpiresAt();  // epoch ms, or null when the old secret already stopped
+```
+
+### Webhooks
+
+`WebhookVerifier` accepts an `atlas-signature` header that carries several signatures separated by spaces
+(`v1,<sig> v1,<sig>`). While an endpoint secret rotates, Atlas may sign each delivery with the old and the new
+secret; the delivery verifies when any one signature matches.
 
 With a platform key, `platform().atlasIdApps().findUsers(id, email)` answers a privacy request for one app,
 `revokeGrant(id, grantId)` revokes one person's approval, and `platform().atlasIdPublisher()` claims and verifies

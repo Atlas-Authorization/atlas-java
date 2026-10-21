@@ -22,6 +22,16 @@ public final class UpdatePlatformAppBody {
 
     public UpdatePlatformAppBody name(String v) { this.name = v; return this; }
     public UpdatePlatformAppBody allowedOrigins(List<String> v) { this.allowedOrigins = v; return this; }
+
+    /**
+     * Send {@code allowed_origins} as entries that may also declare how each origin signs in
+     * ({@link AllowedOriginEntry}); replaces {@link #allowedOrigins(List)}.
+     */
+    public UpdatePlatformAppBody allowedOriginEntries(List<AllowedOriginEntry> v) {
+        this.allowedOrigins = null;
+        this.additionalFields.put("allowed_origins", v);
+        return this;
+    }
     public UpdatePlatformAppBody tags(List<String> v) { this.tags = v; return this; }
 
     /**
