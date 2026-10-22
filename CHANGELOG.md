@@ -1,5 +1,47 @@
 # Changelog
 
+## 1.8.0
+
+### Added
+
+- **Referral attribution v2.** `referrals().retryFailed(kind, errorCode[, idempotencyKey])`
+  (`POST /v1/instance/referrals/calls/retry_failed`, `ReferralRetryFailedResult` with `requeued`),
+  `referrals().simulate(code)` (`POST /v1/instance/referrals/simulate`, `ReferralSimulateResult`: `callId`,
+  `customerRef`, `result`, `response`), `referrals().backfill(ReferralBackfillBody[, idempotencyKey])` and
+  `referrals().getBackfill(id)` (`POST /v1/instance/referrals/backfill`, `GET /v1/instance/referrals/backfill/{id}`;
+  `ReferralBackfillBody`: `since`, `codes`, `codeMetadataPath`; `ReferralBackfillJob`: `usersScanned`, `usersSkipped`,
+  `callsQueued`, `truncated`, `nextSince`, `calls`), and `referrals().getForUser(userId)`
+  (`GET /v1/users/{id}/referral`, `UserReferralResult`).
+- **Settings.** `ReferralSettings` gains `trackingToken`, `codeLookupUrl`, `signupCodeField`, `forwardLifecycle`,
+  `mirrorToPublicMetadata` and `includeReferralClaims`; `UpdateReferralSettingsBody` gains the same setters (`clear`
+  takes `tracking_token` and `code_lookup_url`). `provider` can be `referally`. `Capabilities` gains `alias`, `user`
+  and `ping`. `Connection` gains `lastPing` (`ReferralPing`) and `alert` (`Alert`: `signature_rejected` or
+  `connection_paused`). `ReferralConnectionTest` gains `method` (`ping` or `probe`), `ping` and `warnings`.
+- **Call log.** New `listCalls(limit, status, kind, userId, errorCode, startingAfter)`; `limit` goes up to 1000.
+  `ReferralCall.kind` adds `alias`, `user` and `ping`; calls gain `latencyMs`, `errorCode`, `response`, `highlights`
+  (`Highlights`), `requestId` and `batchId`.
+- **Users.** `users().setExternalId(id, externalId)` (`PATCH /v1/users/{id}`; null clears; with referrals on, the
+  change is forwarded to the platform as an alias). `UpdateUserBody` gains `externalId` and `clearExternalId()`;
+  `User` gains `externalId`. `UserReferral` gains `partnerExternalRef`, `referralStatus` and `notes`. The new
+  `user.referral_resolved` webhook carries the full user as `data` (decode it as `User`).
+- **before_user_create hook.** New `userHooks()` namespace: `getBeforeUserCreate()`,
+  `updateBeforeUserCreate(UpdateBeforeUserCreateHookBody[, idempotencyKey])` and `testBeforeUserCreate()`
+  (`/v1/instance/hooks/before_user_create`; `BeforeUserCreateHook`, `BeforeUserCreateHookTest`). The hook call is
+  signed like a webhook with type `user.before_create`; verify it with `WebhookVerifier`.
+- **Preflight** can report `referrals_secret_invalid`, `referrals_program_inactive`, `referrals_unreachable`,
+  `referrals_clock_skew` and `referrals_external_id_unset`.
+
+### Changed
+
+- On the server, `User.referral().status()` is now where attribution stands (`pending`, `attributed`, `none`,
+  `failed`, `held`, `flagged`); the platform's own status moved to `referralStatus()`. `user.created` carries
+  `status: "pending"` while the platform has not answered.
+
+### Compatibility
+
+- `User`, `UserReferral`, `ReferralSettings` (and its `Connection`, `Capabilities`), `ReferralCall` and
+  `ReferralConnectionTest` have more record components; their 1.7 constructors are kept.
+
 ## 1.7.0
 
 ### Added

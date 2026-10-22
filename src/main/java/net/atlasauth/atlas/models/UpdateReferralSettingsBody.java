@@ -33,6 +33,14 @@ public final class UpdateReferralSettingsBody {
     /** 100-5000. */
     public Integer timeoutMs;
     public UpdateReferralSecurityBody security;
+    /** 1-128 of A-Z a-z 0-9 _ -. */
+    public String trackingToken;
+    /** An https URL template containing {@code {code}}. */
+    public String codeLookupUrl;
+    public Boolean signupCodeField;
+    public Boolean forwardLifecycle;
+    public Boolean mirrorToPublicMetadata;
+    public Boolean includeReferralClaims;
 
     @JsonIgnore
     private final Map<String, Object> additionalFields = new LinkedHashMap<>();
@@ -55,11 +63,18 @@ public final class UpdateReferralSettingsBody {
     public UpdateReferralSettingsBody linkTemplate(String v) { this.linkTemplate = v; return this; }
     public UpdateReferralSettingsBody timeoutMs(Integer v) { this.timeoutMs = v; return this; }
     public UpdateReferralSettingsBody security(UpdateReferralSecurityBody v) { this.security = v; return this; }
+    public UpdateReferralSettingsBody trackingToken(String v) { this.trackingToken = v; return this; }
+    public UpdateReferralSettingsBody codeLookupUrl(String v) { this.codeLookupUrl = v; return this; }
+    public UpdateReferralSettingsBody signupCodeField(Boolean v) { this.signupCodeField = v; return this; }
+    public UpdateReferralSettingsBody forwardLifecycle(Boolean v) { this.forwardLifecycle = v; return this; }
+    public UpdateReferralSettingsBody mirrorToPublicMetadata(Boolean v) { this.mirrorToPublicMetadata = v; return this; }
+    public UpdateReferralSettingsBody includeReferralClaims(Boolean v) { this.includeReferralClaims = v; return this; }
 
     /**
      * Clear a nullable field by its wire name ({@code endpoint_url}, {@code program_id},
      * {@code connection_id}, {@code signing_secret}, {@code api_key}, {@code context_cookie},
-     * {@code consent_fallback_category}, {@code link_template}): it is sent as {@code null}.
+     * {@code consent_fallback_category}, {@code link_template}, {@code tracking_token},
+     * {@code code_lookup_url}): it is sent as {@code null}.
      */
     public UpdateReferralSettingsBody clear(String key) { this.additionalFields.put(key, null); return this; }
 

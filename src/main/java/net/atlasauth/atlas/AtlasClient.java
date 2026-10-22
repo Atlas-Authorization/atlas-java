@@ -70,6 +70,7 @@ import net.atlasauth.atlas.resources.SsoOnboarding;
 import net.atlasauth.atlas.resources.Testing;
 import net.atlasauth.atlas.resources.Tickets;
 import net.atlasauth.atlas.resources.Tokens;
+import net.atlasauth.atlas.resources.UserHooks;
 import net.atlasauth.atlas.resources.Users;
 import net.atlasauth.atlas.resources.Waitlist;
 import net.atlasauth.atlas.resources.Webhooks;
@@ -151,6 +152,7 @@ public final class AtlasClient {
     private final Instance instance;
     private final InstanceSecurity instanceSecurity;
     private final Referrals referrals;
+    private final UserHooks userHooks;
     private final Tokens tokens;
     private final Design design;
     private final Platform platform;
@@ -247,6 +249,7 @@ public final class AtlasClient {
         this.instance = new Instance(transport);
         this.instanceSecurity = new InstanceSecurity(transport);
         this.referrals = new Referrals(transport);
+        this.userHooks = new UserHooks(transport);
         this.tokens = new Tokens(transport);
         this.design = new Design(transport);
         this.platform = new Platform(platformTransport);
@@ -487,6 +490,11 @@ public final class AtlasClient {
     /** Referral attribution: the instance's referral platform connection, connection test and call log. */
     public Referrals referrals() {
         return referrals;
+    }
+
+    /** The {@code before_user_create} hook: settings and a test call. */
+    public UserHooks userHooks() {
+        return userHooks;
     }
 
     public Tokens tokens() {

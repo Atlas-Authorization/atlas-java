@@ -281,12 +281,14 @@ the publisher name shown on consent screens.
 ### Referral attribution
 
 With referral attribution on, Atlas reports every interactive sign-up to your referral platform before
-`user.created` is sent. `User` gains `referral()` (who referred them, or null), `referralCode()` and `referralLink()`.
+`user.created` is sent. `User` gains `referral()` (where attribution stands and, once attributed, who referred them;
+null when never reported), `referralCode()` and `referralLink()`. `referral().status()` is `pending`, `attributed`,
+`none`, `failed`, `held` or `flagged`; the platform's own status is `referral().referralStatus()`.
 
 ```java
 atlas.referrals().update(new UpdateReferralSettingsBody()
         .enabled(true)
-        .provider("webhook") // the Atlas referral protocol; or a built-in vendor adapter
+        .provider("webhook") // the Atlas referral protocol; or "referally" or another built-in adapter
         .endpointUrl("https://referrals.example.com/atlas")
         .signingSecret(System.getenv("REFERRAL_SIGNING_SECRET"))
         .security(new UpdateReferralSecurityBody().onHighRisk("hold"))
@@ -297,10 +299,33 @@ atlas.referrals().retryCall(failed.data().get(0).id());
 
 atlas.users().update("user_123", new UpdateUserBody().referralCode("ada-1")); // 409 REFERRAL_CODE_TAKEN if held
 atlas.users().flagReferral("user_123", "self-referral", null);
+
+atlas.referrals().simulate("ACME10");                          // a made-up user; nothing is stored
+atlas.referrals().retryFailed(null, "signature_rejected");     // after pasting the new secret
+atlas.referrals().listCalls(1000, null, null, null, "timeout", "rfc_123"); // error code, starting_after
+ReferralBackfillJob job = atlas.referrals().backfill(new ReferralBackfillBody()
+        .since("2026-01-01").codeMetadataPath("public_metadata.referral_code"));
+atlas.referrals().getBackfill(job.id());                       // running, then completed
+atlas.referrals().getForUser("user_123");                      // the stored result, no call to the platform
+atlas.users().setExternalId("user_123", "cust_42");            // forwarded to the platform as an alias
 ```
 
-Enabling without what the provider needs is `422 REFERRALS_NOT_CONFIGURED`. A late answer from the platform arrives
-as the `user.referral_attributed` webhook (`UserReferralAttributedEvent`).
+Enabling without what the provider needs is `422 REFERRALS_NOT_CONFIGURED`. When the platform has not answered by the
+time `user.created` is sent, `referral().status()` is `pending` and the `user.referral_resolved` webhook follows; its
+`data` is the full user (decode it as `User`), with `attributed`, `none` or `failed`. `user.referral_attributed`
+(`UserReferralAttributedEvent`) still fires for a late attribution.
+
+To give each user your own id before the first referral call, turn on the `before_user_create` hook. Atlas then sends
+your endpoint a signed `POST` (verify it with `WebhookVerifier`) of type `user.before_create` for every self-service
+sign-up, and stamps the `external_id` and metadata you answer:
+
+```java
+atlas.userHooks().updateBeforeUserCreate(new UpdateBeforeUserCreateHookBody()
+        .enabled(true)
+        .url("https://app.example.com/hooks/before-create")
+        .signingSecret(System.getenv("BEFORE_CREATE_SECRET")));
+BeforeUserCreateHookTest tested = atlas.userHooks().testBeforeUserCreate(); // ok(), answer(), error()
+```
 
 ### API key spend caps
 

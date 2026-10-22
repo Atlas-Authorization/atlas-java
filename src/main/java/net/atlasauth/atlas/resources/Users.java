@@ -89,6 +89,21 @@ public final class Users {
         });
     }
 
+    /**
+     * {@code PATCH /v1/users/:id} — set (or clear with {@code null}) the user's external id. With
+     * referral attribution on, Atlas forwards the change to the referral platform as an alias (old
+     * id, or the Atlas user id, to the new one).
+     */
+    public User setExternalId(String id, String externalId) {
+        UpdateUserBody body = new UpdateUserBody();
+        if (externalId == null) {
+            body.clearExternalId();
+        } else {
+            body.externalId(externalId);
+        }
+        return update(id, body);
+    }
+
     /** {@code PUT /v1/users/:id/metadata} — replaces the named bags wholesale. */
     public User replaceMetadata(String id, ReplaceUserMetadataBody body) {
         return t.put("/v1/users/" + enc(id) + "/metadata", body, new TypeReference<>() {
