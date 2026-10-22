@@ -158,6 +158,50 @@ class ReferralsTest {
         assertEquals("REFERRALS_NOT_CONFIGURED", ErrorCodes.REFERRALS_NOT_CONFIGURED);
     }
     @Test
+    void inboundTwoWaySyncFields() throws IOException {
+        mock.reply(200, "{\"object\":\"referral_settings\",\"enabled\":true,\"provider\":\"webhook\",\"signing_secret_set\":true,\"api_key_set\":false,"
+                + "\"url_params\":[\"ref\"],\"auto_enroll_users\":false,"
+                + "\"inbound\":{\"url\":\"https://api.example.test/v1/webhooks/referrals/ins_1\",\"secret_set\":true,\"endpoint_id\":\"we_1\","
+                + "\"last_event\":{\"at\":1700000000000,\"type\":\"referral.updated\",\"outcome\":\"applied\"}},"
+                + "\"providers\":[{\"id\":\"webhook\",\"capabilities\":{\"signup\":true,\"erase\":true,\"export\":true,\"partner\":true,\"auto_enroll\":true,\"signal\":true,\"inbound\":true},"
+                + "\"needs\":[\"endpoint_url\",\"signing_secret\"]}]}");
+        ReferralSettings view = atlas.referrals().get();
+        assertEquals("https://api.example.test/v1/webhooks/referrals/ins_1", view.inbound().url());
+        assertTrue(view.inbound().secretSet());
+        assertEquals("we_1", view.inbound().endpointId());
+        assertEquals(1700000000000L, view.inbound().lastEvent().at());
+        assertEquals("referral.updated", view.inbound().lastEvent().type());
+        assertEquals("applied", view.inbound().lastEvent().outcome());
+        assertTrue(view.providers().get(0).capabilities().inbound());
+
+        mock.reply(200, SETTINGS);
+        ReferralSettings older = atlas.referrals().get();
+        assertEquals(null, older.inbound());
+        assertEquals(null, older.providers().get(0).capabilities().inbound());
+
+        mock.reply(200, SETTINGS);
+        atlas.referrals().update(new UpdateReferralSettingsBody().inboundSecret("whsec_" + "y".repeat(32)).inboundEndpointId("we_1"));
+        JsonNode body = om.readTree(mock.requestBody);
+        assertEquals("whsec_" + "y".repeat(32), body.get("inbound_secret").asText());
+        assertEquals("we_1", body.get("inbound_endpoint_id").asText());
+        assertEquals(2, body.size());
+
+        mock.reply(200, SETTINGS);
+        atlas.referrals().update(new UpdateReferralSettingsBody().clear("inbound_secret").clear("inbound_endpoint_id"));
+        body = om.readTree(mock.requestBody);
+        assertTrue(body.has("inbound_secret") && body.get("inbound_secret").isNull());
+        assertTrue(body.has("inbound_endpoint_id") && body.get("inbound_endpoint_id").isNull());
+
+        // The earlier constructor shapes still compile and leave the new fields null.
+        ReferralSettings.Capabilities caps = new ReferralSettings.Capabilities(true, true, true, true, true, true, true, true, true);
+        assertEquals(null, caps.inbound());
+        ReferralSettings v2 = new ReferralSettings("referral_settings", true, "webhook", null, null, null, true, false, java.util.List.of("ref"),
+                null, "referrals", null, false, null, 3000, null, java.util.List.of(), null, java.util.List.of(), 1L,
+                null, null, true, true, false, false);
+        assertEquals(null, v2.inbound());
+    }
+
+    @Test
     void v2SettingsFieldsPingTestAndCallPaging() throws IOException {
         mock.reply(200, "{\"object\":\"referral_settings\",\"enabled\":true,\"provider\":\"referally\",\"signing_secret_set\":true,\"api_key_set\":false,"
                 + "\"url_params\":[\"ref\"],\"auto_enroll_users\":false,\"tracking_token\":\"tt_public_1\",\"code_lookup_url\":null,\"signup_code_field\":true,"

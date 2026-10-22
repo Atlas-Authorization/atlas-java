@@ -315,6 +315,11 @@ time `user.created` is sent, `referral().status()` is `pending` and the `user.re
 `data` is the full user (decode it as `User`), with `attributed`, `none` or `failed`. `user.referral_attributed`
 (`UserReferralAttributedEvent`) still fires for a late attribution.
 
+Two-way sync: a provider with the `inbound` capability sends referral changes made after sign-up back to Atlas. The
+settings report `inbound()` (`url()` to give the platform, `secretSet()`, `endpointId()`, and `lastEvent()` with
+`at()`, `type()`, `outcome()`). Store the platform's event secret with `inboundSecret(...)` (write-only, 16-512
+characters) and its subscription id with `inboundEndpointId(...)`; `clear("inbound_secret")` sends null.
+
 To give each user your own id before the first referral call, turn on the `before_user_create` hook. Atlas then sends
 your endpoint a signed `POST` (verify it with `WebhookVerifier`) of type `user.before_create` for every self-service
 sign-up, and stamps the `external_id` and metadata you answer:

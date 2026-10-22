@@ -23,6 +23,13 @@ public final class UpdateReferralSettingsBody {
     public String signingSecret;
     /** Write-only vendor API key. */
     public String apiKey;
+    /**
+     * Write-only, 16-512 characters: verifies the platform's events to {@code inbound.url}
+     * (two-way sync). Optional for the Atlas referral protocol (the signing secret is used when unset).
+     */
+    public String inboundSecret;
+    /** The platform's id for Atlas's event subscription, kept for reference. */
+    public String inboundEndpointId;
     public List<String> urlParams;
     public String contextCookie;
     public String consentCategory;
@@ -55,6 +62,8 @@ public final class UpdateReferralSettingsBody {
     public UpdateReferralSettingsBody connectionId(String v) { this.connectionId = v; return this; }
     public UpdateReferralSettingsBody signingSecret(String v) { this.signingSecret = v; return this; }
     public UpdateReferralSettingsBody apiKey(String v) { this.apiKey = v; return this; }
+    public UpdateReferralSettingsBody inboundSecret(String v) { this.inboundSecret = v; return this; }
+    public UpdateReferralSettingsBody inboundEndpointId(String v) { this.inboundEndpointId = v; return this; }
     public UpdateReferralSettingsBody urlParams(List<String> v) { this.urlParams = v; return this; }
     public UpdateReferralSettingsBody contextCookie(String v) { this.contextCookie = v; return this; }
     public UpdateReferralSettingsBody consentCategory(String v) { this.consentCategory = v; return this; }
@@ -72,7 +81,8 @@ public final class UpdateReferralSettingsBody {
 
     /**
      * Clear a nullable field by its wire name ({@code endpoint_url}, {@code program_id},
-     * {@code connection_id}, {@code signing_secret}, {@code api_key}, {@code context_cookie},
+     * {@code connection_id}, {@code signing_secret}, {@code api_key}, {@code inbound_secret},
+     * {@code inbound_endpoint_id}, {@code context_cookie},
      * {@code consent_fallback_category}, {@code link_template}, {@code tracking_token},
      * {@code code_lookup_url}): it is sent as {@code null}.
      */

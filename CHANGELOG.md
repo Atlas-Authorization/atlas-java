@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.9.0
+
+### Added
+
+- **Two-way referral sync.** Referral settings carry two-way sync: `inbound` (`url`, `secret_set`, `endpoint_id`, `last_event`) on reads, write-only `inbound_secret` and `inbound_endpoint_id` on updates (null clears), and provider capability `inbound`. The earlier `ReferralSettings` and `Capabilities` constructors keep working.
+
 ## 1.8.0
 
 ### Added
