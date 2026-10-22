@@ -45,6 +45,14 @@ public final class UpdateReferralSettingsBody {
     /** An https URL template containing {@code {code}}. */
     public String codeLookupUrl;
     public Boolean signupCodeField;
+    /**
+     * The referral programs whose script or cookie the browser reads, in order (referally,
+     * rewardful, tolt, promotekit, firstpromoter, partnerstack, dub). {@code clear("browser_sources")}
+     * goes back to the provider's default.
+     */
+    public List<String> browserSources;
+    /** auto, one consent manager (cookiemunch, onetrust, cookiebot, didomi, usercentrics, osano, cookieyes, complianz, klaro, tcf, consent_mode), or app. */
+    public String consentProvider;
     public Boolean forwardLifecycle;
     public Boolean mirrorToPublicMetadata;
     public Boolean includeReferralClaims;
@@ -75,6 +83,8 @@ public final class UpdateReferralSettingsBody {
     public UpdateReferralSettingsBody trackingToken(String v) { this.trackingToken = v; return this; }
     public UpdateReferralSettingsBody codeLookupUrl(String v) { this.codeLookupUrl = v; return this; }
     public UpdateReferralSettingsBody signupCodeField(Boolean v) { this.signupCodeField = v; return this; }
+    public UpdateReferralSettingsBody browserSources(List<String> v) { this.browserSources = v; return this; }
+    public UpdateReferralSettingsBody consentProvider(String v) { this.consentProvider = v; return this; }
     public UpdateReferralSettingsBody forwardLifecycle(Boolean v) { this.forwardLifecycle = v; return this; }
     public UpdateReferralSettingsBody mirrorToPublicMetadata(Boolean v) { this.mirrorToPublicMetadata = v; return this; }
     public UpdateReferralSettingsBody includeReferralClaims(Boolean v) { this.includeReferralClaims = v; return this; }
@@ -84,7 +94,7 @@ public final class UpdateReferralSettingsBody {
      * {@code connection_id}, {@code signing_secret}, {@code api_key}, {@code inbound_secret},
      * {@code inbound_endpoint_id}, {@code context_cookie},
      * {@code consent_fallback_category}, {@code link_template}, {@code tracking_token},
-     * {@code code_lookup_url}): it is sent as {@code null}.
+     * {@code code_lookup_url}, {@code browser_sources}): it is sent as {@code null}.
      */
     public UpdateReferralSettingsBody clear(String key) { this.additionalFields.put(key, null); return this; }
 

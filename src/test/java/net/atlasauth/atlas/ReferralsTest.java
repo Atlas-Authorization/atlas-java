@@ -202,6 +202,43 @@ class ReferralsTest {
     }
 
     @Test
+    void browserCaptureFields() throws IOException {
+        mock.reply(200, "{\"object\":\"referral_settings\",\"enabled\":true,\"provider\":\"dub\",\"signing_secret_set\":false,\"api_key_set\":true,"
+                + "\"url_params\":[\"ref\"],\"auto_enroll_users\":false,\"browser_sources\":[\"rewardful\",\"dub\"],\"browser_sources_default\":false,"
+                + "\"consent_provider\":\"onetrust\",\"providers\":[]}");
+        ReferralSettings view = atlas.referrals().get();
+        assertEquals(java.util.List.of("rewardful", "dub"), view.browserSources());
+        assertEquals(Boolean.FALSE, view.browserSourcesDefault());
+        assertEquals("onetrust", view.consentProvider());
+
+        mock.reply(200, SETTINGS);
+        ReferralSettings older = atlas.referrals().get();
+        assertEquals(null, older.browserSources());
+        assertEquals(null, older.consentProvider());
+
+        mock.reply(200, SETTINGS);
+        atlas.referrals().update(new UpdateReferralSettingsBody().browserSources(java.util.List.of("rewardful", "dub")).consentProvider("app"));
+        JsonNode body = om.readTree(mock.requestBody);
+        assertEquals("rewardful", body.get("browser_sources").get(0).asText());
+        assertEquals("dub", body.get("browser_sources").get(1).asText());
+        assertEquals("app", body.get("consent_provider").asText());
+        assertEquals(2, body.size());
+
+        mock.reply(200, SETTINGS);
+        atlas.referrals().update(new UpdateReferralSettingsBody().clear("browser_sources"));
+        body = om.readTree(mock.requestBody);
+        assertTrue(body.has("browser_sources") && body.get("browser_sources").isNull());
+        assertEquals(1, body.size());
+
+        // The two-way sync constructor shape still compiles and leaves the new fields null.
+        ReferralSettings v3 = new ReferralSettings("referral_settings", true, "webhook", null, null, null, true, false, java.util.List.of("ref"),
+                null, "referrals", null, false, null, 3000, null, java.util.List.of(), null, java.util.List.of(), 1L,
+                null, null, true, true, false, false, null);
+        assertEquals(null, v3.browserSources());
+        assertEquals(null, v3.browserSourcesDefault());
+    }
+
+    @Test
     void v2SettingsFieldsPingTestAndCallPaging() throws IOException {
         mock.reply(200, "{\"object\":\"referral_settings\",\"enabled\":true,\"provider\":\"referally\",\"signing_secret_set\":true,\"api_key_set\":false,"
                 + "\"url_params\":[\"ref\"],\"auto_enroll_users\":false,\"tracking_token\":\"tt_public_1\",\"code_lookup_url\":null,\"signup_code_field\":true,"

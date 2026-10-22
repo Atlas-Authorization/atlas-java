@@ -37,16 +37,24 @@ public record ReferralSettings(
         /** Forward email, name and suspension changes to the platform (default true). */ Boolean forwardLifecycle,
         /** Mirror the result into public_metadata.referral (default false). */ Boolean mirrorToPublicMetadata,
         /** Add the user's own code as a referral_code claim to session and ID tokens (default false). */ Boolean includeReferralClaims,
-        /** Two-way sync: where the platform sends referral changes made after sign-up, and the latest one received. */ Inbound inbound) {
+        /** Two-way sync: where the platform sends referral changes made after sign-up, and the latest one received. */ Inbound inbound,
+        /** The referral programs whose script or cookie the browser reads, in order (referally, rewardful, tolt, promotekit, firstpromoter, partnerstack, dub); the provider's default unless set. */ List<String> browserSources,
+        /** Whether browserSources is the provider's default. */ Boolean browserSourcesDefault,
+        /** Which consent manager decides on the tracking cookie's ids: auto (any common one), one manager (cookiemunch, onetrust, cookiebot, didomi, usercentrics, osano, cookieyes, complianz, klaro, tcf, consent_mode), or app (only the app's own decision). */ String consentProvider) {
 
     /** The 1.7 shape, without the referral attribution v2 fields. */
     public ReferralSettings(String object, boolean enabled, String provider, String endpointUrl, String programId, String connectionId, boolean signingSecretSet, boolean apiKeySet, List<String> urlParams, String contextCookie, String consentCategory, String consentFallbackCategory, boolean autoEnrollUsers, String linkTemplate, Integer timeoutMs, ReferralSecuritySettings security, List<String> missing, Connection connection, List<Provider> providers, Long updatedAt) {
-        this(object, enabled, provider, endpointUrl, programId, connectionId, signingSecretSet, apiKeySet, urlParams, contextCookie, consentCategory, consentFallbackCategory, autoEnrollUsers, linkTemplate, timeoutMs, security, missing, connection, providers, updatedAt, null, null, null, null, null, null, null);
+        this(object, enabled, provider, endpointUrl, programId, connectionId, signingSecretSet, apiKeySet, urlParams, contextCookie, consentCategory, consentFallbackCategory, autoEnrollUsers, linkTemplate, timeoutMs, security, missing, connection, providers, updatedAt, null, null, null, null, null, null, null, null, null, null);
     }
 
     /** The referral attribution v2 shape, without {@code inbound} (two-way sync). */
     public ReferralSettings(String object, boolean enabled, String provider, String endpointUrl, String programId, String connectionId, boolean signingSecretSet, boolean apiKeySet, List<String> urlParams, String contextCookie, String consentCategory, String consentFallbackCategory, boolean autoEnrollUsers, String linkTemplate, Integer timeoutMs, ReferralSecuritySettings security, List<String> missing, Connection connection, List<Provider> providers, Long updatedAt, String trackingToken, String codeLookupUrl, Boolean signupCodeField, Boolean forwardLifecycle, Boolean mirrorToPublicMetadata, Boolean includeReferralClaims) {
-        this(object, enabled, provider, endpointUrl, programId, connectionId, signingSecretSet, apiKeySet, urlParams, contextCookie, consentCategory, consentFallbackCategory, autoEnrollUsers, linkTemplate, timeoutMs, security, missing, connection, providers, updatedAt, trackingToken, codeLookupUrl, signupCodeField, forwardLifecycle, mirrorToPublicMetadata, includeReferralClaims, null);
+        this(object, enabled, provider, endpointUrl, programId, connectionId, signingSecretSet, apiKeySet, urlParams, contextCookie, consentCategory, consentFallbackCategory, autoEnrollUsers, linkTemplate, timeoutMs, security, missing, connection, providers, updatedAt, trackingToken, codeLookupUrl, signupCodeField, forwardLifecycle, mirrorToPublicMetadata, includeReferralClaims, null, null, null, null);
+    }
+
+    /** The two-way sync shape, without browser capture ({@code browserSources}, {@code browserSourcesDefault}, {@code consentProvider}). */
+    public ReferralSettings(String object, boolean enabled, String provider, String endpointUrl, String programId, String connectionId, boolean signingSecretSet, boolean apiKeySet, List<String> urlParams, String contextCookie, String consentCategory, String consentFallbackCategory, boolean autoEnrollUsers, String linkTemplate, Integer timeoutMs, ReferralSecuritySettings security, List<String> missing, Connection connection, List<Provider> providers, Long updatedAt, String trackingToken, String codeLookupUrl, Boolean signupCodeField, Boolean forwardLifecycle, Boolean mirrorToPublicMetadata, Boolean includeReferralClaims, Inbound inbound) {
+        this(object, enabled, provider, endpointUrl, programId, connectionId, signingSecretSet, apiKeySet, urlParams, contextCookie, consentCategory, consentFallbackCategory, autoEnrollUsers, linkTemplate, timeoutMs, security, missing, connection, providers, updatedAt, trackingToken, codeLookupUrl, signupCodeField, forwardLifecycle, mirrorToPublicMetadata, includeReferralClaims, inbound, null, null, null);
     }
 
     /** Two-way sync: the URL the platform sends referral changes to, and the latest one received. */
