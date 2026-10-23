@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.13.0 — 2026-10-24
+
+### Added
+
+- **Migrate from Better Auth: sealed-bundle imports.** `betterAuthImports()`: `getPublicKey`, `rotatePublicKey`, `create` (`BetterAuthImportOptions`), `list`, `get`, `uploadPart` (a `text/plain` part), `finalize`, `dryRun`, `apply` (resumes a failed import; `confirmConflicts`), `delete`, `listJwks`, `deleteJwk`. Helpers: `upload(bundle[, options, partBytes, onPart])` creates the import, uploads the bundle in line-aligned parts of at most 8 MiB (`BetterAuthImports.splitBundleParts`, `PART_BYTES`) and finalizes it; `waitFor(id[, interval, timeout, onProgress])` polls until the import leaves `analyzing` / `queued` / `applying`. Typed `BetterAuthImport` (with `BetterAuthImportReport`: models, skipped, conflicts, action items), `BetterAuthImportKey`, `BetterAuthImportPart`, `ImportedJwk`.
+- **Better Auth session bridge.** `betterAuthBridge()`: `get` / `update` (`UpdateBetterAuthBridgeBody`; the old app's secret is write-only, `LiveFallback.clearSecret()`) / `delete`, and `exchange(token[, clientIp, userAgent, remember])` on the secret-key Backend API route, forwarding the end user's IP and user agent (`X-Atlas-Client-IP`, `X-Atlas-Client-User-Agent`). `net.atlasauth.atlas.betterauth`: `BetterAuth.exchange` classifies the outcome (`ExchangeResult`: `SESSION`, `NEEDS_MFA`, `REFUSED` with the `meta.bridge_outcome`; never throws for a refusal or an outage); `SessionBridge` turns a request's cookies into a `BridgeDecision` (Atlas cookies to set, Better Auth cookies to clear only on a final refusal, `continuationUrl` for a second factor); `BetterAuth.readSessionCookie`, `sessionCookieNames`, `allCookieNames`, `BridgeCookie.toHeader`. Spring: `atlas.better-auth-bridge.enabled=true` (with `atlas.secret-key`; `cookie-prefix`, `cookie-name`, `better-auth-cookie-domain`, `secure`, `sign-in-url`) makes `AtlasAuthenticationFilter` exchange a GET/HEAD's Better Auth cookie and answer 303 to the same URL signed in (or to the sign-in page when a second factor is owed). `Transport.requestWithHeaders` sends per-call headers (never `authorization`).
+- **Better Auth JWTs during the cutover.** `SessionVerifier.Builder.legacyIssuers(List<LegacyIssuer>)` (`LegacyIssuer.builder(issuer).until(...).jwks(...) | jwksUrl(...)`, `audience`, `algorithms`, `resolveSubject`): a token from that issuer, inside its window, is verified against that issuer's keys only (EdDSA/Ed25519 via the JDK, ES256, ES512, RS256, PS256; `exp` required) and its `sub` is mapped to the Atlas user id through `external_id` (Backend API lookup with `secretKey` / `bapiBaseUrl`, cached 5 minutes, at most 10 000 entries; failures are not cached). The claims carry `external_id` and `legacy`. Spring: `atlas.legacy-issuers[n].issuer` / `until` / `jwks-url` / `audience` / `algorithms`.
+- The API coverage list now holds all 604 Backend and Platform API operations.
+
 ## 1.12.0 — 2026-10-24
 
 ### Added

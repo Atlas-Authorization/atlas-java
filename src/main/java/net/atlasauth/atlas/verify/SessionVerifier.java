@@ -50,6 +50,7 @@ public final class SessionVerifier {
     private final String secretKey;
     private final String bapiBaseUrl;
     private final ObjectMapper mapper = new ObjectMapper();
+    private final LegacyIssuerVerifier legacy;
 
     private SessionVerifier(Builder b) {
         if (b.jwksUrl == null || b.jwksUrl.isEmpty()) {
@@ -65,6 +66,17 @@ public final class SessionVerifier {
         this.secretKey = b.secretKey;
         this.bapiBaseUrl = b.bapiBaseUrl;
         this.jwks = new JwksCache(b.jwksUrl, this.http, this.now);
+        if (b.legacyIssuers != null && !b.legacyIssuers.isEmpty()) {
+            for (LegacyIssuer entry : b.legacyIssuers) {
+                if (entry.issuer().equals(b.issuer)) {
+                    throw new IllegalArgumentException("SessionVerifier: a legacy issuer cannot be the Atlas issuer itself.");
+                }
+            }
+            this.legacy = new LegacyIssuerVerifier(b.legacyIssuers, this.http, b.secretKey, b.bapiBaseUrl, this.now,
+                    CLOCK_SKEW_SECONDS);
+        } else {
+            this.legacy = null;
+        }
     }
 
     public static Builder builder() {
@@ -75,6 +87,27 @@ public final class SessionVerifier {
     public VerifyResult verify(String token) {
         if (token == null || token.split("\\.").length != 3) {
             return VerifyResult.failed(VerifyResult.Reason.MALFORMED);
+        }
+
+        // A token from a configured legacy issuer (inside its window) is verified against THAT issuer's keys
+        // only, never the Atlas keys: the `iss` routes, the signature decides.
+        if (legacy != null) {
+            LegacyIssuer entry = legacy.match(LegacyIssuerVerifier.peekIssuer(token));
+            if (entry != null) {
+                LegacyIssuerVerifier.Result r = legacy.verify(token, entry);
+                if ("no_keys".equals(r.outcome())) {
+                    return VerifyResult.failed(VerifyResult.Reason.NO_KEYS);
+                }
+                if (!r.ok()) {
+                    return VerifyResult.failed(VerifyResult.Reason.INVALID);
+                }
+                Object azp = r.claims().get("azp");
+                if (authorizedParties != null && !authorizedParties.isEmpty() && azp != null
+                        && !authorizedParties.contains(String.valueOf(azp))) {
+                    return VerifyResult.failed(VerifyResult.Reason.UNAUTHORIZED_PARTY);
+                }
+                return VerifyResult.authorized(new SessionClaims(r.claims()));
+            }
         }
 
         SignedJWT jwt;
@@ -243,6 +276,7 @@ public final class SessionVerifier {
         private HttpClient http;
         private String secretKey;
         private String bapiBaseUrl;
+        private List<LegacyIssuer> legacyIssuers;
 
         public Builder jwksUrl(String jwksUrl) {
             this.jwksUrl = jwksUrl;
@@ -265,9 +299,22 @@ public final class SessionVerifier {
             return this;
         }
 
-        /** For {@link SessionVerifier#verifyOnline(String)}. */
+        /** For {@link SessionVerifier#verifyOnline(String)} and the default legacy-issuer subject lookup. */
         public Builder bapiBaseUrl(String bapiBaseUrl) {
             this.bapiBaseUrl = bapiBaseUrl;
+            return this;
+        }
+
+        /**
+         * Cutover from another auth provider (Better Auth): ALSO accept JWTs from these issuers until each one's
+         * {@code until}, verified against that issuer's own key set, with {@code sub} mapped to the Atlas user id
+         * (the old id is the user's {@code external_id}; the default lookup uses {@link #secretKey} and
+         * {@link #bapiBaseUrl}, default {@code https://api.atlasauth.net}, cached 5 minutes). The claims then
+         * carry {@code sub} = the Atlas id, {@code external_id} = the old id and {@code legacy} =
+         * {@code {kind, issuer, sub}}. Atlas tokens are unaffected.
+         */
+        public Builder legacyIssuers(List<LegacyIssuer> legacyIssuers) {
+            this.legacyIssuers = legacyIssuers == null ? null : List.copyOf(legacyIssuers);
             return this;
         }
 

@@ -37,6 +37,8 @@ import net.atlasauth.atlas.resources.InstanceSecurity;
 import net.atlasauth.atlas.resources.Invitations;
 import net.atlasauth.atlas.resources.JwtTemplates;
 import net.atlasauth.atlas.resources.LegacyAuthConnection;
+import net.atlasauth.atlas.resources.BetterAuthBridge;
+import net.atlasauth.atlas.resources.BetterAuthImports;
 import net.atlasauth.atlas.resources.Localizations;
 import net.atlasauth.atlas.resources.LogStreams;
 import net.atlasauth.atlas.resources.LogoutNotifyEndpoints;
@@ -172,6 +174,8 @@ public final class AtlasClient {
     private final Notifications notifications;
     private final Analytics analytics;
     private final LegacyAuthConnection legacyAuthConnection;
+    private final BetterAuthImports betterAuthImports;
+    private final BetterAuthBridge betterAuthBridge;
     private final Mcp mcp;
     private final Pca pca;
     private final McpConnector mcpConnector;
@@ -274,6 +278,8 @@ public final class AtlasClient {
         this.notifications = new Notifications(transport);
         this.analytics = new Analytics(transport);
         this.legacyAuthConnection = new LegacyAuthConnection(transport);
+        this.betterAuthImports = new BetterAuthImports(transport);
+        this.betterAuthBridge = new BetterAuthBridge(transport);
         this.mcp = new Mcp(transport);
         this.pca = new Pca(transport);
         this.mcpConnector = new McpConnector(transport);
@@ -571,6 +577,16 @@ public final class AtlasClient {
 
     public LegacyAuthConnection legacyAuthConnection() {
         return legacyAuthConnection;
+    }
+
+    /** Migrate from Better Auth: sealed-bundle imports ({@code /v1/better_auth_imports}). */
+    public BetterAuthImports betterAuthImports() {
+        return betterAuthImports;
+    }
+
+    /** Migrate from Better Auth: the session bridge settings and the secret-key exchange. */
+    public BetterAuthBridge betterAuthBridge() {
+        return betterAuthBridge;
     }
 
     public Mcp mcp() {

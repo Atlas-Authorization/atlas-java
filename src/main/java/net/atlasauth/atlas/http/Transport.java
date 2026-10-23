@@ -143,7 +143,26 @@ public final class Transport {
         if (contentType == null || contentType.isEmpty()) {
             throw new IllegalArgumentException("contentType is required (e.g. image/png)");
         }
-        return send(method, path, query, HttpRequest.BodyPublishers.ofByteArray(data), contentType, null, false, type);
+        return send(method, path, query, HttpRequest.BodyPublishers.ofByteArray(data), contentType, null, false, null, type);
+    }
+
+    /**
+     * A JSON request with extra per-call headers (for example the end user's forwarded IP on the
+     * Better Auth exchange). An {@code authorization} entry is ignored: the Bearer secret is never replaced.
+     */
+    public <T> T requestWithHeaders(String method,
+                                    String path,
+                                    Map<String, Object> query,
+                                    Object body,
+                                    String idempotencyKey,
+                                    Map<String, String> headers,
+                                    TypeReference<T> type) {
+        if (body != null) {
+            String json = writeBody(body);
+            return send(method, path, query, HttpRequest.BodyPublishers.ofString(json, StandardCharsets.UTF_8),
+                    "application/json", idempotencyKey, false, headers, type);
+        }
+        return send(method, path, query, HttpRequest.BodyPublishers.noBody(), null, idempotencyKey, false, headers, type);
     }
 
     // ---- The one request path ---------------------------------------------
@@ -158,9 +177,9 @@ public final class Transport {
         if (body != null) {
             String json = writeBody(body);
             return send(method, path, query, HttpRequest.BodyPublishers.ofString(json, StandardCharsets.UTF_8),
-                    "application/json", idempotencyKey, raw, type);
+                    "application/json", idempotencyKey, raw, null, type);
         }
-        return send(method, path, query, HttpRequest.BodyPublishers.noBody(), null, idempotencyKey, raw, type);
+        return send(method, path, query, HttpRequest.BodyPublishers.noBody(), null, idempotencyKey, raw, null, type);
     }
 
     private <T> T send(String method,
@@ -170,6 +189,7 @@ public final class Transport {
                        String contentType,
                        String idempotencyKey,
                        boolean raw,
+                       Map<String, String> extraHeaders,
                        TypeReference<T> type) {
         if (secretKey == null || secretKey.isEmpty()) {
             throw new IllegalStateException(missingKeyMessage != null ? missingKeyMessage
@@ -187,6 +207,15 @@ public final class Transport {
         }
         if (idempotencyKey != null && !idempotencyKey.isEmpty()) {
             builder.header("idempotency-key", idempotencyKey);
+        }
+        if (extraHeaders != null) {
+            for (Map.Entry<String, String> h : extraHeaders.entrySet()) {
+                if (h.getKey() == null || h.getValue() == null || h.getValue().isEmpty()
+                        || "authorization".equalsIgnoreCase(h.getKey())) {
+                    continue;
+                }
+                builder.header(h.getKey(), h.getValue());
+            }
         }
         if (strict != null && !"GET".equalsIgnoreCase(method)) {
             builder.header(STRICT_HEADER, strict ? "true" : "false");
