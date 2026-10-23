@@ -35,7 +35,14 @@ public record OAuthClient(
         /** PKCE is required for this confidential client too. */ boolean requirePkce,
         /** "public" (sub = the user id) or "pairwise" (a per-sector sub). */ String subjectType,
         /** The pairwise sector document, if registered. */ String sectorIdentifierUri,
-        /** When the current secret stops authenticating (epoch ms); null = never. */ Long clientSecretExpiresAt) {
+        /** When the current secret stops authenticating (epoch ms); null = never. */ Long clientSecretExpiresAt,
+        /** jwt or opaque access tokens for this client; null inherits from the API / instance. */ String accessTokenFormat,
+        /** This client's token lifetime overrides (seconds); a null field is inherited. */ OAuthTokenLifetimes tokenLifetimes) {
+
+    /** The 1.11 shape, before the custom-data, add-on, enterprise and token-format fields. */
+    public OAuthClient(String object, String id, String clientId, String name, String logoUrl, List<String> redirectUris, List<String> allowedScopes, List<String> grantTypes, String tokenEndpointAuthMethod, String secretPrefix, boolean isPublic, boolean firstParty, long createdAt, long updatedAt, boolean skipLogoutConfirmation, Long previousSecretExpiresAt, boolean disabled, boolean requirePkce, String subjectType, String sectorIdentifierUri, Long clientSecretExpiresAt) {
+        this(object, id, clientId, name, logoUrl, redirectUris, allowedScopes, grantTypes, tokenEndpointAuthMethod, secretPrefix, isPublic, firstParty, createdAt, updatedAt, skipLogoutConfirmation, previousSecretExpiresAt, disabled, requirePkce, subjectType, sectorIdentifierUri, clientSecretExpiresAt, null, null);
+    }
 
     /** The 1.10 shape, before the 1.11 fields. */
     public OAuthClient(String object, String id, String clientId, String name, String logoUrl, List<String> redirectUris, List<String> allowedScopes, List<String> grantTypes, String tokenEndpointAuthMethod, String secretPrefix, boolean isPublic, boolean firstParty, long createdAt, long updatedAt, boolean skipLogoutConfirmation, Long previousSecretExpiresAt) {

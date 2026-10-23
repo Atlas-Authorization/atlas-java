@@ -75,4 +75,37 @@ public final class Sessions {
         return t.post("/v1/sessions/" + enc(id) + "/tokens/" + enc(template), null, new TypeReference<>() {
         });
     }
+
+    /**
+     * {@code PUT /v1/sessions/{id}/custom_data} — replace the session's custom data
+     * ({@code null} clears it). At most 2 KB; only an active session can be changed. Not
+     * for secrets: the signed-in user can read it. Sends the {@code session.updated} webhook.
+     */
+    public Session setCustomData(String id, Map<String, Object> customData) {
+        Map<String, Object> body = new java.util.HashMap<>();
+        body.put("custom_data", customData);
+        return t.put("/v1/sessions/" + enc(id) + "/custom_data", body, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code PATCH /v1/sessions/{id}/custom_data} — merge keys into the session's custom
+     * data; a key mapped to {@code null} is removed.
+     */
+    public Session updateCustomData(String id, Map<String, Object> patch) {
+        Map<String, Object> body = new java.util.HashMap<>();
+        body.put("custom_data", patch);
+        return t.patch("/v1/sessions/" + enc(id) + "/custom_data", body, new TypeReference<>() {
+        });
+    }
+
+    /** {@code POST /v1/sessions} with custom per-session data (a JSON object, at most 2 KB). */
+    public MintedSession create(String userId, String actorSub, Map<String, Object> customData) {
+        Params body = Params.of().set("user_id", userId).set("custom_data", customData);
+        if (actorSub != null) {
+            body.set("actor", Map.of("sub", actorSub));
+        }
+        return t.post("/v1/sessions", body.map(), new TypeReference<>() {
+        });
+    }
 }

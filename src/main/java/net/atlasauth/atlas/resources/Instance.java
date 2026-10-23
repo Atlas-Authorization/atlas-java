@@ -1,5 +1,6 @@
 package net.atlasauth.atlas.resources;
 
+import java.util.Map;
 import com.fasterxml.jackson.core.type.TypeReference;
 import net.atlasauth.atlas.http.Transport;
 import net.atlasauth.atlas.models.CookieConsent;
@@ -104,5 +105,25 @@ public final class Instance {
     public CookieConsent deleteCookieConsent() {
         return t.delete("/v1/instance/cookie_consent", new TypeReference<>() {
         });
+    }
+
+    /**
+     * Write {@code auth_config.accountLinkingTrust}: keys are an exact provider key, a
+     * {@code prefix*} or {@code *}; values {@code always} (vouch for the provider's email,
+     * for linking only), {@code verified} or {@code never} (refused with 409
+     * {@code IDENTITY_ALREADY_LINKED}). An account that never proved its email is never linked.
+     */
+    public InstanceUpdateResult setAccountLinkingTrust(Map<String, String> trust) {
+        return update(new UpdateInstanceBody().authConfig(Map.of("accountLinkingTrust", trust)));
+    }
+
+    /**
+     * Merge {@code auth_config.captcha}: {@code provider} (see
+     * {@link net.atlasauth.atlas.AtlasConstants#CAPTCHA_PROVIDERS}), {@code siteKey},
+     * {@code widget}, {@code minScore}, per-flow / per-action overrides and, for Vercel
+     * BotID, {@code attestationUrl} (https or a root-relative path).
+     */
+    public InstanceUpdateResult setCaptchaConfig(Map<String, Object> captcha) {
+        return update(new UpdateInstanceBody().authConfig(Map.of("captcha", captcha)));
     }
 }

@@ -30,7 +30,13 @@ public record BillingSubscription(
         /** When the scheduled change applies (epoch ms), or null. */ Long scheduledChangeAt,
         /** When the trial ends (epoch ms), or null. */ Long trialEnd,
         /** When the subscription was canceled (epoch ms), or null. */ Long canceledAt,
-        /** On a change response: true when the switch waits for the period end. */ boolean scheduled) {
+        /** On a change response: true when the switch waits for the period end. */ boolean scheduled,
+        /** What an entitlement provider (Autumn, Commet) reports this subscription grants; null for other providers. */ BillingEntitlements entitlements) {
+
+    /** The 1.11 shape, before the custom-data, add-on, enterprise and token-format fields. */
+    public BillingSubscription(String object, String id, String subjectType, String subjectId, String planId, String status, String stripeSubscriptionId, String stripeCustomerId, Long currentPeriodEnd, long createdAt, long updatedAt, String provider, String providerSubscriptionId, String providerCustomerId, String account, String interval, boolean cancelAtPeriodEnd, String scheduledPlanId, String scheduledInterval, Long scheduledChangeAt, Long trialEnd, Long canceledAt, boolean scheduled) {
+        this(object, id, subjectType, subjectId, planId, status, stripeSubscriptionId, stripeCustomerId, currentPeriodEnd, createdAt, updatedAt, provider, providerSubscriptionId, providerCustomerId, account, interval, cancelAtPeriodEnd, scheduledPlanId, scheduledInterval, scheduledChangeAt, trialEnd, canceledAt, scheduled, null);
+    }
 
     /** The 1.10 shape, before the 1.11 fields. */
     public BillingSubscription(String object, String id, String subjectType, String subjectId, String planId, String status, String stripeSubscriptionId, String stripeCustomerId, Long currentPeriodEnd, long createdAt, long updatedAt) {

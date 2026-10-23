@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.12.0 — 2026-10-24
+
+### Added
+
+- **DPoP (RFC 9449) on the access-token verifier.** A DPoP-bound token (`cnf.jkt`) is accepted only with the DPoP scheme and a valid proof (never as Bearer): `typ` `dpop+jwt`, `Dpop.ALGS` (ES256/384/512, RS256/384/512, PS256/384/512, EdDSA/Ed25519 via the JDK), public embedded JWK, signature, `htm`, normalised `htu` (`Dpop.normalizeHtu`; `Builder.publicOrigin` for path-only URLs), `iat` window, `ath`, `jti` replay via a `DpopReplayStore` (`MemoryDpopReplayStore` by default), RFC 7638 `Dpop.jwkThumbprint` match. `Builder.requireDpop` refuses unbound tokens; `Builder.dpopNonces` (`HmacDpopNonceSource`) demands a server nonce (`use_dpop_nonce`, `Result.dpopNonce()` for the `DPoP-Nonce` header). `verifyRequest(ResourceRequest)`; `Result` gains `dpopBound` / `dpopNonce` (the old constructor stays). Challenges use the `DPoP` scheme with `algs` (`buildWwwAuthenticate(scheme, ...)`). `AtlasAccessTokenFilter` checks the proof against the servlet request and sets `DPoP-Nonce`. Metadata advertises `dpop_signing_alg_values_supported`; `protectedResourceMetadata(..., dpopBoundAccessTokensRequired)`.
+- **Billing: several subscriptions per subject, add-ons, Chargebee / Autumn / Commet.** `billing().getSubscription`, `syncPlanEntitlements`, `getSettings` / `updateSettings` (`BillingSettings`, limit merge `max` / `sum`), `checkFeature` (`BillingFeatureCheck`). `BillingPlan` gains `limits`, `kind`, `seatFeatureId`; `BillingSubscription` gains `entitlements` (`BillingEntitlements`); plan bodies take `kind`, `limits`, `seatFeatureId`; `ReportBillingUsageBody` takes `feature` and `subscriptionId`. `AtlasConstants.BILLING_PROVIDERS`.
+- **Custom OAuth / OIDC providers.** `customOAuthProviders()`: `list`, `get`, `create` / `update` (`CustomOAuthProviderBody`), `delete`, `discover`, `previewProfileMapping` (ad hoc or by id, `ProfileMappingPreview`), `listSigningKeys` / `rotateSigningKey` / `retireSigningKey` (`UpstreamSigningKey`). SSO connections gain `previewProfileMapping` and the signing-key methods; their bodies take the relying-party settings, and `SsoConnection` reports them plus `upstreamUrls`.
+- **Actions gallery.** `actionGallery()` (`list`, `get`, `install`, `installs`, `update`) and `actionTemplates()` (`list`, `create` / `update` with `ActionTemplateBody`, `get`, `delete`, `addVersion`, `submitVersion`, `deleteVersion`, `publish`, `unlist`). `ActionTestResult.httpRequests`; sample events take `user.organizations` and `request.country`.
+- **Session custom data.** `sessions().setCustomData` (replace; null clears), `updateCustomData` (merge; a null value removes a key), `create(userId, actorSub, customData)`; `Session.customData`, `MintedSession.customData`. `AtlasConstants.WEBHOOK_EVENT_SESSION_UPDATED`.
+- **Sign-in settings.** `instanceSecurity().setWalletRpcSecret`; rate-limit `rules` (`RateLimitRule`) on `UpdateRateLimitPolicyBody` and `RateLimitPolicy` (plus the verify / LDAP budgets and the group catalog); `instance().setAccountLinkingTrust`, `instance().setCaptchaConfig`; `AtlasConstants.CAPTCHA_PROVIDERS` (incl. `captchafox`, `vercel_botid`), `LINKING_TRUST_LEVELS`.
+- **Vercel BotID attestations.** `BotId.createAttestation(secret, isBot, isVerifiedBot[, ttlSeconds, nowSeconds])` in Atlas's `atlas_botid.v1` format.
+- **Enterprise SSO.** SAML Single Logout and encrypted-assertion fields on SSO bodies and `SsoConnection`; `SsoConnectionSamlMetadata.sloUrl`; `ssoConnections().getSamlEncryptionKey`, `createSamlEncryptionKey`, `retirePreviousSamlEncryptionKey`, `deleteSamlEncryptionKey` (`SamlEncryptionKey`). Attack protection `dormantAccounts` (`DormantAccountsSettings`); risk weight / signal `dormantAccount`; `AtlasConstants.WEBHOOK_EVENT_USER_REACTIVATED`, `EMAIL_TEMPLATE_ACCOUNT_REACTIVATED`.
+- **Atlas as OAuth provider.** `OAuthClient.accessTokenFormat` / `tokenLifetimes` (`OAuthTokenLifetimes`) and the same on client bodies; resource servers report and take `accessTokenFormat`, refresh lifetimes and `introspectionClientIds`. `instanceSecurity().getSigningKeyProvider` / `setSigningKeyProvider` / `removeSigningKeyProvider` (`SigningKeyProviderSettings`; AWS KMS, Google Cloud KMS, Azure Key Vault).
+- **Opaque access tokens.** `AccessTokenVerifier.Builder.introspection(Introspector)`: non-JWT access tokens are validated at Atlas's RFC 7662 endpoint with your API's client credentials, cached by token hash (TTL, negative TTL, never past `exp`, bounded); `Introspector.Builder.introspectJwts(true)` checks JWTs live too.
+- **Device sign-in approval.** `DeviceAuthorizations(frontendApi, sessionToken[, publishableKey, httpClient])`: `lookup`, `approve`, `deny` with the user's session token; `DeviceAuthorizationException` (`needsReverification`, `isInvalidCode`); `formatUserCode`, `userCodeFromUrl`.
+- The API coverage list now holds all 588 Backend and Platform API operations.
+
+Records keep their previous constructors.
+
+### Changed
+
+- Without introspection, a token that is not a JWT is refused with "configure introspection to accept opaque tokens" instead of "malformed".
+
 ## 1.11.0 — 2026-10-23
 
 ### Added

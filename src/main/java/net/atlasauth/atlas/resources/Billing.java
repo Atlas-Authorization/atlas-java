@@ -1,5 +1,7 @@
 package net.atlasauth.atlas.resources;
 
+import net.atlasauth.atlas.models.BillingFeatureCheck;
+import net.atlasauth.atlas.models.BillingSettings;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.core.type.TypeReference;
 import net.atlasauth.atlas.Params;
@@ -162,6 +164,54 @@ public final class Billing {
     public JsonNode deleteProvider(String provider, boolean force) {
         Map<String, Object> q = force ? Params.of("force", "true").map() : Params.of().map();
         return t.delete("/v1/billing/providers/" + enc(provider), q, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code GET /v1/billing/subscriptions/{id}} — one subscription (a subject may hold
+     * several: a base plan plus add-ons).
+     */
+    public BillingSubscription getSubscription(String id) {
+        return t.get("/v1/billing/subscriptions/" + enc(id), new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code POST /v1/billing/plans/{id}/sync_entitlements} — mirror a plan's features and
+     * limits from its provider (Autumn, Commet).
+     */
+    public BillingPlan syncPlanEntitlements(String id) {
+        return t.post("/v1/billing/plans/" + enc(id) + "/sync_entitlements", null, new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/billing/settings} — how numeric limits merge across a subject's subscriptions. */
+    public BillingSettings getSettings() {
+        return t.get("/v1/billing/settings", new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code PUT /v1/billing/settings} — {@code defaultLimitMerge} is {@code max} or
+     * {@code sum}; {@code limitMerge} (limit key → {@code max} | {@code sum}) replaces the
+     * stored map. Either may be null to leave it.
+     */
+    public BillingSettings updateSettings(String defaultLimitMerge, Map<String, String> limitMerge) {
+        Map<String, Object> body = Params.of().set("default_limit_merge", defaultLimitMerge)
+                .set("limit_merge", limitMerge).map();
+        return t.put("/v1/billing/settings", body, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code POST /v1/billing/check} — may a subject use a feature? {@code required} is the
+     * units about to be used (null = 1). Asked live of Autumn/Commet when the subject is on
+     * one, otherwise from the resolved entitlement and this period's usage.
+     */
+    public BillingFeatureCheck checkFeature(String subjectType, String subjectId, String feature, Double required) {
+        Map<String, Object> body = Params.of().set("subject_type", subjectType).set("subject_id", subjectId)
+                .set("feature", feature).set("required", required).map();
+        return t.post("/v1/billing/check", body, new TypeReference<>() {
         });
     }
 }

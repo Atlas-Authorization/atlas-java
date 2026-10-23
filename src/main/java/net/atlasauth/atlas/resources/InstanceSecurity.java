@@ -1,5 +1,6 @@
 package net.atlasauth.atlas.resources;
 
+import net.atlasauth.atlas.models.SigningKeyProviderSettings;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.atlasauth.atlas.Params;
@@ -143,6 +144,55 @@ public final class InstanceSecurity {
         Map<String, Object> body = Params.of().set("alg", alg).set("grace_period_seconds", gracePeriodSeconds)
                 .set("emergency", emergency).map();
         return t.post("/v1/instance/signing_keys/rotate", body, new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/instance/signing_key_provider} — the KMS the signing key lives in ({@code local} when none). */
+    public SigningKeyProviderSettings getSigningKeyProvider() {
+        return t.get("/v1/instance/signing_key_provider", new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code PUT /v1/instance/signing_key_provider} — sign every token with a key in your own
+     * KMS ({@code aws_kms}, {@code gcp_kms}, {@code azure_key_vault}).
+     * <ul>
+     *   <li>aws_kms: config {@code {region, key_id?, alg?}}, credentials {@code {access_key_id, secret_access_key, session_token?}}</li>
+     *   <li>gcp_kms: config {@code {crypto_key, key_version?}}, credentials {@code {service_account_json}}</li>
+     *   <li>azure_key_vault: config {@code {vault_url, key_name, key_version?, alg?}}, credentials {@code {tenant_id, client_id, client_secret}}</li>
+     * </ul>
+     * Without a key id / version Atlas creates a new key version in the KMS.
+     */
+    public SigningKeyProviderSettings setSigningKeyProvider(String provider, Map<String, Object> config,
+                                                            Map<String, Object> credentials, Long gracePeriodSeconds,
+                                                            Boolean emergency) {
+        Map<String, Object> body = Params.of().set("provider", provider).set("config", config)
+                .set("credentials", credentials).set("grace_period_seconds", gracePeriodSeconds)
+                .set("emergency", emergency).map();
+        return t.put("/v1/instance/signing_key_provider", body, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code DELETE /v1/instance/signing_key_provider} — rotate back to a key Atlas holds and
+     * forget the KMS credentials.
+     */
+    public SigningKeyProviderSettings removeSigningKeyProvider(Long gracePeriodSeconds, Boolean emergency) {
+        Map<String, Object> body = Params.of().set("grace_period_seconds", gracePeriodSeconds)
+                .set("emergency", emergency).map();
+        return t.request("DELETE", "/v1/instance/signing_key_provider", null, body, null, false,
+                new TypeReference<>() {
+                });
+    }
+
+    /**
+     * {@code PUT /v1/instance/wallet_rpc_secret} — store (write-only, encrypted) the wallet
+     * RPC endpoint for an EIP-155 chain, used by wallet token gating and the Sign in with
+     * Ethereum ENS lookup. An empty url removes it.
+     */
+    public JsonNode setWalletRpcSecret(long chainId, String url) {
+        Map<String, Object> body = Params.of().set("chain_id", chainId).set("url", url).map();
+        return t.put("/v1/instance/wallet_rpc_secret", body, new TypeReference<>() {
         });
     }
 }

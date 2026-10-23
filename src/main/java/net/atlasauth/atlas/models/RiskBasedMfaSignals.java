@@ -13,5 +13,11 @@ public record RiskBasedMfaSignals(
         @JsonProperty("newSubnet") boolean newSubnet,
         @JsonProperty("newIp") boolean newIp,
         @JsonProperty("velocity") boolean velocity,
-        @JsonProperty("impossibleTravel") boolean impossibleTravel) {
+        @JsonProperty("impossibleTravel") boolean impossibleTravel,
+        @JsonProperty("dormantAccount") boolean dormantAccount) {
+
+    /** The 1.11 shape, before the custom-data, add-on, enterprise and token-format fields. */
+    public RiskBasedMfaSignals(boolean newDevice, boolean newSubnet, boolean newIp, boolean velocity, boolean impossibleTravel) {
+        this(newDevice, newSubnet, newIp, velocity, impossibleTravel, false);
+    }
 }

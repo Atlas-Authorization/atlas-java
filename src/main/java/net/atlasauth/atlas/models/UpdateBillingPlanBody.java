@@ -1,5 +1,9 @@
 package net.atlasauth.atlas.models;
 
+import java.util.Map;
+import java.util.LinkedHashMap;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import java.util.List;
 
 /** Body for {@code PATCH /v1/billing/plans/:id}. */
@@ -21,6 +25,15 @@ public final class UpdateBillingPlanBody {
     public List<String> features;
     public String audience;
     public Boolean active;
+    /** Numeric limits the plan grants (-1 = unlimited). */
+    public Map<String, Object> limits;
+    /** base (default) or addon. */
+    public String kind;
+    /** Autumn plans: one of the plan's features; its usage follows the org's member count. Clear it with {@code set("seat_feature_id", null)}. */
+    public String seatFeatureId;
+
+    @JsonIgnore
+    private final Map<String, Object> additionalFields = new LinkedHashMap<>();
 
     public UpdateBillingPlanBody name(String v) { this.name = v; return this; }
     public UpdateBillingPlanBody slug(String v) { this.slug = v; return this; }
@@ -36,4 +49,17 @@ public final class UpdateBillingPlanBody {
     public UpdateBillingPlanBody providerPriceId(String v) { this.providerPriceId = v; return this; }
     public UpdateBillingPlanBody annualPriceId(String v) { this.annualPriceId = v; return this; }
     public UpdateBillingPlanBody annualAmount(String v) { this.annualAmount = v; return this; }
+
+    public UpdateBillingPlanBody limits(Map<String, Object> v) { this.limits = v; return this; }
+    public UpdateBillingPlanBody kind(String v) { this.kind = v; return this; }
+    public UpdateBillingPlanBody seatFeatureId(String v) { this.seatFeatureId = v; return this; }
+
+    /**
+     * Set any field by its wire name, including an explicit {@code null} (which
+     * clears a stored value on a partial update) or a field this SDK does not model yet.
+     */
+    public UpdateBillingPlanBody set(String key, Object value) { this.additionalFields.put(key, value); return this; }
+
+    @JsonAnyGetter
+    public Map<String, Object> additionalFields() { return additionalFields; }
 }

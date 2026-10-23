@@ -26,13 +26,33 @@ import java.util.regex.Pattern;
  * refusal carries the RFC 6750 / RFC 9728 {@code WWW-Authenticate} challenge, so an OAuth or MCP
  * client can discover Atlas from the 401 ({@code resource_metadata}) or ask for the missing scope.
  *
- * <p>DPoP-bound tokens ({@code cnf.jkt}) are refused: this verifier checks Bearer tokens only.
+ * <p>Sender-constrained tokens (RFC 9449 DPoP) are enforced: a token bound to a key
+ * ({@code cnf.jkt}) is accepted only with the {@code DPoP} scheme and a valid DPoP proof from that
+ * key, never as a plain Bearer token. {@link Builder#requireDpop} refuses unbound tokens
+ * altogether, and {@link Builder#dpopNonces} demands a server nonce.
  */
 public final class AccessTokenVerifier {
 
-    /** The verdict; {@link #ok} with claims on success, else status + challenge. */
+    /**
+     * The verdict; {@link #ok} with claims on success, else status + challenge. {@code dpopNonce},
+     * when not null, goes in the {@code DPoP-Nonce} response header (on success and refusal alike).
+     */
     public record Result(boolean ok, int status, String error, String description, String wwwAuthenticate,
-                         Map<String, Object> claims, List<String> scopes, String subject, String clientId) {
+                         Map<String, Object> claims, List<String> scopes, String subject, String clientId,
+                         boolean dpopBound, String dpopNonce) {
+        /** The pre-DPoP shape (not bound, no nonce). */
+        public Result(boolean ok, int status, String error, String description, String wwwAuthenticate,
+                      Map<String, Object> claims, List<String> scopes, String subject, String clientId) {
+            this(ok, status, error, description, wwwAuthenticate, claims, scopes, subject, clientId, false, null);
+        }
+    }
+
+    /**
+     * What verification reads from an HTTP request: the method, the URL (absolute, or a path resolved
+     * against {@link Builder#publicOrigin}) for the DPoP {@code htu}, and the {@code Authorization}
+     * and {@code DPoP} header values (either may be null).
+     */
+    public record ResourceRequest(String method, String url, String authorization, String dpop) {
     }
 
     private static final Pattern AUTHZ = Pattern.compile("^(Bearer|DPoP)\\s+([A-Za-z0-9\\-._~+/]+=*)$",
@@ -45,6 +65,11 @@ public final class AccessTokenVerifier {
     private final String realm;
     private final LongSupplier now;
     private final JwksCache jwks;
+    private final boolean requireDpop;
+    private final String publicOrigin;
+    private final DpopReplayStore dpopReplay;
+    private final DpopNonceSource dpopNonces;
+    private final Introspector introspector;
 
     private AccessTokenVerifier(Builder b) {
         if (b.issuer == null || b.issuer.isEmpty()) {
@@ -62,74 +87,161 @@ public final class AccessTokenVerifier {
         HttpClient http = b.http != null ? b.http : HttpClient.newHttpClient();
         String url = b.jwksUrl != null ? b.jwksUrl : this.issuer + "/.well-known/jwks.json";
         this.jwks = new JwksCache(url, http, this.now);
+        this.requireDpop = b.requireDpop;
+        this.publicOrigin = b.publicOrigin;
+        this.dpopReplay = b.dpopReplay != null ? b.dpopReplay : new MemoryDpopReplayStore(10_000, this.now);
+        this.dpopNonces = b.dpopNonces;
+        this.introspector = b.introspector;
+    }
+
+    /** Whether a {@link Builder#publicOrigin} is set (framework adapters then pass the path, not the full URL). */
+    public boolean hasPublicOrigin() {
+        return publicOrigin != null;
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    /** Verify an {@code Authorization} header value. Never throws for a bad token. */
+    /**
+     * Verify an {@code Authorization} header value with no DPoP proof: a DPoP-bound token is refused.
+     * Use {@link #verifyRequest(ResourceRequest, String...)} for DPoP. Never throws for a bad token.
+     */
     public Result verify(String authorization, String... extraScopes) {
+        return verifyRequest(new ResourceRequest("GET", "", authorization, null), extraScopes);
+    }
+
+    /**
+     * Verify a request: its {@code Authorization} header ({@code Bearer} or {@code DPoP} scheme) and,
+     * for a DPoP-bound token, its {@code DPoP} proof against the method and URL. Never throws for a
+     * bad token.
+     */
+    public Result verifyRequest(ResourceRequest request, String... extraScopes) {
         List<String> required = new ArrayList<>(requiredScopes);
         required.addAll(Arrays.asList(extraScopes));
+        String nonce = dpopNonces == null ? null : dpopNonces.current();
+        Refuser refuse = (status, error, description, req, scheme) ->
+                refuse(status, error, description, req, scheme, nonce);
+        String authorization = request.authorization();
         String value = authorization == null ? "" : authorization.trim();
         if (value.isEmpty()) {
-            return refuse(401, null, "Authentication required.", required);
+            return refuse.at(401, null, "Authentication required.", required, null);
         }
         Matcher m = AUTHZ.matcher(value);
         if (!m.matches()) {
-            return refuse(400, "invalid_request", "Malformed Authorization header.", required);
+            return refuse.at(400, "invalid_request", "Malformed Authorization header.", required, null);
         }
-        if (m.group(1).equalsIgnoreCase("dpop")) {
-            return refuse(401, "invalid_token", "DPoP-bound access tokens are not accepted here.", required);
-        }
+        boolean presentedDpop = m.group(1).equalsIgnoreCase("dpop");
         String token = m.group(2);
         String invalid = "The access token is invalid or expired.";
-        SignedJWT jwt;
-        try {
-            jwt = SignedJWT.parse(token);
-        } catch (Exception e) {
-            return refuse(401, "invalid_token", "The access token is malformed.", required);
-        }
-        String kid = jwt.getHeader().getKeyID();
-        JWKSet keys = jwks.get(kid);
-        if (keys == null || keys.getKeys().isEmpty()) {
-            return refuse(401, "invalid_token", "No signing keys are available to verify the token.", required);
-        }
         Map<String, Object> claims;
-        try {
-            if (!SigningAlgs.allowed(jwt) || !SigningAlgs.verify(jwt, keys, kid)) {
-                return refuse(401, "invalid_token", invalid, required);
+        boolean isJwt = token.split("\\.", -1).length == 3;
+        if (!isJwt || (introspector != null && introspector.introspectJwts())) {
+            // An opaque token (or a JWT the caller wants checked live) is validated by Atlas itself.
+            if (introspector == null) {
+                return refuse.at(401, "invalid_token",
+                        "The access token is not a JWT; configure introspection to accept opaque tokens.", required, null);
             }
-            JWTClaimsSet set = jwt.getJWTClaimsSet();
-            long nowSec = now.getAsLong() / 1000L;
-            if (!issuer.equals(set.getIssuer())) {
-                return refuse(401, "invalid_token", invalid, required);
+            Map<String, Object> active;
+            try {
+                active = introspector.introspect(token);
+            } catch (Introspector.IntrospectionException e) {
+                return refuse.at(401, "invalid_token", "The access token could not be validated right now.", required, null);
             }
-            Date exp = set.getExpirationTime();
-            if (exp == null || nowSec > exp.getTime() / 1000L + SessionVerifier.CLOCK_SKEW_SECONDS) {
-                return refuse(401, "invalid_token", invalid, required);
+            if (active == null) {
+                return refuse.at(401, "invalid_token", invalid, required, null);
             }
-            Date nbf = set.getNotBeforeTime();
-            if (nbf != null && nowSec < nbf.getTime() / 1000L - SessionVerifier.CLOCK_SKEW_SECONDS) {
-                return refuse(401, "invalid_token", invalid, required);
+            if (active.containsKey("iss") && !String.valueOf(active.get("iss")).replaceAll("/+$", "").equals(issuer)) {
+                return refuse.at(401, "invalid_token", "The access token was issued by another authorization server.",
+                        required, null);
             }
-            claims = set.getClaims();
-            Object tokenUse = claims.get("token_use");
+            if (active.get("exp") instanceof Number exp
+                    && exp.longValue() + SessionVerifier.CLOCK_SKEW_SECONDS <= now.getAsLong() / 1000L) {
+                return refuse.at(401, "invalid_token", invalid, required, null);
+            }
+            Object tokenUse = active.get("token_use");
             if (tokenUse != null && !"access_token".equals(tokenUse)) {
-                return refuse(401, "invalid_token", "The token is not an access token.", required);
+                return refuse.at(401, "invalid_token", "The token is not an access token.", required, null);
             }
             if (audiences != null) {
-                List<String> aud = set.getAudience();
-                if (aud == null || aud.stream().noneMatch(audiences::contains)) {
-                    return refuse(401, "invalid_token", "The access token was not issued for this resource.", required);
+                Object aud = active.get("aud");
+                List<?> auds = aud instanceof List<?> l ? l : aud == null ? List.of() : List.of(aud);
+                if (auds.stream().noneMatch(a -> audiences.contains(String.valueOf(a)))) {
+                    return refuse.at(401, "invalid_token", "The access token was not issued for this resource.", required, null);
                 }
             }
-        } catch (Exception e) {
-            return refuse(401, "invalid_token", invalid, required);
+            claims = active;
+        } else {
+            SignedJWT jwt;
+            try {
+                jwt = SignedJWT.parse(token);
+            } catch (Exception e) {
+                return refuse.at(401, "invalid_token", "The access token is malformed.", required, null);
+            }
+            String kid = jwt.getHeader().getKeyID();
+            JWKSet keys = jwks.get(kid);
+            if (keys == null || keys.getKeys().isEmpty()) {
+                return refuse.at(401, "invalid_token", "No signing keys are available to verify the token.", required, null);
+            }
+            try {
+                if (!SigningAlgs.allowed(jwt) || !SigningAlgs.verify(jwt, keys, kid)) {
+                    return refuse.at(401, "invalid_token", invalid, required, null);
+                }
+                JWTClaimsSet set = jwt.getJWTClaimsSet();
+                long nowSec = now.getAsLong() / 1000L;
+                if (!issuer.equals(set.getIssuer())) {
+                    return refuse.at(401, "invalid_token", invalid, required, null);
+                }
+                Date exp = set.getExpirationTime();
+                if (exp == null || nowSec > exp.getTime() / 1000L + SessionVerifier.CLOCK_SKEW_SECONDS) {
+                    return refuse.at(401, "invalid_token", invalid, required, null);
+                }
+                Date nbf = set.getNotBeforeTime();
+                if (nbf != null && nowSec < nbf.getTime() / 1000L - SessionVerifier.CLOCK_SKEW_SECONDS) {
+                    return refuse.at(401, "invalid_token", invalid, required, null);
+                }
+                claims = set.getClaims();
+                Object tokenUse = claims.get("token_use");
+                if (tokenUse != null && !"access_token".equals(tokenUse)) {
+                    return refuse.at(401, "invalid_token", "The token is not an access token.", required, null);
+                }
+                if (audiences != null) {
+                    List<String> aud = set.getAudience();
+                    if (aud == null || aud.stream().noneMatch(audiences::contains)) {
+                        return refuse.at(401, "invalid_token", "The access token was not issued for this resource.", required, null);
+                    }
+                }
+            } catch (Exception e) {
+                return refuse.at(401, "invalid_token", invalid, required, null);
+            }
         }
+        // Sender constraint (RFC 9449). A bound token is only ever a DPoP token.
+        String jkt = null;
         if (claims.get("cnf") instanceof Map<?, ?> cnf && cnf.containsKey("jkt")) {
-            return refuse(401, "invalid_token", "DPoP-bound access tokens are not accepted here.", required);
+            if (!(cnf.get("jkt") instanceof String j) || j.isEmpty()) {
+                return refuse.at(401, "invalid_token", invalid, required, null);
+            }
+            jkt = j;
+        }
+        if (jkt != null || requireDpop || presentedDpop) {
+            if (jkt == null) {
+                return refuse.at(401, "invalid_token", "This resource requires a DPoP-bound access token.", required, "DPoP");
+            }
+            if (!presentedDpop) {
+                return refuse.at(401, "invalid_token", "A DPoP-bound access token must be sent with the DPoP scheme.",
+                        required, "DPoP");
+            }
+            String proof = request.dpop() == null ? "" : request.dpop().trim();
+            if (proof.isEmpty()) {
+                return refuse.at(401, "invalid_dpop_proof", "A DPoP proof is required.", required, "DPoP");
+            }
+            String method = request.method() == null || request.method().isEmpty()
+                    ? "GET" : request.method().toUpperCase(java.util.Locale.ROOT);
+            Dpop.Refusal r = Dpop.check(proof, token, jkt, method, request.url() == null ? "" : request.url(),
+                    publicOrigin, now.getAsLong(), dpopReplay, dpopNonces);
+            if (r != null) {
+                return refuse.at(401, r.error(), r.description(), required, "DPoP");
+            }
         }
         List<String> scopes = claims.get("scope") instanceof String s && !s.isBlank()
                 ? List.of(s.trim().split("\\s+")) : List.of();
@@ -143,19 +255,28 @@ public final class AccessTokenVerifier {
         }
         List<String> missing = required.stream().filter(s -> !granted.contains(s)).toList();
         if (!missing.isEmpty()) {
-            return refuse(403, "insufficient_scope",
-                    "The access token is missing the required scope(s): " + String.join(" ", missing) + ".", required);
+            return refuse.at(403, "insufficient_scope",
+                    "The access token is missing the required scope(s): " + String.join(" ", missing) + ".", required, null);
         }
         Object clientId = claims.get("client_id") != null ? claims.get("client_id") : claims.get("azp");
         Object sub = claims.get("sub");
         return new Result(true, 200, null, "", "", Collections.unmodifiableMap(new LinkedHashMap<>(claims)), scopes,
-                sub == null ? "" : String.valueOf(sub), clientId == null ? null : String.valueOf(clientId));
+                sub == null ? "" : String.valueOf(sub), clientId == null ? null : String.valueOf(clientId),
+                jkt != null, nonce);
     }
 
-    private Result refuse(int status, String error, String description, List<String> required) {
+    @FunctionalInterface
+    private interface Refuser {
+        Result at(int status, String error, String description, List<String> required, String scheme);
+    }
+
+    private Result refuse(int status, String error, String description, List<String> required, String scheme,
+                          String nonce) {
         List<String> scope = (error == null || error.equals("insufficient_scope")) ? required : null;
+        String challenge = scheme != null ? scheme : (requireDpop ? "DPoP" : "Bearer");
         return new Result(false, status, error, description,
-                buildWwwAuthenticate(realm, error, description, scope, resourceMetadataUrl), Map.of(), List.of(), "", null);
+                buildWwwAuthenticate(challenge, realm, error, description, scope, resourceMetadataUrl), Map.of(),
+                List.of(), "", null, false, nonce);
     }
 
     /**
@@ -164,6 +285,15 @@ public final class AccessTokenVerifier {
      */
     public static String buildWwwAuthenticate(String realm, String error, String description, List<String> scope,
                                               String resourceMetadataUrl) {
+        return buildWwwAuthenticate("Bearer", realm, error, description, scope, resourceMetadataUrl);
+    }
+
+    /**
+     * An RFC 6750 / RFC 9449 / RFC 9728 challenge for {@code scheme} {@code Bearer} or {@code DPoP}
+     * (a DPoP challenge also lists the accepted proof algorithms). Other arguments are nullable.
+     */
+    public static String buildWwwAuthenticate(String scheme, String realm, String error, String description,
+                                              List<String> scope, String resourceMetadataUrl) {
         List<String> parts = new ArrayList<>();
         if (realm != null) {
             parts.add("realm=" + quote(realm));
@@ -180,17 +310,34 @@ public final class AccessTokenVerifier {
         if (resourceMetadataUrl != null) {
             parts.add("resource_metadata=" + quote(resourceMetadataUrl));
         }
-        return parts.isEmpty() ? "Bearer" : "Bearer " + String.join(", ", parts);
+        String sch = "DPoP".equals(scheme) ? "DPoP" : "Bearer";
+        if (sch.equals("DPoP")) {
+            parts.add("algs=" + quote(String.join(" ", Dpop.ALGS)));
+        }
+        return parts.isEmpty() ? sch : sch + " " + String.join(", ", parts);
     }
 
     /** The RFC 9728 protected-resource metadata document for your API. */
     public static Map<String, Object> protectedResourceMetadata(String resource, String issuer, List<String> scopesSupported) {
+        return protectedResourceMetadata(resource, issuer, scopesSupported, false);
+    }
+
+    /**
+     * The RFC 9728 protected-resource metadata document; {@code dpopBoundAccessTokensRequired}
+     * advertises that tokens must be DPoP-bound (pair it with {@link Builder#requireDpop}).
+     */
+    public static Map<String, Object> protectedResourceMetadata(String resource, String issuer, List<String> scopesSupported,
+                                                                boolean dpopBoundAccessTokensRequired) {
         Map<String, Object> doc = new LinkedHashMap<>();
         doc.put("resource", resource);
         doc.put("authorization_servers", List.of(issuer.replaceAll("/+$", "")));
         doc.put("bearer_methods_supported", List.of("header"));
         if (scopesSupported != null && !scopesSupported.isEmpty()) {
             doc.put("scopes_supported", scopesSupported);
+        }
+        doc.put("dpop_signing_alg_values_supported", Dpop.ALGS);
+        if (dpopBoundAccessTokensRequired) {
+            doc.put("dpop_bound_access_tokens_required", true);
         }
         return doc;
     }
@@ -216,6 +363,11 @@ public final class AccessTokenVerifier {
         private String realm;
         private HttpClient http;
         private LongSupplier now;
+        private boolean requireDpop;
+        private String publicOrigin;
+        private DpopReplayStore dpopReplay;
+        private DpopNonceSource dpopNonces;
+        private Introspector introspector;
 
         public Builder issuer(String v) { this.issuer = v; return this; }
         /** Your API identifier (the resource server identifier); call again to accept several. */
@@ -228,6 +380,19 @@ public final class AccessTokenVerifier {
         public Builder realm(String v) { this.realm = v; return this; }
         public Builder httpClient(HttpClient v) { this.http = v; return this; }
         public Builder now(LongSupplier v) { this.now = v; return this; }
+        /** Refuse every token that is not DPoP-bound and challenge with the {@code DPoP} scheme. */
+        public Builder requireDpop(boolean v) { this.requireDpop = v; return this; }
+        /** This API's public origin, for the DPoP {@code htu} when the request URL is a path (set it behind a proxy). */
+        public Builder publicOrigin(String v) { this.publicOrigin = v; return this; }
+        /** Where DPoP proof {@code jti}s are recorded; default a {@link MemoryDpopReplayStore} (one process). */
+        public Builder dpopReplayStore(DpopReplayStore v) { this.dpopReplay = v; return this; }
+        /** Require every DPoP proof to carry a nonce this source issued ({@code use_dpop_nonce} otherwise). */
+        public Builder dpopNonces(DpopNonceSource v) { this.dpopNonces = v; return this; }
+        /**
+         * Validate opaque access tokens (and, with {@link Introspector.Builder#introspectJwts},
+         * JWTs too) at Atlas's RFC 7662 introspection endpoint, cached briefly.
+         */
+        public Builder introspection(Introspector v) { this.introspector = v; return this; }
 
         public AccessTokenVerifier build() {
             return new AccessTokenVerifier(this);

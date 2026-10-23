@@ -17,5 +17,11 @@ public record MintedSession(
         String jwt,
         String refreshToken,
         long expiresIn,
-        Map<String, Object> impersonatedBy) {
+        Map<String, Object> impersonatedBy,
+        /** The custom data attached at creation, if any. */ Map<String, Object> customData) {
+
+    /** The 1.11 shape, before the custom-data, add-on, enterprise and token-format fields. */
+    public MintedSession(String object, String id, String userId, String jwt, String refreshToken, long expiresIn, Map<String, Object> impersonatedBy) {
+        this(object, id, userId, jwt, refreshToken, expiresIn, impersonatedBy, null);
+    }
 }

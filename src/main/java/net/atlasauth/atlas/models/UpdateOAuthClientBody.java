@@ -1,5 +1,9 @@
 package net.atlasauth.atlas.models;
 
+import java.util.Map;
+import java.util.LinkedHashMap;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import java.util.List;
 
 /** Body for {@code PATCH /v1/oauth_clients/:id}. */
@@ -28,6 +32,13 @@ public final class UpdateOAuthClientBody {
      * redirects straight back (with {@code state}) without the confirmation page.
      */
     public Boolean skipLogoutConfirmation;
+    /** jwt or opaque; clear it with {@code set("access_token_format", null)}. */
+    public String accessTokenFormat;
+    /** Replaces the token lifetime overrides; clear them with {@code set("token_lifetimes", null)}. */
+    public OAuthTokenLifetimes tokenLifetimes;
+
+    @JsonIgnore
+    private final Map<String, Object> additionalFields = new LinkedHashMap<>();
 
     public UpdateOAuthClientBody() {
     }
@@ -45,4 +56,16 @@ public final class UpdateOAuthClientBody {
     public UpdateOAuthClientBody sectorIdentifierUri(String v) { this.sectorIdentifierUri = v; return this; }
     public UpdateOAuthClientBody disabled(Boolean v) { this.disabled = v; return this; }
     public UpdateOAuthClientBody requirePkce(Boolean v) { this.requirePkce = v; return this; }
+
+    public UpdateOAuthClientBody accessTokenFormat(String v) { this.accessTokenFormat = v; return this; }
+    public UpdateOAuthClientBody tokenLifetimes(OAuthTokenLifetimes v) { this.tokenLifetimes = v; return this; }
+
+    /**
+     * Set any field by its wire name, including an explicit {@code null} (which
+     * clears a stored value on a partial update) or a field this SDK does not model yet.
+     */
+    public UpdateOAuthClientBody set(String key, Object value) { this.additionalFields.put(key, value); return this; }
+
+    @JsonAnyGetter
+    public Map<String, Object> additionalFields() { return additionalFields; }
 }

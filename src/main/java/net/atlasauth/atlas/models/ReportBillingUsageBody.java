@@ -13,6 +13,10 @@ public final class ReportBillingUsageBody {
     public String subjectId;
     public Double quantity;
     public String idempotencyKey;
+    /** Count against this provider feature (an Autumn feature id / Commet feature code). */
+    public String feature;
+    /** Attribute to this subscription when the subject holds several. */
+    public String subscriptionId;
 
     @JsonIgnore
     private final Map<String, Object> additionalFields = new LinkedHashMap<>();
@@ -33,4 +37,7 @@ public final class ReportBillingUsageBody {
 
     @JsonAnyGetter
     public Map<String, Object> additionalFields() { return additionalFields; }
+
+    public ReportBillingUsageBody feature(String v) { this.feature = v; return this; }
+    public ReportBillingUsageBody subscriptionId(String v) { this.subscriptionId = v; return this; }
 }

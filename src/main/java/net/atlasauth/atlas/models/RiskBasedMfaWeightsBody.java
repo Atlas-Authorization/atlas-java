@@ -16,10 +16,14 @@ public final class RiskBasedMfaWeightsBody {
     public Double velocity;
     @JsonProperty("impossibleTravel")
     public Double impossibleTravel;
+    /** The account was idle past the dormant-account threshold before this sign-in. */
+    @JsonProperty("dormantAccount")
+    public Double dormantAccount;
 
     public RiskBasedMfaWeightsBody newDevice(Double v) { this.newDevice = v; return this; }
     public RiskBasedMfaWeightsBody newSubnet(Double v) { this.newSubnet = v; return this; }
     public RiskBasedMfaWeightsBody newIp(Double v) { this.newIp = v; return this; }
     public RiskBasedMfaWeightsBody velocity(Double v) { this.velocity = v; return this; }
     public RiskBasedMfaWeightsBody impossibleTravel(Double v) { this.impossibleTravel = v; return this; }
+    public RiskBasedMfaWeightsBody dormantAccount(Double v) { this.dormantAccount = v; return this; }
 }

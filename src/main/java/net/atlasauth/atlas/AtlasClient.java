@@ -3,7 +3,10 @@ package net.atlasauth.atlas;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.atlasauth.atlas.http.Json;
 import net.atlasauth.atlas.http.Transport;
+import net.atlasauth.atlas.resources.ActionGallery;
+import net.atlasauth.atlas.resources.ActionTemplates;
 import net.atlasauth.atlas.resources.Actions;
+import net.atlasauth.atlas.resources.CustomOAuthProviders;
 import net.atlasauth.atlas.resources.ActorTokens;
 import net.atlasauth.atlas.resources.Allowlist;
 import net.atlasauth.atlas.resources.AppRoles;
@@ -147,6 +150,9 @@ public final class AtlasClient {
     private final SmsTemplates smsTemplates;
     private final Localizations localizations;
     private final Actions actions;
+    private final ActionGallery actionGallery;
+    private final ActionTemplates actionTemplates;
+    private final CustomOAuthProviders customOAuthProviders;
     private final Billing billing;
     private final Messaging messaging;
     private final ImportExport importExport;
@@ -246,6 +252,9 @@ public final class AtlasClient {
         this.smsTemplates = new SmsTemplates(transport);
         this.localizations = new Localizations(transport);
         this.actions = new Actions(transport);
+        this.actionGallery = new ActionGallery(transport);
+        this.actionTemplates = new ActionTemplates(transport);
+        this.customOAuthProviders = new CustomOAuthProviders(transport);
         this.billing = new Billing(transport);
         this.messaging = new Messaging(transport);
         this.importExport = new ImportExport(transport);
@@ -469,6 +478,21 @@ public final class AtlasClient {
 
     public Actions actions() {
         return actions;
+    }
+
+    /** The community Actions gallery: browse, install and update templates. */
+    public ActionGallery actionGallery() {
+        return actionGallery;
+    }
+
+    /** Action templates this instance publishes to the gallery. */
+    public ActionTemplates actionTemplates() {
+        return actionTemplates;
+    }
+
+    /** Your own upstream OAuth / OIDC login providers. */
+    public CustomOAuthProviders customOAuthProviders() {
+        return customOAuthProviders;
     }
 
     public Billing billing() {

@@ -16,10 +16,13 @@ public final class RiskBasedMfaSignalsBody {
     public Boolean velocity;
     @JsonProperty("impossibleTravel")
     public Boolean impossibleTravel;
+    @JsonProperty("dormantAccount")
+    public Boolean dormantAccount;
 
     public RiskBasedMfaSignalsBody newDevice(Boolean v) { this.newDevice = v; return this; }
     public RiskBasedMfaSignalsBody newSubnet(Boolean v) { this.newSubnet = v; return this; }
     public RiskBasedMfaSignalsBody newIp(Boolean v) { this.newIp = v; return this; }
     public RiskBasedMfaSignalsBody velocity(Boolean v) { this.velocity = v; return this; }
     public RiskBasedMfaSignalsBody impossibleTravel(Boolean v) { this.impossibleTravel = v; return this; }
+    public RiskBasedMfaSignalsBody dormantAccount(Boolean v) { this.dormantAccount = v; return this; }
 }

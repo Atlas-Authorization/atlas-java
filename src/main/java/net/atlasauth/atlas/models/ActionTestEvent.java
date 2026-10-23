@@ -2,6 +2,7 @@ package net.atlasauth.atlas.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
 import java.util.Map;
 
 /** The sample event a dry-run runs against; every field has a stand-in default. */
@@ -23,6 +24,8 @@ public final class ActionTestEvent {
         @JsonProperty("emailVerified")
         public Boolean emailVerified;
         public Map<String, Object> metadata;
+        /** The user's organization memberships, as {@code event.user.organizations}: {@code id}, {@code slug}, {@code name}, {@code role}. */
+        public List<Map<String, String>> organizations;
 
         public User() {
         }
@@ -31,6 +34,7 @@ public final class ActionTestEvent {
         public User email(String v) { this.email = v; return this; }
         public User emailVerified(Boolean v) { this.emailVerified = v; return this; }
         public User metadata(Map<String, Object> v) { this.metadata = v; return this; }
+        public User organizations(List<Map<String, String>> v) { this.organizations = v; return this; }
     }
 
     public static final class Connection {
@@ -45,11 +49,14 @@ public final class ActionTestEvent {
     public static final class Request {
         public String ip;
         public String userAgent;
+        /** The ISO code {@code event.request.country} should carry. */
+        public String country;
 
         public Request() {
         }
 
         public Request ip(String v) { this.ip = v; return this; }
         public Request userAgent(String v) { this.userAgent = v; return this; }
+        public Request country(String v) { this.country = v; return this; }
     }
 }

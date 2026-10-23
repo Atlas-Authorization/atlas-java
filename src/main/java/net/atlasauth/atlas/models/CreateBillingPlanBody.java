@@ -1,5 +1,9 @@
 package net.atlasauth.atlas.models;
 
+import java.util.Map;
+import java.util.LinkedHashMap;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import java.util.List;
 
 /** Body for {@code POST /v1/billing/plans}. */
@@ -23,6 +27,15 @@ public final class CreateBillingPlanBody {
     /** One of {@code user}, {@code org}. Defaults to {@code user}. */
     public String audience;
     public Boolean active;
+    /** Numeric limits the plan grants (-1 = unlimited). */
+    public Map<String, Object> limits;
+    /** base (default) or addon. */
+    public String kind;
+    /** Autumn plans: one of the plan's features; its usage follows the org's member count. Clear it with {@code set("seat_feature_id", null)}. */
+    public String seatFeatureId;
+
+    @JsonIgnore
+    private final Map<String, Object> additionalFields = new LinkedHashMap<>();
 
     public CreateBillingPlanBody() {
     }
@@ -47,4 +60,17 @@ public final class CreateBillingPlanBody {
     public CreateBillingPlanBody providerPriceId(String v) { this.providerPriceId = v; return this; }
     public CreateBillingPlanBody annualPriceId(String v) { this.annualPriceId = v; return this; }
     public CreateBillingPlanBody annualAmount(String v) { this.annualAmount = v; return this; }
+
+    public CreateBillingPlanBody limits(Map<String, Object> v) { this.limits = v; return this; }
+    public CreateBillingPlanBody kind(String v) { this.kind = v; return this; }
+    public CreateBillingPlanBody seatFeatureId(String v) { this.seatFeatureId = v; return this; }
+
+    /**
+     * Set any field by its wire name, including an explicit {@code null} (which
+     * clears a stored value on a partial update) or a field this SDK does not model yet.
+     */
+    public CreateBillingPlanBody set(String key, Object value) { this.additionalFields.put(key, value); return this; }
+
+    @JsonAnyGetter
+    public Map<String, Object> additionalFields() { return additionalFields; }
 }

@@ -16,5 +16,11 @@ public record ActionTestResult(
         Map<String, Object> idTokenClaims,
         Map<String, Object> appMetadata,
         List<String> logs,
-        String error) {
+        String error,
+        /** What the code queued with api.http (sent only on a real post_login / post_user_registration run). */ List<ActionTestHttpRequest> httpRequests) {
+
+    /** The 1.11 shape, before the custom-data, add-on, enterprise and token-format fields. */
+    public ActionTestResult(String object, String id, boolean denied, String denyReason, Map<String, Object> accessTokenClaims, Map<String, Object> idTokenClaims, Map<String, Object> appMetadata, List<String> logs, String error) {
+        this(object, id, denied, denyReason, accessTokenClaims, idTokenClaims, appMetadata, logs, error, null);
+    }
 }
