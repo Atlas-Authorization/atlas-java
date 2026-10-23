@@ -1,5 +1,8 @@
 package net.atlasauth.atlas.resources;
 
+import java.util.Map;
+import net.atlasauth.atlas.Params;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.core.type.TypeReference;
 import net.atlasauth.atlas.http.Transport;
 import net.atlasauth.atlas.models.BeforeUserCreateHook;
@@ -42,6 +45,17 @@ public final class UserHooks {
     /** {@code POST /v1/instance/hooks/before_user_create/test} — send the hook a sample draft; nothing is stored. */
     public BeforeUserCreateHookTest testBeforeUserCreate() {
         return t.post(PATH + "/test", null, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code GET /v1/instance/hooks/before_user_create/calls} — the hook's delivery log, newest first
+     * (kept 30 days). {@code status}: ok, failed, timeout, error or invalid_response.
+     */
+    public JsonNode listBeforeUserCreateCalls(Integer limit, String status, Boolean test, String startingAfter) {
+        Map<String, Object> q = Params.of().set("limit", limit).set("status", status)
+                .set("test", test == null ? null : test.toString()).set("starting_after", startingAfter).map();
+        return t.get("/v1/instance/hooks/before_user_create/calls", q, new TypeReference<>() {
         });
     }
 }

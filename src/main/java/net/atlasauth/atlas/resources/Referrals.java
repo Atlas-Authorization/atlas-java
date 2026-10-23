@@ -1,5 +1,6 @@
 package net.atlasauth.atlas.resources;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.core.type.TypeReference;
 import net.atlasauth.atlas.Params;
 import net.atlasauth.atlas.http.Transport;
@@ -168,6 +169,12 @@ public final class Referrals {
      */
     public UserReferralResult getForUser(String userId) {
         return t.get("/v1/users/" + enc(userId) + "/referral", new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/instance/referrals/calls/{id}} — one call of the delivery log (or by the platform's request id). */
+    public JsonNode getCall(String id) {
+        return t.get("/v1/instance/referrals/calls/" + enc(id), new TypeReference<>() {
         });
     }
 }

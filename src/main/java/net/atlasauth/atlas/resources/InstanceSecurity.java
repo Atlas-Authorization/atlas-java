@@ -125,4 +125,24 @@ public final class InstanceSecurity {
                 new TypeReference<>() {
                 });
     }
+
+    /**
+     * {@code GET /v1/instance/signing_keys} — the published token-signing keys: {@code current} and,
+     * inside a rotation's grace window, {@code previous} with {@code retires_at}.
+     */
+    public JsonNode listSigningKeys() {
+        return t.get("/v1/instance/signing_keys", new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code POST /v1/instance/signing_keys/rotate} — rotate the instance key, optionally switching
+     * {@code alg} (RS256 or ES256). {@code emergency} publishes ONLY the new key.
+     */
+    public JsonNode rotateSigningKey(String alg, Long gracePeriodSeconds, Boolean emergency) {
+        Map<String, Object> body = Params.of().set("alg", alg).set("grace_period_seconds", gracePeriodSeconds)
+                .set("emergency", emergency).map();
+        return t.post("/v1/instance/signing_keys/rotate", body, new TypeReference<>() {
+        });
+    }
 }

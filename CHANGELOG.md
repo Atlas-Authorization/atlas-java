@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.11.0 — 2026-10-23
+
+### Added
+
+- **App roles.** `appRoles()`: `list`, `create`, `get`, `update`, `delete`, `listUsers`, `getForUser`, `setForUser` (replace), `changeForUser` (add/remove), `removeFromUser`. `SessionClaims.hasAppRole` / `hasAppPermission` / `appRoles()` / `appPermissions()` and `ProtectCondition.appRole` / `appPermission` read the `app_roles` / `app_permissions` claims (no active organization needed).
+- **Organization teams and custom roles.** `organizations().teams()` (list, create, get, update, delete, members list/add/remove) and `organizations().roles()` (the roles an org can assign; create/update/delete its own, with `reassignTo`). `organizations().getBySlug`, `checkSlug`, `invitations().resend`.
+- **User search.** `users().list(UserSearchParams)`: `query`, `emailAddress`, `username`, `phoneNumber`, `externalId`, `banned`, `emailVerified`, `organizationId`, `createdAfter` / `createdBefore`, `orderBy`, `offset`, `includeTotalCount`.
+- **Timed bans.** `users().ban(id, reason, note, expiresInSeconds, expiresAt)`; `User.banExpiresAt`.
+- **API key controls.** `CreateApiKeyBody` `prefix`, `expiresInSeconds`, `enabled`, `rateLimit` (`ApiKeyRateLimit`), `remaining`, `scopes`; `UpdateApiKeyBody` `enabled`, `rateLimit`, `remaining`, `scopes` (clear with `set("rate_limit", null)` / `set("remaining", null)`). `apiKeys().verify(secret, requiredScopes)`; `ApiKeyVerification` carries `code` (`insufficient_scope`, `rate_limited`, `usage_exhausted`), `missingScopes`, `retryAfterMs`, `remaining`. `ApiKey` reports `enabled`, `rateLimit`, `remaining`, `scopes`.
+- **Billing providers (bring your own key).** `billing()`: `listProviders`, `getProvider`, `setProvider`, `testProvider`, `deleteProvider(force)`, `changeSubscription`, `cancelSubscription(immediately)`, `restoreSubscription`. Plan bodies and `BillingPlan` carry `provider`, `providerPriceId`, `annualPriceId`, `annualAmount`; `BillingSubscription` the provider, account, interval, scheduled change, trial and cancellation fields.
+- **OAuth server administration.** `instanceSecurity().listSigningKeys` / `rotateSigningKey(alg, gracePeriodSeconds, emergency)`; `oauthInitialAccessTokens()` (list, create, revoke). OAuth client bodies take `disabled`, `requirePkce`, `subjectType`, `sectorIdentifierUri`, `secretExpiresInSeconds` and `OAuthClient` reports them (with `clientSecretExpiresAt`); resource servers take and report `publishResourceMetadata`.
+- **Access-token verification for your API.** `AccessTokenVerifier` checks an Atlas-issued OAuth access token locally (issuer, expiry, `token_use`, audience, scopes) and returns the RFC 6750 / RFC 9728 `WWW-Authenticate` challenge on refusal; `buildWwwAuthenticate`, `protectedResourceMetadata`, `protectedResourceMetadataPath`; the Spring `AtlasAccessTokenFilter`. DPoP-bound tokens are refused.
+- `scimTokens().update`, `userHooks().listBeforeUserCreateCalls`, `referrals().getCall`; SCIM token bodies take `scopes` and `roleMappings`.
+
+### Changed
+
+- Session and logout-token verification accept **ES256** as well as RS256 (`SigningAlgs.ALGS`), and nothing else. The records that gained fields keep their previous constructors.
+
 ## 1.10.0
 
 ### Added

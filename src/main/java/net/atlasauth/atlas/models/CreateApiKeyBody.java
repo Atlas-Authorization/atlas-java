@@ -5,6 +5,18 @@ import java.util.Map;
 
 /** Body for {@code POST /v1/api_keys}. */
 public final class CreateApiKeyBody {
+    /** Alternative to expiresAt; without either the instance default lifetime applies. */
+    public Long expiresInSeconds;
+    /** A custom secret prefix, e.g. "acme" gives acme_<id>_<secret>. */
+    public String prefix;
+    /** False mints the key disabled. */
+    public Boolean enabled;
+    /** A per-key verify throttle. */
+    public ApiKeyRateLimit rateLimit;
+    /** A use budget each successful verify spends. */
+    public Long remaining;
+    /** Scopes the key carries (checked by verify requiredScopes). */
+    public java.util.List<String> scopes;
     /** "user" or "organization". */
     public String subjectType;
     public String subjectId;
@@ -29,4 +41,11 @@ public final class CreateApiKeyBody {
     public CreateApiKeyBody claims(Map<String, Object> v) { this.claims = v; return this; }
     public CreateApiKeyBody expiresAt(Long v) { this.expiresAt = v; return this; }
     public CreateApiKeyBody limits(List<ApiKeyLimit> v) { this.limits = v; return this; }
+
+    public CreateApiKeyBody expiresInSeconds(Long v) { this.expiresInSeconds = v; return this; }
+    public CreateApiKeyBody prefix(String v) { this.prefix = v; return this; }
+    public CreateApiKeyBody enabled(Boolean v) { this.enabled = v; return this; }
+    public CreateApiKeyBody rateLimit(ApiKeyRateLimit v) { this.rateLimit = v; return this; }
+    public CreateApiKeyBody remaining(Long v) { this.remaining = v; return this; }
+    public CreateApiKeyBody scopes(java.util.List<String> v) { this.scopes = v; return this; }
 }

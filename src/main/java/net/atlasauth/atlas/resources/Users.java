@@ -1,5 +1,6 @@
 package net.atlasauth.atlas.resources;
 
+import net.atlasauth.atlas.models.UserSearchParams;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.atlasauth.atlas.Params;
@@ -112,6 +113,23 @@ public final class Users {
 
     public User ban(String id) {
         return t.post("/v1/users/" + enc(id) + "/ban", null, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code POST /v1/users/:id/ban} with a reason, note or expiry. A non-null {@code expiresInSeconds}
+     * or {@code expiresAt} (epoch ms) makes a timed ban that lifts itself.
+     */
+    public User ban(String id, String reason, String note, Long expiresInSeconds, Long expiresAt) {
+        Map<String, Object> body = Params.of().set("reason", reason).set("note", note)
+                .set("expires_in_seconds", expiresInSeconds).set("expires_at", expiresAt).map();
+        return t.post("/v1/users/" + enc(id) + "/ban", body.isEmpty() ? null : body, new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/users} with search filters and sort ({@link UserSearchParams}). */
+    public CursorPage<User> list(UserSearchParams params) {
+        return t.get("/v1/users", params.toQuery(), new TypeReference<>() {
         });
     }
 

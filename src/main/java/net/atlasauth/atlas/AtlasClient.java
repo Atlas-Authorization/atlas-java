@@ -6,6 +6,8 @@ import net.atlasauth.atlas.http.Transport;
 import net.atlasauth.atlas.resources.Actions;
 import net.atlasauth.atlas.resources.ActorTokens;
 import net.atlasauth.atlas.resources.Allowlist;
+import net.atlasauth.atlas.resources.AppRoles;
+import net.atlasauth.atlas.resources.OAuthInitialAccessTokens;
 import net.atlasauth.atlas.resources.Analytics;
 import net.atlasauth.atlas.resources.ApiKeys;
 import net.atlasauth.atlas.resources.AttackProtection;
@@ -113,6 +115,8 @@ public final class AtlasClient {
     private final Permissions permissions;
     private final OAuthClients oauthClients;
     private final ResourceServers resourceServers;
+    private final AppRoles appRoles;
+    private final OAuthInitialAccessTokens oauthInitialAccessTokens;
     private final SsoConnections ssoConnections;
     private final ScimTokens scimTokens;
     private final Domains domains;
@@ -210,6 +214,8 @@ public final class AtlasClient {
         this.permissions = new Permissions(transport);
         this.oauthClients = new OAuthClients(transport);
         this.resourceServers = new ResourceServers(transport);
+        this.appRoles = new AppRoles(transport);
+        this.oauthInitialAccessTokens = new OAuthInitialAccessTokens(transport);
         this.ssoConnections = new SsoConnections(transport);
         this.scimTokens = new ScimTokens(transport);
         this.domains = new Domains(transport);
@@ -332,6 +338,16 @@ public final class AtlasClient {
 
     public ResourceServers resourceServers() {
         return resourceServers;
+    }
+
+    /** {@code /v1/app_roles} — instance-wide user roles. */
+    public AppRoles appRoles() {
+        return appRoles;
+    }
+
+    /** {@code /v1/oauth_initial_access_tokens} — OAuth dynamic client registration gating. */
+    public OAuthInitialAccessTokens oauthInitialAccessTokens() {
+        return oauthInitialAccessTokens;
     }
 
     public SsoConnections ssoConnections() {

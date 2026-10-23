@@ -1,5 +1,6 @@
 package net.atlasauth.atlas.resources;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.core.type.TypeReference;
 import net.atlasauth.atlas.Params;
 import net.atlasauth.atlas.http.Transport;
@@ -97,6 +98,70 @@ public final class Billing {
     /** {@code POST /v1/billing/subjects/{type}/{id}/sync_seats} — Sync a per-seat subscription's Stripe quantity to the org's current member count (proration applied). */
     public BillingSeatSync syncSeats(String type, String id) {
         return t.post("/v1/billing/subjects/" + enc(type) + "/" + enc(id) + "/sync_seats", null, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code POST /v1/billing/subscriptions/{id}/change} — switch to another plan or interval on the
+     * billing provider, now (prorated) or at the period end ({@code scheduleAtPeriodEnd}).
+     */
+    public BillingSubscription changeSubscription(String id, String planId, String interval, Boolean scheduleAtPeriodEnd) {
+        Map<String, Object> body = Params.of().set("plan_id", planId).set("interval", interval)
+                .set("schedule_at_period_end", scheduleAtPeriodEnd).map();
+        return t.post("/v1/billing/subscriptions/" + enc(id) + "/change", body, new TypeReference<>() {
+        });
+    }
+
+    /** {@code POST /v1/billing/subscriptions/{id}/cancel} — at the period end, or now when {@code immediately}. */
+    public BillingSubscription cancelSubscription(String id, boolean immediately) {
+        Map<String, Object> body = immediately ? Params.of("immediately", true).map() : Params.of().map();
+        return t.post("/v1/billing/subscriptions/" + enc(id) + "/cancel", body, new TypeReference<>() {
+        });
+    }
+
+    /** {@code POST /v1/billing/subscriptions/{id}/restore} — undo a cancellation scheduled for the period end. */
+    public BillingSubscription restoreSubscription(String id) {
+        return t.post("/v1/billing/subscriptions/" + enc(id) + "/restore", null, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code GET /v1/billing/providers} — the providers (stripe, polar, dodo, creem) this instance has
+     * its OWN credentials for. Secrets are never returned ({@code secrets_set} only); each carries the
+     * {@code webhook_url} to register with the provider.
+     */
+    public JsonNode listProviders() {
+        return t.get("/v1/billing/providers", new TypeReference<>() {
+        });
+    }
+
+    public JsonNode getProvider(String provider) {
+        return t.get("/v1/billing/providers/" + enc(provider), new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code PUT /v1/billing/providers/{provider}} — store credentials (merged onto what is stored).
+     * {@code config} keys: Stripe {@code secret_key}, {@code webhook_secret}, {@code publishable_key};
+     * Polar {@code access_token}, {@code webhook_secret}; Dodo and Creem {@code api_key},
+     * {@code webhook_secret}. {@code environment} is "live" or "test".
+     */
+    public JsonNode setProvider(String provider, String environment, Map<String, String> config) {
+        Map<String, Object> body = Params.of().set("environment", environment).set("config", config).map();
+        return t.put("/v1/billing/providers/" + enc(provider), body, new TypeReference<>() {
+        });
+    }
+
+    /** One read-only call with the stored credentials: {@code { ok, error, account }}. */
+    public JsonNode testProvider(String provider) {
+        return t.post("/v1/billing/providers/" + enc(provider) + "/test", null, new TypeReference<>() {
+        });
+    }
+
+    /** Remove a provider's credentials; refused while subscriptions or plans depend on it unless {@code force}. */
+    public JsonNode deleteProvider(String provider, boolean force) {
+        Map<String, Object> q = force ? Params.of("force", "true").map() : Params.of().map();
+        return t.delete("/v1/billing/providers/" + enc(provider), q, new TypeReference<>() {
         });
     }
 }

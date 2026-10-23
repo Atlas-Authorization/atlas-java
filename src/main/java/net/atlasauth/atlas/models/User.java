@@ -24,7 +24,13 @@ public record User(
         /** Where the user's referral stands, or null when the user was never reported to the referral platform. */ UserReferral referral,
         /** The user's own referral code, when they are a referrer. */ String referralCode,
         /** The user's own referral link, when they are a referrer. */ String referralLink,
-        /** Your own id for the user, if set ({@code users().setExternalId}). */ String externalId) {
+        /** Your own id for the user, if set ({@code users().setExternalId}). */ String externalId,
+        /** When a timed ban lifts (epoch ms); null for a permanent ban or no ban. */ Long banExpiresAt) {
+
+    /** The 1.10 shape, before the 1.11 fields. */
+    public User(String object, String id, String username, String firstName, String lastName, String imageUrl, Map<String, Object> publicMetadata, boolean mfaEnabled, boolean banned, boolean locked, Long lastSignInAt, long createdAt, long updatedAt, Long version, UserReferral referral, String referralCode, String referralLink, String externalId) {
+        this(object, id, username, firstName, lastName, imageUrl, publicMetadata, mfaEnabled, banned, locked, lastSignInAt, createdAt, updatedAt, version, referral, referralCode, referralLink, externalId, null);
+    }
 
     /** The previous shape, without {@code version}. */
     public User(String object, String id, String username, String firstName, String lastName, String imageUrl, Map<String, Object> publicMetadata, boolean mfaEnabled, boolean banned, boolean locked, Long lastSignInAt, long createdAt, long updatedAt) {

@@ -9,6 +9,14 @@ import java.util.Map;
 
 /** Body for {@code PATCH /v1/api_keys/:id}. */
 public final class UpdateApiKeyBody {
+    /** False disables the key without revoking it; true re-enables it. */
+    public Boolean enabled;
+    /** Set the verify throttle; remove it with set("rate_limit", null). */
+    public ApiKeyRateLimit rateLimit;
+    /** Set the use budget; make it unlimited with set("remaining", null). */
+    public Long remaining;
+    /** Replace the key scopes. */
+    public List<String> scopes;
     public String name;
     public Map<String, Object> claims;
     public Long expiresAt;
@@ -37,4 +45,9 @@ public final class UpdateApiKeyBody {
 
     @JsonAnyGetter
     public Map<String, Object> additionalFields() { return additionalFields; }
+
+    public UpdateApiKeyBody enabled(Boolean v) { this.enabled = v; return this; }
+    public UpdateApiKeyBody rateLimit(ApiKeyRateLimit v) { this.rateLimit = v; return this; }
+    public UpdateApiKeyBody remaining(Long v) { this.remaining = v; return this; }
+    public UpdateApiKeyBody scopes(List<String> v) { this.scopes = v; return this; }
 }

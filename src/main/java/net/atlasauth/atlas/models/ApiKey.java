@@ -30,7 +30,16 @@ public record ApiKey(
         Long revokedAt,
         long createdAt,
         List<ApiKeyLimit> limits,
-        List<ApiKeyLimitState> usage) {
+        List<ApiKeyLimitState> usage,
+        /** False for a disabled key (it verifies as invalid until re-enabled). */ Boolean enabled,
+        /** The per-key verify throttle, or null. */ ApiKeyRateLimit rateLimit,
+        /** Uses left (each successful verify spends one); null = unlimited. */ Long remaining,
+        /** Scopes embedded into tokens minted from this key. */ java.util.List<String> scopes) {
+
+    /** The 1.10 shape, before the 1.11 fields. */
+    public ApiKey(String object, String id, String subjectType, String subjectId, String name, String prefix, Map<String, Object> claims, Long lastUsedAt, Long expiresAt, Long revokedAt, long createdAt, List<ApiKeyLimit> limits, List<ApiKeyLimitState> usage) {
+        this(object, id, subjectType, subjectId, name, prefix, claims, lastUsedAt, expiresAt, revokedAt, createdAt, limits, usage, null, null, null, null);
+    }
 
     /** The 1.1 shape, without spend caps. */
     public ApiKey(String object, String id, String subjectType, String subjectId, String name, String prefix,

@@ -7,6 +7,8 @@ import java.util.List;
  * is either a bare {@code String} or a {@link ResourceServerScope}.
  */
 public final class UpdateResourceServerBody {
+    /** Serve the RFC 9728 protected-resource metadata document for this API. */
+    public Boolean publishResourceMetadata;
     public String name;
     /** Each element is a String or a {@link ResourceServerScope}. */
     public List<Object> scopes;
@@ -23,4 +25,6 @@ public final class UpdateResourceServerBody {
     public UpdateResourceServerBody tokenTtlSeconds(Long v) { this.tokenTtlSeconds = v; return this; }
     public UpdateResourceServerBody signingAlg(String v) { this.signingAlg = v; return this; }
     public UpdateResourceServerBody identifier(String v) { this.identifier = v; return this; }
+
+    public UpdateResourceServerBody publishResourceMetadata(Boolean v) { this.publishResourceMetadata = v; return this; }
 }

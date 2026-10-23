@@ -78,6 +78,30 @@ public final class SessionClaims {
         return v instanceof List<?> list ? (List<String>) list : List.of();
     }
 
+    /** The {@code app_roles} claim: the user's instance-wide app roles. */
+    @SuppressWarnings("unchecked")
+    public List<String> appRoles() {
+        Object v = claims.get("app_roles");
+        return v instanceof List<?> list ? (List<String>) list : List.of();
+    }
+
+    /** The {@code app_permissions} claim: the union of the user's app roles' permissions. */
+    @SuppressWarnings("unchecked")
+    public List<String> appPermissions() {
+        Object v = claims.get("app_permissions");
+        return v instanceof List<?> list ? (List<String>) list : List.of();
+    }
+
+    /** Whether the user holds the app role (no active organization needed). */
+    public boolean hasAppRole(String role) {
+        return appRoles().contains(role);
+    }
+
+    /** Whether the user's app roles grant the permission (no active organization needed). */
+    public boolean hasAppPermission(String permission) {
+        return appPermissions().contains(permission);
+    }
+
     private String str(String key) {
         Object v = claims.get(key);
         return v == null ? null : String.valueOf(v);

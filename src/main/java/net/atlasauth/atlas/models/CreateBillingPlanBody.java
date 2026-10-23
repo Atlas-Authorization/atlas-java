@@ -4,6 +4,14 @@ import java.util.List;
 
 /** Body for {@code POST /v1/billing/plans}. */
 public final class CreateBillingPlanBody {
+    /** stripe (default), polar, dodo or creem. */
+    public String provider;
+    /** The plan price at the provider (the neutral alias of stripePriceId; send one). */
+    public String providerPriceId;
+    /** The yearly price at the provider. */
+    public String annualPriceId;
+    /** The yearly amount. */
+    public String annualAmount;
     public String name;
     public String slug;
     public String stripePriceId;
@@ -34,4 +42,9 @@ public final class CreateBillingPlanBody {
     public CreateBillingPlanBody features(List<String> v) { this.features = v; return this; }
     public CreateBillingPlanBody audience(String v) { this.audience = v; return this; }
     public CreateBillingPlanBody active(Boolean v) { this.active = v; return this; }
+
+    public CreateBillingPlanBody provider(String v) { this.provider = v; return this; }
+    public CreateBillingPlanBody providerPriceId(String v) { this.providerPriceId = v; return this; }
+    public CreateBillingPlanBody annualPriceId(String v) { this.annualPriceId = v; return this; }
+    public CreateBillingPlanBody annualAmount(String v) { this.annualAmount = v; return this; }
 }

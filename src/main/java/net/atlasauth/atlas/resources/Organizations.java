@@ -43,6 +43,8 @@ public final class Organizations {
     private final Invitations invitations;
     private final Domains domains;
     private final GroupRoles groupRoles;
+    private final Teams teams;
+    private final Roles roles;
 
     public Organizations(Transport t) {
         this.t = t;
@@ -50,6 +52,8 @@ public final class Organizations {
         this.invitations = new Invitations(t);
         this.domains = new Domains(t);
         this.groupRoles = new GroupRoles(t);
+        this.teams = new Teams(t);
+        this.roles = new Roles(t);
     }
 
     public CursorPage<Organization> list() {
@@ -137,6 +141,28 @@ public final class Organizations {
         return groupRoles;
     }
 
+    /** Teams inside an organization. */
+    public Teams teams() {
+        return teams;
+    }
+
+    /** The roles an organization can assign, and its own custom roles. */
+    public Roles roles() {
+        return roles;
+    }
+
+    /** {@code GET /v1/organizations/by_slug/:slug} — case-insensitive. */
+    public Organization getBySlug(String slug) {
+        return t.get("/v1/organizations/by_slug/" + enc(slug), new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/organizations/check_slug} — {@code { slug, valid, available }}. */
+    public JsonNode checkSlug(String slug) {
+        return t.get("/v1/organizations/check_slug", Params.of("slug", slug).map(), new TypeReference<>() {
+        });
+    }
+
     // ---- nested sub-resources ---------------------------------------------
 
     public static final class Memberships {
@@ -198,6 +224,114 @@ public final class Organizations {
         public JsonNode revoke(String orgId, String invitationId) {
             return t.post("/v1/organizations/" + enc(orgId) + "/invitations/" + enc(invitationId) + "/revoke",
                     null, new TypeReference<>() {
+                    });
+        }
+
+        /** Resend a pending invitation: same id and role, a fresh expiry. */
+        public JsonNode resend(String orgId, String invitationId) {
+            return t.post("/v1/organizations/" + enc(orgId) + "/invitations/" + enc(invitationId) + "/resend",
+                    null, new TypeReference<>() {
+                    });
+        }
+    }
+
+    /** {@code /v1/organizations/:id/teams}. */
+    public static final class Teams {
+        private final Transport t;
+
+        Teams(Transport t) {
+            this.t = t;
+        }
+
+        private static String base(String orgId) {
+            return "/v1/organizations/" + enc(orgId) + "/teams";
+        }
+
+        /** {@code userId} (nullable) narrows to the teams that user is in. */
+        public JsonNode list(String orgId, String userId) {
+            return t.get(base(orgId), Params.of("user_id", userId).map(), new TypeReference<>() {
+            });
+        }
+
+        public JsonNode create(String orgId, String name, String description) {
+            return t.post(base(orgId), Params.of("name", name).set("description", description).map(),
+                    new TypeReference<>() {
+                    });
+        }
+
+        public JsonNode get(String orgId, String teamId) {
+            return t.get(base(orgId) + "/" + enc(teamId), new TypeReference<>() {
+            });
+        }
+
+        public JsonNode update(String orgId, String teamId, String name, String description) {
+            return t.patch(base(orgId) + "/" + enc(teamId), Params.of("name", name).set("description", description).map(),
+                    new TypeReference<>() {
+                    });
+        }
+
+        public JsonNode delete(String orgId, String teamId) {
+            return t.delete(base(orgId) + "/" + enc(teamId), new TypeReference<>() {
+            });
+        }
+
+        public JsonNode listMembers(String orgId, String teamId) {
+            return t.get(base(orgId) + "/" + enc(teamId) + "/members", new TypeReference<>() {
+            });
+        }
+
+        public JsonNode addMember(String orgId, String teamId, String userId) {
+            return t.post(base(orgId) + "/" + enc(teamId) + "/members", Params.of("user_id", userId).map(),
+                    new TypeReference<>() {
+                    });
+        }
+
+        public JsonNode removeMember(String orgId, String teamId, String userId) {
+            return t.delete(base(orgId) + "/" + enc(teamId) + "/members/" + enc(userId), new TypeReference<>() {
+            });
+        }
+    }
+
+    /** {@code /v1/organizations/:id/roles} — instance roles plus the organization's own. */
+    public static final class Roles {
+        private final Transport t;
+
+        Roles(Transport t) {
+            this.t = t;
+        }
+
+        private static String base(String orgId) {
+            return "/v1/organizations/" + enc(orgId) + "/roles";
+        }
+
+        /** {@code own} lists only the organization's own custom roles. */
+        public JsonNode list(String orgId, boolean own) {
+            Map<String, Object> q = own ? Params.of("own", "true").map() : Params.of().map();
+            return t.get(base(orgId), q, new TypeReference<>() {
+            });
+        }
+
+        public JsonNode create(String orgId, String key, String name, String description, List<String> permissions) {
+            Map<String, Object> body = Params.of("key", key).set("name", name).set("description", description)
+                    .set("permissions", permissions).map();
+            return t.post(base(orgId), body, new TypeReference<>() {
+            });
+        }
+
+        public JsonNode update(String orgId, String roleId, String name, String description, List<String> permissions) {
+            Map<String, Object> body = Params.of("name", name).set("description", description)
+                    .set("permissions", permissions).map();
+            return t.patch(base(orgId) + "/" + enc(roleId), body, new TypeReference<>() {
+            });
+        }
+
+        /**
+         * {@code reassignTo} (a role key, nullable) moves members and pending invitations first; without
+         * it a role in use is refused (409 ROLE_IN_USE).
+         */
+        public JsonNode delete(String orgId, String roleId, String reassignTo) {
+            return t.delete(base(orgId) + "/" + enc(roleId), Params.of("reassign_to", reassignTo).map(),
+                    new TypeReference<>() {
                     });
         }
     }

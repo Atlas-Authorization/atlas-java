@@ -4,6 +4,12 @@ import java.util.List;
 
 /** Body for {@code POST /v1/oauth_clients}. */
 public final class CreateOAuthClientBody {
+    /** Lifetime of the issued secret (reported as client_secret_expires_at); null = never expires. */
+    public Long secretExpiresInSeconds;
+    /** "public" (default) or "pairwise" (a per-sector sub). */
+    public String subjectType;
+    /** An https URL listing every redirect_uri; required for a pairwise client spanning hosts. */
+    public String sectorIdentifierUri;
     public String name;
     public List<String> redirectUris;
     public List<String> allowedScopes;
@@ -36,4 +42,8 @@ public final class CreateOAuthClientBody {
     public CreateOAuthClientBody logoUrl(String v) { this.logoUrl = v; return this; }
     public CreateOAuthClientBody firstParty(Boolean v) { this.firstParty = v; return this; }
     public CreateOAuthClientBody skipLogoutConfirmation(Boolean v) { this.skipLogoutConfirmation = v; return this; }
+
+    public CreateOAuthClientBody secretExpiresInSeconds(Long v) { this.secretExpiresInSeconds = v; return this; }
+    public CreateOAuthClientBody subjectType(String v) { this.subjectType = v; return this; }
+    public CreateOAuthClientBody sectorIdentifierUri(String v) { this.sectorIdentifierUri = v; return this; }
 }

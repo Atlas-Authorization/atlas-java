@@ -19,6 +19,20 @@ public final class ProtectCondition {
     public String permission;
     public List<String> anyPermission;
     public List<String> allPermissions;
+    /** An app role the user must hold ({@code app_roles}; no active organization needed). */
+    public String appRole;
+    /** An app permission the user must hold ({@code app_permissions}). */
+    public String appPermission;
+
+    public ProtectCondition appRole(String appRole) {
+        this.appRole = appRole;
+        return this;
+    }
+
+    public ProtectCondition appPermission(String appPermission) {
+        this.appPermission = appPermission;
+        return this;
+    }
 
     public static ProtectCondition none() {
         return new ProtectCondition();
@@ -45,7 +59,7 @@ public final class ProtectCondition {
     }
 
     public boolean isEmpty() {
-        return role == null && permission == null
+        return role == null && permission == null && appRole == null && appPermission == null
                 && (anyPermission == null || anyPermission.isEmpty())
                 && (allPermissions == null || allPermissions.isEmpty());
     }

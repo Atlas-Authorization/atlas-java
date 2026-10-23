@@ -1,5 +1,6 @@
 package net.atlasauth.atlas.resources;
 
+import java.util.Map;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.atlasauth.atlas.http.Transport;
@@ -35,6 +36,15 @@ public final class ScimTokens {
 
     public JsonNode revoke(String id) {
         return t.post("/v1/scim_tokens/" + enc(id) + "/revoke", null, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code PATCH /v1/scim_tokens/{id}} — change {@code name}, {@code scopes} ({@code ["read"]} =
+     * read-only) or {@code role_mappings} ({@code [{value, role}]}). The secret is unchanged.
+     */
+    public JsonNode update(String id, Map<String, Object> body) {
+        return t.patch("/v1/scim_tokens/" + enc(id), body, new TypeReference<>() {
         });
     }
 }

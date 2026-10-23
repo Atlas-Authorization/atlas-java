@@ -1,11 +1,7 @@
 package net.atlasauth.atlas.verify;
 
 import com.nimbusds.jose.JOSEObjectType;
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.crypto.RSASSAVerifier;
-import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
@@ -130,8 +126,8 @@ public final class LogoutTokenVerifier {
             throw new LogoutTokenException(LogoutTokenException.Reason.MALFORMED, "logout_token could not be parsed");
         }
 
-        if (!JWSAlgorithm.RS256.equals(jwt.getHeader().getAlgorithm())) {
-            throw new LogoutTokenException(LogoutTokenException.Reason.BAD_ALGORITHM, "logout_token must be signed with RS256");
+        if (!SigningAlgs.allowed(jwt)) {
+            throw new LogoutTokenException(LogoutTokenException.Reason.BAD_ALGORITHM, "logout_token must be signed with RS256 or ES256");
         }
         JOSEObjectType typ = jwt.getHeader().getType();
         if (typ != null) {
@@ -200,22 +196,7 @@ public final class LogoutTokenVerifier {
     }
 
     private static boolean signatureValid(SignedJWT jwt, JWKSet keys, String kid) {
-        for (JWK key : keys.getKeys()) {
-            if (kid != null && !kid.equals(key.getKeyID())) {
-                continue;
-            }
-            if (!(key instanceof RSAKey rsaKey)) {
-                continue;
-            }
-            try {
-                if (jwt.verify(new RSASSAVerifier(rsaKey.toRSAPublicKey()))) {
-                    return true;
-                }
-            } catch (Exception ignored) {
-                // try the next key
-            }
-        }
-        return false;
+        return SigningAlgs.verify(jwt, keys, kid);
     }
 
     /** Fluent builder. {@code jwksUrl}, {@code issuer} and {@code clientId} are required. */

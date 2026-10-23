@@ -1,5 +1,6 @@
 package net.atlasauth.atlas.resources;
 
+import java.util.List;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.atlasauth.atlas.Params;
@@ -56,7 +57,16 @@ public final class ApiKeys {
 
     /** Check a presented secret. Rate-limited — it is an online credential check. */
     public ApiKeyVerification verify(String secret) {
-        Map<String, Object> body = Params.of("secret", secret).map();
+        return verify(secret, null);
+    }
+
+    /**
+     * Verify requiring {@code requiredScopes}. A LIVE key refused by its own policy answers
+     * {@code valid=false} with a {@code code}: insufficient_scope ({@code missingScopes}),
+     * rate_limited ({@code retryAfterMs}) or usage_exhausted.
+     */
+    public ApiKeyVerification verify(String secret, List<String> requiredScopes) {
+        Map<String, Object> body = Params.of("secret", secret).set("required_scopes", requiredScopes).map();
         return t.post("/v1/api_keys/verify", body, new TypeReference<>() {
         });
     }

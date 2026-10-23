@@ -1,12 +1,7 @@
 package net.atlasauth.atlas.verify;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSVerifier;
-import com.nimbusds.jose.crypto.RSASSAVerifier;
-import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
@@ -96,12 +91,13 @@ public final class SessionVerifier {
         }
 
         try {
-            // Pinned to RS256. Without this a token whose header says alg:none — or
-            // any algorithm the key material can be coerced into — would verify.
-            if (!JWSAlgorithm.RS256.equals(jwt.getHeader().getAlgorithm())) {
+            // Pinned to RS256 / ES256 (SigningAlgs). Without this a token whose header
+            // says alg:none — or any algorithm the key material can be coerced into —
+            // would verify.
+            if (!SigningAlgs.allowed(jwt)) {
                 return VerifyResult.failed(VerifyResult.Reason.INVALID);
             }
-            if (!verifySignature(jwt, keys, kid)) {
+            if (!SigningAlgs.verify(jwt, keys, kid)) {
                 return VerifyResult.failed(VerifyResult.Reason.INVALID);
             }
 
@@ -140,22 +136,6 @@ public final class SessionVerifier {
         } catch (Exception e) {
             return VerifyResult.failed(VerifyResult.Reason.INVALID);
         }
-    }
-
-    private boolean verifySignature(SignedJWT jwt, JWKSet keys, String kid) throws Exception {
-        for (JWK key : keys.getKeys()) {
-            if (kid != null && !kid.equals(key.getKeyID())) {
-                continue;
-            }
-            if (!(key instanceof RSAKey rsaKey)) {
-                continue;
-            }
-            JWSVerifier verifier = new RSASSAVerifier(rsaKey.toRSAPublicKey());
-            if (jwt.verify(verifier)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**

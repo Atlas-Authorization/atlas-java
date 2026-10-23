@@ -44,6 +44,12 @@ public final class Authz {
                 && !permissions.containsAll(condition.allPermissions)) {
             return "permission";
         }
+        if (condition.appRole != null && !claims.hasAppRole(condition.appRole)) {
+            return "role";
+        }
+        if (condition.appPermission != null && !claims.hasAppPermission(condition.appPermission)) {
+            return "permission";
+        }
         return null;
     }
 
