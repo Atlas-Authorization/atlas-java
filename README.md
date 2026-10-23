@@ -278,6 +278,30 @@ With a platform key, `platform().atlasIdApps().findUsers(id, email)` answers a p
 `revokeGrant(id, grantId)` revokes one person's approval, and `platform().atlasIdPublisher()` claims and verifies
 the publisher name shown on consent screens.
 
+### Policy acceptance
+
+Terms of service, a privacy policy or any policy your users accept at sign-up (and again at sign-in when a new
+version takes effect) are managed with `atlas.policies()`:
+
+```java
+atlas.policies().create(new CreatePolicyBody().key("tos").title("Terms of service").display("scroll")
+        .required(true).appliesTo("sign_in_and_sign_up").reaccept("grace").graceDays(14));
+atlas.policies().createVersion("tos", new CreatePolicyVersionBody().version("2026-10-24")
+        .contentMarkdown("# Terms ...").summaryOfChanges("New fees section"));
+atlas.policies().publishVersion("tos", "2026-10-24", System.currentTimeMillis() + 7 * 86_400_000L);
+UserPolicies standing = atlas.policies().forUser("user_123");
+```
+
+`listAcceptances` / `exportAcceptancesCsv` list who accepted which version, with the reading evidence.
+`atlas.policies().updateSettings(true)` puts the `pol` claim (accepted versions of required policies) on session
+tokens; read it with `SessionClaims.pol()` / `hasAcceptedPolicy(key, version)`.
+
+To serve policy content from your own system, connect it with `atlas.policySource()` (`update` takes the endpoint,
+sync mode and a write-only signing secret; `test` and `sync` try it) and use `PolicySourceProtocol`:
+`verifyFeedRequest(method, pathAndQuery, name -> request.getHeader(name), secret)` checks Atlas's signed feed
+request, and `signPublished(key, version, secret)` / `signRetired(key, secret)` produce the signed event body and
+headers to POST to the source's `webhookUrl`.
+
 ### Referral attribution
 
 With referral attribution on, Atlas reports every interactive sign-up to your referral platform before

@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.14.0 — 2026-10-24
+
+### Added
+
+- **Policy acceptance.** `policies()`: `list` / `create` / `get` / `update` / `delete` (a never-published policy is deleted, one with history is retired), `listVersions` / `createVersion` (a draft, or `publish` with `effectiveAt`) / `getVersion` / `updateVersion` / `deleteVersion` (drafts only) / `publishVersion` (optional `effective_at`, epoch ms or ISO 8601) / `retireVersion`, `listAcceptances` and `exportAcceptancesCsv`, `forUser` (a user's standing on every policy) and `getSettings` / `updateSettings` (the `pol` session claim). Typed `Policy`, `PolicyVersion`, `PolicyAcceptance`, `PolicyStanding`, `PolicySettings`. `policySource()`: `get` / `update` (the signing secret is write-only) / `delete` / `test` / `sync` / `listDeliveries`.
+- **Policy source protocol helpers.** `net.atlasauth.atlas.policy.PolicySourceProtocol`: `verifyFeedRequest` checks Atlas's signed `GET {endpoint_url}/policies` (`atlas-signature` `v1,<base64 HMAC-SHA256>` over `{id}.{timestamp}.GET\n{path+query}`, millisecond timestamps, several `v1` values accepted, 5-minute window; the result carries the `key` query parameter), and `signPublished` / `signRetired` / `signEvent` sign `policy.published` / `policy.retired` events for Atlas. Cross-checked against the TypeScript reference vectors.
+- `SessionClaims.pol()` and `hasAcceptedPolicy(key, version)` read the `pol` claim. `AtlasConstants.WEBHOOK_EVENT_USER_POLICY_ACCEPTED` and `WEBHOOK_EVENT_POLICY_VERSION_PUBLISHED`.
+- The API coverage list now holds all 626 Backend and Platform API operations.
+
 ## 1.13.0 — 2026-10-24
 
 ### Added

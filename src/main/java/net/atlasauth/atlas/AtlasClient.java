@@ -59,6 +59,8 @@ import net.atlasauth.atlas.resources.Organizations;
 import net.atlasauth.atlas.resources.Pca;
 import net.atlasauth.atlas.resources.Permissions;
 import net.atlasauth.atlas.resources.Platform;
+import net.atlasauth.atlas.resources.Policies;
+import net.atlasauth.atlas.resources.PolicySourceConfig;
 import net.atlasauth.atlas.resources.RadiusClients;
 import net.atlasauth.atlas.resources.RateLimitPolicy;
 import net.atlasauth.atlas.resources.RedirectUrls;
@@ -164,6 +166,8 @@ public final class AtlasClient {
     private final Instance instance;
     private final InstanceSecurity instanceSecurity;
     private final Referrals referrals;
+    private final Policies policies;
+    private final PolicySourceConfig policySource;
     private final UserHooks userHooks;
     private final Tokens tokens;
     private final Design design;
@@ -268,6 +272,8 @@ public final class AtlasClient {
         this.instance = new Instance(transport);
         this.instanceSecurity = new InstanceSecurity(transport);
         this.referrals = new Referrals(transport);
+        this.policies = new Policies(transport);
+        this.policySource = new PolicySourceConfig(transport);
         this.userHooks = new UserHooks(transport);
         this.tokens = new Tokens(transport);
         this.design = new Design(transport);
@@ -536,6 +542,16 @@ public final class AtlasClient {
     /** Referral attribution: the instance's referral platform connection, connection test and call log. */
     public Referrals referrals() {
         return referrals;
+    }
+
+    /** Policy acceptance: policies and versions, acceptances, a user's standing and the {@code pol} claim setting. */
+    public Policies policies() {
+        return policies;
+    }
+
+    /** The external policy source: endpoint, sync mode, write-only secret, test, sync and delivery log. */
+    public PolicySourceConfig policySource() {
+        return policySource;
     }
 
     /** The {@code before_user_create} hook: settings and a test call. */

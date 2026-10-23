@@ -102,6 +102,26 @@ public final class SessionClaims {
         return appPermissions().contains(permission);
     }
 
+    /**
+     * The {@code pol} claim: the accepted version of every required policy, keyed by policy key
+     * (for example {@code {"tos": "2026-10-24"}}). Present only when the instance turned on the
+     * policy session claim; empty otherwise.
+     */
+    public Map<String, String> pol() {
+        Object v = claims.get("pol");
+        if (!(v instanceof Map<?, ?> m)) {
+            return Map.of();
+        }
+        Map<String, String> out = new java.util.LinkedHashMap<>();
+        m.forEach((k, val) -> out.put(String.valueOf(k), String.valueOf(val)));
+        return out;
+    }
+
+    /** Whether the token records acceptance of {@code version} of the policy {@code key}. */
+    public boolean hasAcceptedPolicy(String key, String version) {
+        return version != null && version.equals(pol().get(key));
+    }
+
     private String str(String key) {
         Object v = claims.get(key);
         return v == null ? null : String.valueOf(v);

@@ -36,4 +36,10 @@ public final class AtlasConstants {
 
     /** The security notice sent when a dormant account signs in again. */
     public static final String EMAIL_TEMPLATE_ACCOUNT_REACTIVATED = "account_reactivated";
+
+    /** A user accepted a policy version (payload: the policy acceptance with its evidence). */
+    public static final String WEBHOOK_EVENT_USER_POLICY_ACCEPTED = "user.policy_accepted";
+
+    /** A policy version was published. */
+    public static final String WEBHOOK_EVENT_POLICY_VERSION_PUBLISHED = "policy.version_published";
 }
