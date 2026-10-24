@@ -8,6 +8,7 @@ import net.atlasauth.atlas.models.AcceptedPlatformApp;
 import net.atlasauth.atlas.models.AccountlessApp;
 import net.atlasauth.atlas.models.AtlasDesign;
 import net.atlasauth.atlas.models.AtlasIdApp;
+import net.atlasauth.atlas.models.AtlasIdAppManagedBy;
 import net.atlasauth.atlas.models.AtlasIdAppPreflight;
 import net.atlasauth.atlas.models.AtlasIdAppUser;
 import net.atlasauth.atlas.models.AtlasIdAppWithSecret;
@@ -308,6 +309,17 @@ public final class Platform {
         /** {@code POST /v1/platform/atlas_id_apps/{id}/move_origin} — Move the app's URLs from one origin to another. */
         public OriginMove moveOrigin(String id, OriginMoveBody body) {
             return t.post("/v1/platform/atlas_id_apps/" + enc(id) + "/move_origin", body, new TypeReference<>() {
+            });
+        }
+
+        /**
+         * {@code PUT /v1/platform/atlas_id_apps/{id}/managed_by} — Hand the app's grant management to an instance of the same
+         * account ({@code managed_via: "adopted"}), or take it back with {@code null}. That instance's secret key, scoped to
+         * {@code privacy:grants:revoke} or {@code atlas_id_apps:*}, then lists and revokes the app's grants, so a data-rights
+         * tool never needs the platform key.
+         */
+        public AtlasIdAppManagedBy setManagedBy(String id, String instanceId) {
+            return t.put("/v1/platform/atlas_id_apps/" + enc(id) + "/managed_by", java.util.Collections.singletonMap("instance_id", instanceId), new TypeReference<>() {
             });
         }
 

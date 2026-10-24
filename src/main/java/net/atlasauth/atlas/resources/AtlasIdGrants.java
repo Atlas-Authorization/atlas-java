@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.atlasauth.atlas.Params;
 import net.atlasauth.atlas.http.Transport;
+import net.atlasauth.atlas.models.AtlasIdAppPreflight;
 
 import static net.atlasauth.atlas.http.Transport.enc;
 
@@ -18,6 +19,16 @@ public final class AtlasIdGrants {
     /** {@code GET /v1/atlas_id_apps} — The Sign in with Atlas apps this instance manages. */
     public JsonNode listApps() {
         return t.get("/v1/atlas_id_apps", new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code GET /v1/atlas_id_apps/{id}/preflight} — The setup check of an app this instance manages ({@code diagnostics:read}
+     * is enough): findings plus the button-rendered origins, the 7-day sign-in sources, the fallback origins and whether the
+     * homepage includes the script.
+     */
+    public AtlasIdAppPreflight preflight(String appId) {
+        return t.get("/v1/atlas_id_apps/" + enc(appId) + "/preflight", new TypeReference<>() {
         });
     }
 

@@ -78,6 +78,26 @@ public final class SessionClaims {
         return v instanceof List<?> list ? (List<String>) list : List.of();
     }
 
+    /** {@code sso_connection_id}: the enterprise SSO connection the session was made through, or null. */
+    public String ssoConnectionId() {
+        return str("sso_connection_id");
+    }
+
+    /**
+     * {@code sso_organization_id}: the Atlas organization that owns the SSO connection, or null for an instance-wide
+     * connection. Independent of {@link #orgId()}: scope a per-organization "require SSO" rule on this, never on
+     * "signed in via SSO".
+     */
+    public String ssoOrganizationId() {
+        return str("sso_organization_id");
+    }
+
+    /** {@code sso_connection_type}: {@code saml} or {@code oidc}, or null. */
+    public String ssoConnectionType() {
+        String v = str("sso_connection_type");
+        return "saml".equals(v) || "oidc".equals(v) ? v : null;
+    }
+
     /** The {@code app_roles} claim: the user's instance-wide app roles. */
     @SuppressWarnings("unchecked")
     public List<String> appRoles() {

@@ -20,5 +20,14 @@ public record DryRunResult(
         String path,
         /** Each change: {@code section}, {@code before}, {@code after}. */ List<JsonNode> changes,
         JsonNode wouldReturn,
-        String note) {
+        String note,
+        /** The same non-fatal warnings the real write returns (each has a code). */ List<JsonNode> warnings,
+        /** The status the real write would answer with (rollback mode). */ Integer wouldReturnStatus,
+        /** Side effects held back: email, sms, voice, push, outbound_network, redis, cache, file. */ List<String> suppressed,
+        /** Plan mode: why validation did not run to the end. */ DryRunValidationSkipped validationSkipped) {
+    /** The shape before warnings, wouldReturnStatus, suppressed, validationSkipped. */
+    public DryRunResult(String object, boolean dryRun, String mode, boolean validated, String method, String path, List<JsonNode> changes, JsonNode wouldReturn, String note) {
+        this(object, dryRun, mode, validated, method, path, changes, wouldReturn, note, null, null, null, null);
+    }
+
 }

@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.16.0 — 2026-10-24
+
+### Added
+
+- **Enterprise SSO claims.** `SessionClaims` gains `ssoConnectionId()`, `ssoOrganizationId()` (the Atlas organization that owns the connection, null for an instance-wide one, independent of `orgId()`) and `ssoConnectionType()` (`saml` | `oidc`). New `OidcClaims` for relying parties: `organizationOf`, `organizationsOf`, `ssoOf` (`SsoContext`: `connectionId`, `organizationId`, `type`, `tenantId`, `issuer`, `domain`) and `authorizeUrlWithOrganization`. Scope a per-organization "require SSO" rule on `organizationId`, never on "signed in via SSO".
+- **Adopting a Sign in with Atlas app.** `platform().atlasIdApps().setManagedBy(id, instanceIdOrNull)` (`PUT /v1/platform/atlas_id_apps/{id}/managed_by`, `AtlasIdAppManagedBy`). `AtlasIdApp` and `AtlasIdAppWithSecret` gain `managedVia` (`instance_toggle` | `adopted`) and `buttonRenderedOrigins` (`AtlasIdOriginSeen`).
+- **Instance-surface app setup check.** `atlasIdGrants().preflight(appId)` (`GET /v1/atlas_id_apps/{id}/preflight`). `AtlasIdAppPreflight` gains `buttonRenderedOrigins`, `authorizeRequests7d` (`AtlasIdAuthorizeSources`), `fallbackOrigins` and `homepageIncludesScript`.
+- **Dry run.** `DryRunResult` gains `warnings`, `wouldReturnStatus`, `suppressed` and `validationSkipped` (`DryRunValidationSkipped`); `mode` is `native`, `rollback` or `plan`.
+- **Sealed secrets.** `AtlasClient.builder().secretRecipient(...)` and `withSecretRecipient(...)` send `X-Secret-Recipient` on every call, so every route that returns a shown-once secret answers sealed. `sealedSecret`, `sealedClientSecret`, `sealedWebhookSecret` and `secretsSealed` (`SecretsSealed`) are on every secret-bearing response record (webhook endpoints and secrets, OAuth clients, secret keys, Sign in with Atlas apps, SCIM tokens, machines, API keys, platform apps and keys, proxy secrets, partner links).
+- `WebhookEndpoint.lastFailingSince`.
+- API coverage list: two more operations.
+
+### Compatibility
+
+Records that gained components keep a constructor with the previous component list.
+
 ## 1.15.0 — 2026-10-24
 
 ### Added

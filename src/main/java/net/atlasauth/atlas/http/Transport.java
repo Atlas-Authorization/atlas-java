@@ -50,6 +50,7 @@ public final class Transport {
     private final String missingKeyMessage;
     private final boolean dryRun;
     private final String traceparent;
+    private final String secretRecipient;
 
     public Transport(String secretKey, String baseUrl, HttpClient http, ObjectMapper mapper, Duration timeout) {
         this(secretKey, baseUrl, http, mapper, timeout, null, null, null);
@@ -76,6 +77,17 @@ public final class Transport {
     public Transport(String secretKey, String baseUrl, HttpClient http, ObjectMapper mapper, Duration timeout,
                      Boolean strict, Consumer<UnknownFieldsWarning> onUnknownFields, String missingKeyMessage,
                      boolean dryRun, String traceparent) {
+        this(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage, dryRun, traceparent, null);
+    }
+
+    /**
+     * @param secretRecipient an {@code x25519:<base64 public key>} sent as {@code X-Secret-Recipient} on every call, so
+     *                        every shown-once secret in an answer comes back sealed ({@code null} = none)
+     */
+    public Transport(String secretKey, String baseUrl, HttpClient http, ObjectMapper mapper, Duration timeout,
+                     Boolean strict, Consumer<UnknownFieldsWarning> onUnknownFields, String missingKeyMessage,
+                     boolean dryRun, String traceparent, String secretRecipient) {
+        this.secretRecipient = secretRecipient;
         this.dryRun = dryRun;
         this.traceparent = traceparent;
         this.secretKey = secretKey;
@@ -99,17 +111,22 @@ public final class Transport {
 
     /** A copy of this transport that sends {@code Atlas-Strict: <strict>} on writes ({@code null} = never). */
     public Transport withStrict(Boolean strict) {
-        return new Transport(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage, dryRun, traceparent);
+        return new Transport(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage, dryRun, traceparent, secretRecipient);
     }
 
     /** A copy of this transport that sends every write as a dry run ({@code ?dry_run=true}). */
     public Transport withDryRun(boolean dryRun) {
-        return new Transport(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage, dryRun, traceparent);
+        return new Transport(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage, dryRun, traceparent, secretRecipient);
     }
 
     /** A copy of this transport that sends a W3C {@code traceparent} on every call ({@code null} = none). */
     public Transport withTraceparent(String traceparent) {
-        return new Transport(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage, dryRun, traceparent);
+        return new Transport(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage, dryRun, traceparent, secretRecipient);
+    }
+
+    /** A copy of this transport that sends {@code X-Secret-Recipient} on every call ({@code null} = none). */
+    public Transport withSecretRecipient(String secretRecipient) {
+        return new Transport(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage, dryRun, traceparent, secretRecipient);
     }
 
     // ---- Convenience verbs -------------------------------------------------
@@ -245,6 +262,9 @@ public final class Transport {
         }
         if (traceparent != null && !traceparent.isEmpty()) {
             builder.header("traceparent", traceparent);
+        }
+        if (secretRecipient != null && !secretRecipient.isEmpty()) {
+            builder.header("x-secret-recipient", secretRecipient);
         }
         if (extraHeaders != null) {
             for (Map.Entry<String, String> h : extraHeaders.entrySet()) {

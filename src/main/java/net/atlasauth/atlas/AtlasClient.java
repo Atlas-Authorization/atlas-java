@@ -247,11 +247,11 @@ public final class AtlasClient {
 
         this.transport = new Transport(b.secretKey, apiUrl, http, mapper, timeout, b.strict, b.onUnknownFields,
                 "This call needs an instance secret key: set AtlasClient.builder().secretKey(\"sk_...\").",
-                b.dryRun, b.traceparent);
+                b.dryRun, b.traceparent, b.secretRecipient);
         Transport platformTransport = new Transport(b.platformKey, apiUrl, http, mapper, timeout, b.strict,
                 b.onUnknownFields,
                 "Platform calls need a platform key: set AtlasClient.builder().platformKey(\"psk_...\").",
-                b.dryRun, b.traceparent);
+                b.dryRun, b.traceparent, b.secretRecipient);
 
         this.users = new Users(transport);
         this.sessions = new Sessions(transport);
@@ -808,6 +808,13 @@ public final class AtlasClient {
         return new AtlasClient(b);
     }
 
+    /** A copy of this client that sends {@code X-Secret-Recipient} on every call ({@code null} = none). */
+    public AtlasClient withSecretRecipient(String secretRecipient) {
+        Builder b = config.copy();
+        b.secretRecipient = secretRecipient;
+        return new AtlasClient(b);
+    }
+
     /**
      * Send one write as a dry run and return the plan. {@code method} is POST, PUT, PATCH or DELETE; {@code body}
      * may be null.
@@ -837,6 +844,7 @@ public final class AtlasClient {
         private Consumer<UnknownFieldsWarning> onUnknownFields;
         private boolean dryRun;
         private String traceparent;
+        private String secretRecipient;
 
         private Builder copy() {
             Builder b = new Builder();
@@ -850,6 +858,7 @@ public final class AtlasClient {
             b.onUnknownFields = onUnknownFields;
             b.dryRun = dryRun;
             b.traceparent = traceparent;
+            b.secretRecipient = secretRecipient;
             return b;
         }
 
@@ -882,6 +891,16 @@ public final class AtlasClient {
          */
         public Builder onUnknownFields(Consumer<UnknownFieldsWarning> onUnknownFields) {
             this.onUnknownFields = onUnknownFields;
+            return this;
+        }
+
+        /**
+         * Send {@code X-Secret-Recipient: <recipient>} (an {@code x25519:<base64 public key>}) on every call: each shown-once
+         * secret in an answer comes back sealed to it ({@code sealed_secret}, {@code sealed_client_secret},
+         * {@code sealed_webhook_secret}, with {@code secrets_sealed} naming the fields) and the plaintext field is absent.
+         */
+        public Builder secretRecipient(String secretRecipient) {
+            this.secretRecipient = secretRecipient;
             return this;
         }
 

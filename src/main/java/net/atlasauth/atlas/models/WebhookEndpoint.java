@@ -56,7 +56,13 @@ public record WebhookEndpoint(
         /** Your idempotent-create key. */
         String externalRef,
         /** True on a create that sent an {@code external_ref} and got the existing endpoint back. */
-        Boolean idempotentReplay) {
+        Boolean idempotentReplay,
+        /** When the most recent failure streak began (epoch ms); kept after the endpoint recovers or is re-enabled, so since=failing_since still resolves on replay. */ Long lastFailingSince) {
+    /** The shape before lastFailingSince. */
+    public WebhookEndpoint(String object, String id, String url, List<String> enabledEvents, boolean active, Long disabledAt, long createdAt, Long failingSince, Long previousSecretExpiresAt, String description, String eventNaming, Boolean external, List<String> signatureVersions, JsonNode destination, String health, Long lastSuccessAt, JsonNode lastFailure, Integer consecutiveFailures, Double successRate24h, JsonNode attempts24h, List<String> alertContacts, JsonNode alertsSent, JsonNode autoDisable, JsonNode replay, Boolean created, Long updatedAt, Map<String, Object> metadata, String externalRef, Boolean idempotentReplay) {
+        this(object, id, url, enabledEvents, active, disabledAt, createdAt, failingSince, previousSecretExpiresAt, description, eventNaming, external, signatureVersions, destination, health, lastSuccessAt, lastFailure, consecutiveFailures, successRate24h, attempts24h, alertContacts, alertsSent, autoDisable, replay, created, updatedAt, metadata, externalRef, idempotentReplay, null);
+    }
+
 
     /** The 1.13 shape, without the health, destination and provisioning fields. */
     public WebhookEndpoint(String object, String id, String url, List<String> enabledEvents, boolean active, Long disabledAt, long createdAt, Long failingSince, Long previousSecretExpiresAt) {

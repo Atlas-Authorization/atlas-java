@@ -32,7 +32,16 @@ public record WebhookEndpointWithSecret(
         Boolean created,
         Map<String, Object> metadata,
         String externalRef,
-        Boolean idempotentReplay) {
+        Boolean idempotentReplay,
+        /** With an `X-Secret-Recipient`: the secret sealed to it (then the plaintext field is absent). */ String sealedSecret,
+        /** With an `X-Secret-Recipient`: the client secret sealed to it. */ String sealedClientSecret,
+        /** With an `X-Secret-Recipient`: the webhook secret sealed to it. */ String sealedWebhookSecret,
+        /** Names the fields that arrived sealed. */ SecretsSealed secretsSealed) {
+    /** The shape before sealedSecret, sealedClientSecret, sealedWebhookSecret, secretsSealed. */
+    public WebhookEndpointWithSecret(String object, String id, String url, List<String> enabledEvents, boolean active, Long disabledAt, long createdAt, String secret, Long failingSince, String description, String eventNaming, Boolean external, List<String> signatureVersions, JsonNode destination, List<String> alertContacts, Boolean created, Map<String, Object> metadata, String externalRef, Boolean idempotentReplay) {
+        this(object, id, url, enabledEvents, active, disabledAt, createdAt, secret, failingSince, description, eventNaming, external, signatureVersions, destination, alertContacts, created, metadata, externalRef, idempotentReplay, null, null, null, null);
+    }
+
 
     /** The previous shape, without the destination, naming and provisioning fields. */
     public WebhookEndpointWithSecret(String object, String id, String url, List<String> enabledEvents, boolean active, Long disabledAt, long createdAt, String secret, Long failingSince) {
