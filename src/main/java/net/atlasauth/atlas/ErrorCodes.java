@@ -27,8 +27,27 @@ public final class ErrorCodes {
     /** The key is valid but for a different surface (e.g. a platform key on an instance route). */
     public static final String WRONG_KEY_SURFACE = "WRONG_KEY_SURFACE";
     public static final String FORBIDDEN = "FORBIDDEN";
-    /** The key lacks the scope this route needs. */
+    /**
+     * The key lacks the scope this route needs ({@code meta.required_scope} names it; 403). It replaces
+     * {@link #SCOPE_MISSING}; use {@link AtlasApiException#isInsufficientScope()}, which accepts both.
+     */
+    public static final String INSUFFICIENT_SCOPE = "INSUFFICIENT_SCOPE";
+    /** The former spelling of {@link #INSUFFICIENT_SCOPE} (the new envelope carries it as {@code meta.legacy_code}); still tolerated. */
     public static final String SCOPE_MISSING = "SCOPE_MISSING";
+    /** A root action (create an app or instance, mint a key) needs a multi-factor sign-in within the last five minutes (403). */
+    public static final String STEP_UP_REQUIRED = "STEP_UP_REQUIRED";
+    /** No endpoint matches the method and path (a typo or a guessed route); see {@link ErrorItem#didYouMean()} and {@link ErrorItem#allowedMethods()}. */
+    public static final String ROUTE_NOT_FOUND = "ROUTE_NOT_FOUND";
+    /** The call is for a live instance only. */
+    public static final String NOT_A_LIVE_INSTANCE = "NOT_A_LIVE_INSTANCE";
+    /** The call is refused on anything but a test-mode instance. */
+    public static final String TEST_MODE_ONLY = "TEST_MODE_ONLY";
+    /** Testing tokens are not available on this deployment. */
+    public static final String TESTING_UNAVAILABLE = "TESTING_UNAVAILABLE";
+    /** The partner-link credential an integration needs is not available on this instance. */
+    public static final String PARTNER_LINK_UNAVAILABLE = "PARTNER_LINK_UNAVAILABLE";
+    /** The key's origin allowlist refuses the request's Origin (403). */
+    public static final String ORIGIN_NOT_ALLOWED = "ORIGIN_NOT_ALLOWED";
     /** Email sending is not set up for this instance. */
     public static final String EMAIL_DELIVERY_NOT_CONFIGURED = "EMAIL_DELIVERY_NOT_CONFIGURED";
     /** The operation needs an email provider to be configured first. */

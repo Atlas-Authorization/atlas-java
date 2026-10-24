@@ -255,6 +255,87 @@ WebhookSecret rotated = atlas.webhooks().endpoints().rotateSecret(endpointId,
 rotated.previousSecretExpiresAt();  // epoch ms, or null when the old secret already stopped
 ```
 
+### Integrator platform (1.15)
+
+Scoped credentials, the privacy executor, identity integrations, dry runs and trace context. Atlas keys come in
+two formats (`atlas_<live|test>_<kind>_...` and the legacy `sk_` / `pk_` / `psk_` / `whsec_`); `KeyFormat` accepts both.
+
+```java
+// A secret key for one service: only the scopes it needs, an owner, an expiry
+SecretKey key = atlas.secretKeys().create(new CreateSecretKeyBody()
+        .name("ci").scopes(List.of("read_only")).owner("platform-team").expiresAtIso("2027-01-01T00:00:00Z"));
+key.secret();                                           // shown once
+atlas.secretKeys().rotate(key.id(), new RotateSecretKeyBody().overlapSeconds(3600));
+Whoami me = atlas.whoami();                             // what this key may do: me.key().effectiveScopes()
+
+// Idempotent provisioning: a repeat create with the same external_ref returns the object (no secret)
+atlas.platform().apps().create(new CreatePlatformAppBody().name("Acme").externalRef("acme-prod")
+        .metadata(Map.of("product", "acme", "sandbox", true)));
+atlas.platform().apps().sandboxTeardown(null, true);    // dry run of "delete every sandbox-tagged app"
+
+// Validate a write without applying it
+DryRunResult plan = atlas.dryRun("PUT", "/v1/instance/integrations/acme", Map.of("enabled", true));
+atlas.withDryRun().instance().setIntegration("acme", new SetIntegrationBody().enabled(true).name("Acme"));
+
+// W3C trace context reaches the deliveries and executor calls the write triggers
+AtlasClient traced = atlas.withTraceparent(Traceparent.create());
+```
+
+**Identity integrations.** `instance().setIntegration(id, body)` connects a preset (`chatly`, `forumulate`,
+`cookiemunch`, `referalli`) or your own service; `sessions().getIntegrationToken(sessionId, "chatly")` mints its
+short-lived token (the server-side `getToken({ for })`).
+
+**Webhooks.** Upsert on every deploy, test inline, replay what a down endpoint missed, and verify v2 signatures
+(they cover the URL, so a captured delivery cannot be replayed to another one):
+
+```java
+WebhookEndpointWithSecret ep = atlas.webhooks().endpoints().upsertByUrl(
+        new UpsertWebhookEndpointBody("https://app.example.com/hooks/atlas")
+                .signatureVersions(List.of("v1", "v2")).eventNaming("canonical"));
+WebhookTestResult test = atlas.webhooks().endpoints().testNow(ep.id(), "5s");   // status, latency, signature header sent
+atlas.webhooks().endpoints().replay(ep.id(), new WebhookWindowBody().since(sinceMs));
+
+WebhookVerification v = new WebhookVerifier(secret)
+        .verify(rawBody, headers, "https://app.example.com/hooks/atlas", true);   // requireV2
+```
+
+Event names: `WebhookEvents.canonical("organizationMembership.created")` and `WebhookEvents.spellings(...)`.
+
+**Privacy executor.** A DSAR orchestrator calls `privacy()` with a key that has the `privacy:execute` scope
+(`lookup`, `createRequest`, `getRequest`, `cancelRequest`); Atlas calls your orchestrator when an account deletion
+is scheduled (`privacy().orchestrator().set(...)`). Verify what Atlas sends with `PrivacyCallVerifier`.
+
+**Operator CLI.** `OperatorLogin` runs the device flow and the one-hour token exchange without a stored key:
+
+```java
+OperatorLogin login = new OperatorLogin();
+OperatorLogin.DeviceAuthorization device = login.start();
+System.out.println("Open " + device.verificationUriComplete() + " and confirm " + device.userCode());
+OperatorLogin.TokenResponse operator = login.poll(device);
+OperatorLogin.TokenResponse scoped = login.exchange(operator.accessToken(), "ins_123", List.of("users:read"));
+AtlasClient cli = OperatorLogin.clientFromAccessToken(scoped.accessToken(), null);
+```
+
+A root action without a recent second factor throws `OAuthFlowException` with code `STEP_UP_REQUIRED`.
+
+**Errors.** `INSUFFICIENT_SCOPE` (the former `SCOPE_MISSING` is still matched: `e.isInsufficientScope()`,
+`e.requiredScope()`), `STEP_UP_REQUIRED`, and `ROUTE_NOT_FOUND` with `e.didYouMean()`.
+
+**Back-channel logout receiver.** `BackchannelLogoutHandler` wraps `LogoutTokenVerifier`: it answers 200 / 400 /
+503 + `Retry-After` the way Atlas's retries expect, from any framework:
+
+```java
+BackchannelLogoutHandler handler = BackchannelLogoutHandler.builder()
+        .verifier(logout)
+        .onLogout(claims -> sessions.endFor(claims.sid(), claims.sub()))
+        .build();
+BackchannelLogoutHandler.Response r = handler.handle(request.getMethod(), body);   // write r.status(), r.body(), r.headers()
+```
+
+Also new: `status()`, `delivery()` (health, egress IPs), `auditExports()`, `notices()`, `securityAdvisories()`,
+`subProcessors()`, `entitlements()`, `partnerLinks()`, `atlasIdGrants()`, `instance().unknownFieldsReport` /
+`openapiDiff` / `integrationHealth` / `embed`. Sealed (`X-Secret-Recipient`) secrets are not supported in this SDK yet.
+
 ### Trusted reverse proxy
 
 If a reverse proxy serves the Frontend API from your own origin, give it a proxy secret. It sends the secret in
@@ -312,7 +393,7 @@ null when never reported), `referralCode()` and `referralLink()`. `referral().st
 ```java
 atlas.referrals().update(new UpdateReferralSettingsBody()
         .enabled(true)
-        .provider("webhook") // the Atlas referral protocol; or "referally" or another built-in adapter
+        .provider("webhook") // the Atlas referral protocol; or "referalli" (the old "referally" is still accepted) or another built-in adapter
         .endpointUrl("https://referrals.example.com/atlas")
         .signingSecret(System.getenv("REFERRAL_SIGNING_SECRET"))
         .security(new UpdateReferralSecurityBody().onHighRisk("hold"))

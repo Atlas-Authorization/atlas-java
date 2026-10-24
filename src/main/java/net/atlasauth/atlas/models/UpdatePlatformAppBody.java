@@ -17,6 +17,9 @@ public final class UpdatePlatformAppBody {
     @JsonIgnore
     private final Map<String, Object> additionalFields = new LinkedHashMap<>();
 
+    /** Provisioning tags (strings, numbers and booleans); on an update they replace the stored tags. */
+    public Map<String, Object> metadata;
+
     public UpdatePlatformAppBody() {
     }
 
@@ -33,6 +36,8 @@ public final class UpdatePlatformAppBody {
         return this;
     }
     public UpdatePlatformAppBody tags(List<String> v) { this.tags = v; return this; }
+
+    public UpdatePlatformAppBody metadata(Map<String, Object> v) { this.metadata = v; return this; }
 
     /**
      * Set any field by its wire name, including an explicit {@code null} (which

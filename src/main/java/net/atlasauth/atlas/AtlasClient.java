@@ -83,8 +83,25 @@ import net.atlasauth.atlas.resources.UserHooks;
 import net.atlasauth.atlas.resources.Users;
 import net.atlasauth.atlas.resources.Waitlist;
 import net.atlasauth.atlas.resources.Webhooks;
+import net.atlasauth.atlas.resources.SecretKeys;
+import net.atlasauth.atlas.resources.Keys;
+import net.atlasauth.atlas.resources.PartnerLinks;
+import net.atlasauth.atlas.resources.AtlasIdGrants;
+import net.atlasauth.atlas.resources.Privacy;
+import net.atlasauth.atlas.resources.Integrations;
+import net.atlasauth.atlas.resources.Entitlements;
+import net.atlasauth.atlas.resources.Notices;
+import net.atlasauth.atlas.resources.SecurityAdvisories;
+import net.atlasauth.atlas.resources.SubProcessors;
+import net.atlasauth.atlas.resources.AuditExports;
+import net.atlasauth.atlas.resources.Status;
+import net.atlasauth.atlas.resources.Delivery;
 
 import net.atlasauth.atlas.http.UnknownFieldsWarning;
+import net.atlasauth.atlas.models.DryRunResult;
+import net.atlasauth.atlas.models.Whoami;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.net.http.HttpClient;
 import java.time.Duration;
@@ -195,6 +212,19 @@ public final class AtlasClient {
     private final Testing testing;
     private final OpenFga openFga;
     private final Captcha captcha;
+    private final SecretKeys secretKeys;
+    private final Keys keys;
+    private final PartnerLinks partnerLinks;
+    private final AtlasIdGrants atlasIdGrants;
+    private final Privacy privacy;
+    private final Integrations integrations;
+    private final Entitlements entitlements;
+    private final Notices notices;
+    private final SecurityAdvisories securityAdvisories;
+    private final SubProcessors subProcessors;
+    private final AuditExports auditExports;
+    private final Status status;
+    private final Delivery delivery;
 
     private final Builder config;
 
@@ -216,10 +246,12 @@ public final class AtlasClient {
         Duration timeout = b.timeout != null ? b.timeout : Duration.ofSeconds(30);
 
         this.transport = new Transport(b.secretKey, apiUrl, http, mapper, timeout, b.strict, b.onUnknownFields,
-                "This call needs an instance secret key: set AtlasClient.builder().secretKey(\"sk_...\").");
+                "This call needs an instance secret key: set AtlasClient.builder().secretKey(\"sk_...\").",
+                b.dryRun, b.traceparent);
         Transport platformTransport = new Transport(b.platformKey, apiUrl, http, mapper, timeout, b.strict,
                 b.onUnknownFields,
-                "Platform calls need a platform key: set AtlasClient.builder().platformKey(\"psk_...\").");
+                "Platform calls need a platform key: set AtlasClient.builder().platformKey(\"psk_...\").",
+                b.dryRun, b.traceparent);
 
         this.users = new Users(transport);
         this.sessions = new Sessions(transport);
@@ -301,6 +333,19 @@ public final class AtlasClient {
         this.testing = new Testing(transport);
         this.openFga = new OpenFga(transport);
         this.captcha = new Captcha(transport);
+        this.secretKeys = new SecretKeys(transport);
+        this.keys = new Keys(transport);
+        this.partnerLinks = new PartnerLinks(transport);
+        this.atlasIdGrants = new AtlasIdGrants(transport);
+        this.privacy = new Privacy(transport);
+        this.integrations = new Integrations(transport);
+        this.entitlements = new Entitlements(transport);
+        this.notices = new Notices(transport);
+        this.securityAdvisories = new SecurityAdvisories(transport);
+        this.subProcessors = new SubProcessors(transport);
+        this.auditExports = new AuditExports(transport);
+        this.status = new Status(transport);
+        this.delivery = new Delivery(transport);
     }
 
     /**
@@ -665,6 +710,118 @@ public final class AtlasClient {
         return captcha;
     }
 
+
+    /** Scoped instance secret keys: mint, list, update, rotate with an overlap, revoke. */
+    public SecretKeys secretKeys() {
+        return secretKeys;
+    }
+
+    /** Every credential on the instance in one shape ({@code /v1/keys}). */
+    public Keys keys() {
+        return keys;
+    }
+
+    /** Credentials integrated partner services hold on this instance, and the ones it holds for partner APIs. */
+    public PartnerLinks partnerLinks() {
+        return partnerLinks;
+    }
+
+    /** Sign in with Atlas grants for the apps this instance manages (privacy requests). */
+    public AtlasIdGrants atlasIdGrants() {
+        return atlasIdGrants;
+    }
+
+    /** The data-rights executor protocol ({@code /v1/privacy}) and the instance's orchestrator connection. */
+    public Privacy privacy() {
+        return privacy;
+    }
+
+    /** The routes an integrated service calls: verify errors, the agent-sidebar card, public instance metadata. */
+    public Integrations integrations() {
+        return integrations;
+    }
+
+    /** Effective entitlements of a user or organization. */
+    public Entitlements entitlements() {
+        return entitlements;
+    }
+
+    /** Operator notices from Atlas. */
+    public Notices notices() {
+        return notices;
+    }
+
+    /** Security advisories. */
+    public SecurityAdvisories securityAdvisories() {
+        return securityAdvisories;
+    }
+
+    /** The third parties that process this instance's data. */
+    public SubProcessors subProcessors() {
+        return subProcessors;
+    }
+
+    /** Stream the audit log to your SIEM as CloudEvents. */
+    public AuditExports auditExports() {
+        return auditExports;
+    }
+
+    /** Atlas service status, the status subscription, incidents and watched dependencies. */
+    public Status status() {
+        return status;
+    }
+
+    /** Outbound delivery health and the egress IPs. */
+    public Delivery delivery() {
+        return delivery;
+    }
+
+    /** {@code GET /v1/whoami} — what the secret key in use is, its scopes and the instance it belongs to. */
+    public Whoami whoami() {
+        return keys.whoami();
+    }
+
+    /**
+     * A copy of this client that sends every write (POST, PUT, PATCH, DELETE) with {@code ?dry_run=true} and
+     * without an {@code Idempotency-Key}: Atlas validates it and answers with the changes it would make,
+     * changing nothing. The typed result of a method called on the copy is mostly empty; use
+     * {@link #dryRun(String, String, Object)} to get the plan itself. The copy shares this client's HTTP pool.
+     *
+     * <pre>{@code
+     * atlas.withDryRun().instance().setIntegration("acme", body);
+     * }</pre>
+     */
+    public AtlasClient withDryRun() {
+        Builder b = config.copy();
+        b.dryRun = true;
+        return new AtlasClient(b);
+    }
+
+    /**
+     * A copy of this client that sends a W3C {@code traceparent} on every call, so Atlas stores the trace id on
+     * the webhook deliveries, back-channel deliveries, referral calls and executor requests the call triggers.
+     * Mint one with {@link net.atlasauth.atlas.Traceparent#create()}.
+     */
+    public AtlasClient withTraceparent(String traceparent) {
+        Builder b = config.copy();
+        b.traceparent = traceparent;
+        return new AtlasClient(b);
+    }
+
+    /**
+     * Send one write as a dry run and return the plan. {@code method} is POST, PUT, PATCH or DELETE; {@code body}
+     * may be null.
+     *
+     * <pre>{@code
+     * DryRunResult plan = atlas.dryRun("PATCH", "/v1/instance", Map.of("name", "New"));
+     * }</pre>
+     */
+    public DryRunResult dryRun(String method, String path, Object body) {
+        return transport.withDryRun(true).request(method.toUpperCase(java.util.Locale.ROOT), path, null, body, null, false,
+                new TypeReference<DryRunResult>() {
+                });
+    }
+
     /**
      * Fluent builder for {@link AtlasClient}. Set {@code secretKey} for the instance
      * API, {@code platformKey} for {@link #platform()}, or both.
@@ -678,6 +835,8 @@ public final class AtlasClient {
         private Duration timeout;
         private Boolean strict;
         private Consumer<UnknownFieldsWarning> onUnknownFields;
+        private boolean dryRun;
+        private String traceparent;
 
         private Builder copy() {
             Builder b = new Builder();
@@ -689,6 +848,8 @@ public final class AtlasClient {
             b.timeout = timeout;
             b.strict = strict;
             b.onUnknownFields = onUnknownFields;
+            b.dryRun = dryRun;
+            b.traceparent = traceparent;
             return b;
         }
 
@@ -724,7 +885,13 @@ public final class AtlasClient {
             return this;
         }
 
-        /** The instance secret key ({@code sk_...}). Sent as a Bearer token, never logged. */
+        /** Send a W3C {@code traceparent} on every call (see {@link AtlasClient#withTraceparent(String)}). */
+        public Builder traceparent(String traceparent) {
+            this.traceparent = traceparent;
+            return this;
+        }
+
+        /** The instance secret key ({@code sk_...}, or the suite format {@code atlas_<env>_sk_...}). Sent as a Bearer token, never logged. */
         public Builder secretKey(String secretKey) {
             this.secretKey = secretKey;
             return this;

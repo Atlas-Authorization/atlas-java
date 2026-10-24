@@ -46,6 +46,9 @@ import net.atlasauth.atlas.models.RotateAtlasIdAppSecretBody;
 import net.atlasauth.atlas.models.RotatePlatformSecretBody;
 import net.atlasauth.atlas.models.UpdateAtlasIdAppBody;
 import net.atlasauth.atlas.models.UpdatePlatformAppBody;
+import net.atlasauth.atlas.models.Whoami;
+import net.atlasauth.atlas.models.StandardKey;
+import net.atlasauth.atlas.models.UpdateSecretKeyBody;
 
 import java.util.List;
 import java.util.Map;
@@ -60,13 +63,33 @@ public final class Platform {
     private final AtlasIdApps atlasIdApps;
     private final Apps apps;
     private final AtlasIdPublisherResource atlasIdPublisher;
+    private final PlatformKeys keys;
+    private final PlatformAudit audit;
 
     public Platform(Transport t) {
+        this.keys = new PlatformKeys(t);
+        this.audit = new PlatformAudit(t);
         this.t = t;
         this.designAssets = new DesignAssets(t);
         this.atlasIdApps = new AtlasIdApps(t);
         this.apps = new Apps(t);
         this.atlasIdPublisher = new AtlasIdPublisherResource(t);
+    }
+
+    /** {@code GET /v1/platform/whoami} — What the platform key (or one-hour access token) in use is, its scopes and the account it belongs to. */
+    public Whoami whoami() {
+        return t.get("/v1/platform/whoami", new TypeReference<>() {
+        });
+    }
+
+    /** Every credential on the account, and minting / revoking platform keys ({@code /v1/platform/keys}). */
+    public PlatformKeys keys() {
+        return keys;
+    }
+
+    /** The account audit log and its streams ({@code /v1/platform/audit_logs}, {@code /v1/platform/audit_streams}). */
+    public PlatformAudit audit() {
+        return audit;
     }
 
     /** The account's Sign in with Atlas publisher ({@code /v1/platform/atlas_id_publisher}). */
@@ -206,6 +229,12 @@ public final class Platform {
         /** {@code GET /v1/platform/atlas_id_apps} — List the Sign in with Atlas apps registered to this platform's account, with the issuer and discovery URL. */
         public DataList<AtlasIdApp> list() {
             return t.get("/v1/platform/atlas_id_apps", new TypeReference<>() {
+            });
+        }
+
+        /** {@code GET /v1/platform/atlas_id_apps} — The apps whose provisioning metadata matches every pair of {@code metadata}. */
+        public DataList<AtlasIdApp> list(Map<String, Object> metadata) {
+            return t.get("/v1/platform/atlas_id_apps", Params.putMetadata(new java.util.LinkedHashMap<>(), metadata), new TypeReference<>() {
             });
         }
 
@@ -400,6 +429,53 @@ public final class Platform {
             });
         }
 
+        /** {@code POST /v1/platform/apps/{id}/secret_keys} — Mint an additional named, taggable secret key for an app (shown once; an {@code external_ref} makes it idempotent). {@code body}: {@code name}, {@code instance_id}, {@code external_ref}, {@code metadata}. */
+        public PlatformSecretKey createSecretKey(String id, Map<String, Object> body) {
+            return createSecretKey(id, body, null);
+        }
+
+        /** As above, with an {@code Idempotency-Key}. */
+        public PlatformSecretKey createSecretKey(String id, Map<String, Object> body, String idempotencyKey) {
+            return t.post("/v1/platform/apps/" + enc(id) + "/secret_keys", body, idempotencyKey, new TypeReference<>() {
+            });
+        }
+
+        /** {@code GET /v1/platform/apps/{id}/secret_keys} — The app's valid secret keys whose provisioning metadata matches every pair of {@code metadata}. */
+        public CursorPage<PlatformSecretKey> listSecretKeys(String id, Map<String, Object> metadata) {
+            return t.get("/v1/platform/apps/" + enc(id) + "/secret_keys", Params.putMetadata(new java.util.LinkedHashMap<>(), metadata), new TypeReference<>() {
+            });
+        }
+
+        /**
+         * {@code POST /v1/platform/apps/{id}/clone_config} — Copy an app's configuration into its development (or
+         * another) instance, secrets excluded. {@code body}: {@code to_environment}, {@code target_instance_id},
+         * {@code sections}, {@code include_origins}, {@code dry_run}.
+         */
+        public JsonNode cloneConfig(String id, Map<String, Object> body) {
+            return cloneConfig(id, body, null);
+        }
+
+        /** As above, with an {@code Idempotency-Key}. */
+        public JsonNode cloneConfig(String id, Map<String, Object> body, String idempotencyKey) {
+            return t.post("/v1/platform/apps/" + enc(id) + "/clone_config", body, idempotencyKey, new TypeReference<>() {
+            });
+        }
+
+        /**
+         * {@code POST /v1/platform/apps/bulk_delete} — Hard-delete every sandbox-tagged app and resource of this
+         * platform. {@code metadata} must carry {@code sandbox: true} (null = {@code {"sandbox": true}});
+         * {@code dryRun} lists what would go.
+         */
+        public PlatformAppBulkDeleteResult sandboxTeardown(Map<String, Object> metadata, boolean dryRun) {
+            Map<String, Object> payload = new java.util.LinkedHashMap<>();
+            payload.put("metadata", metadata != null ? metadata : Map.of("sandbox", true));
+            if (dryRun) {
+                payload.put("dry_run", true);
+            }
+            return t.post("/v1/platform/apps/bulk_delete", payload, new TypeReference<>() {
+            });
+        }
+
         /** {@code POST /v1/platform/apps/{id}/instances} — Provision an additional instance (e.g. */
         public PlatformAppWithSecret createInstance(String id, CreatePlatformInstanceBody body) {
             return t.post("/v1/platform/apps/" + enc(id) + "/instances", body, new TypeReference<>() {
@@ -466,6 +542,124 @@ public final class Platform {
             Map<String, Object> payload = Params.of().set("transfer_token", transferToken).map();
             return t.post("/v1/platform/apps/accept_transfer", payload, new TypeReference<>() {
             });
+        }
+    }
+
+    /** Every credential on the account, and minting / revoking platform keys ({@code /v1/platform/keys}). */
+    public static final class PlatformKeys {
+        private final Transport t;
+
+        PlatformKeys(Transport t) {
+            this.t = t;
+        }
+
+        /** {@code GET /v1/platform/keys} — Every credential on the account, revoked ones included. */
+        public ListPage<StandardKey> list() {
+            return list(null, null, null);
+        }
+
+        /**
+         * {@code GET /v1/platform/keys} — {@code kind} (secret_key, platform_key, account_key, webhook_secret,
+         * partner_link, access_token), {@code status} (active, expiring, expired, revoked) and
+         * {@code instanceId} filter the list; each may be null.
+         */
+        public ListPage<StandardKey> list(String kind, String status, String instanceId) {
+            return t.get("/v1/platform/keys", Params.of("kind", kind).set("status", status).set("instance_id", instanceId).map(), new TypeReference<>() {
+            });
+        }
+
+        /**
+         * {@code POST /v1/platform/keys} — Mint a platform key; the secret is in this response only. {@code body}:
+         * {@code scopes} (a subset of the caller's; per-app grant scopes {@code atlas_id_apps:<app id>:grants:read|write}
+         * are allowed), {@code name}, {@code application_ids}, {@code expires_at}, {@code ip_allowlist}, {@code owner},
+         * {@code key_format} ({@code atlas} or {@code legacy}).
+         */
+        public JsonNode create(Map<String, Object> body) {
+            return create(body, null);
+        }
+
+        /** As above, with an {@code Idempotency-Key}. */
+        public JsonNode create(Map<String, Object> body, String idempotencyKey) {
+            return t.post("/v1/platform/keys", body, idempotencyKey, new TypeReference<>() {
+            });
+        }
+
+        /** {@code PATCH /v1/platform/keys/{id}} — Change a key's name, owner or expiry. */
+        public JsonNode update(String id, UpdateSecretKeyBody body) {
+            return t.patch("/v1/platform/keys/" + enc(id), body, new TypeReference<>() {
+            });
+        }
+
+        /** {@code POST /v1/platform/keys/{id}/revoke} — Revoke a key at once. */
+        public JsonNode revoke(String id) {
+            return t.post("/v1/platform/keys/" + enc(id) + "/revoke", null, new TypeReference<>() {
+            });
+        }
+    }
+
+    /** The account audit log and its streams. */
+    public static final class PlatformAudit {
+        private final Transport t;
+        private final Streams streams;
+
+        PlatformAudit(Transport t) {
+            this.t = t;
+            this.streams = new Streams(t);
+        }
+
+        /** The account audit streams ({@code /v1/platform/audit_streams}). */
+        public Streams streams() {
+            return streams;
+        }
+
+        /** {@code GET /v1/platform/audit_logs} — The account audit log, newest first. */
+        public JsonNode list() {
+            return list(null, null, null);
+        }
+
+        /** {@code GET /v1/platform/audit_logs} — Filter by {@code action}; page with {@code limit} / {@code startingAfter} (each may be null). */
+        public JsonNode list(String action, Integer limit, String startingAfter) {
+            return t.get("/v1/platform/audit_logs", Params.of("action", action).set("limit", limit).set("starting_after", startingAfter).map(), new TypeReference<>() {
+            });
+        }
+
+        /** Streams that send the account audit log to your SIEM. A body takes {@code url}, {@code format} (for example {@code cloudevents}) and {@code active}. */
+        public static final class Streams {
+            private final Transport t;
+
+            Streams(Transport t) {
+                this.t = t;
+            }
+
+            /** {@code GET /v1/platform/audit_streams} */
+            public JsonNode list() {
+                return t.get("/v1/platform/audit_streams", new TypeReference<>() {
+                });
+            }
+
+            /** {@code POST /v1/platform/audit_streams} */
+            public JsonNode create(Map<String, Object> body) {
+                return t.post("/v1/platform/audit_streams", body, new TypeReference<>() {
+                });
+            }
+
+            /** {@code PATCH /v1/platform/audit_streams/{id}} */
+            public JsonNode update(String id, Map<String, Object> body) {
+                return t.patch("/v1/platform/audit_streams/" + enc(id), body, new TypeReference<>() {
+                });
+            }
+
+            /** {@code DELETE /v1/platform/audit_streams/{id}} */
+            public JsonNode delete(String id) {
+                return t.delete("/v1/platform/audit_streams/" + enc(id), new TypeReference<>() {
+                });
+            }
+
+            /** {@code POST /v1/platform/audit_streams/{id}/test} — Send a test event. */
+            public JsonNode test(String id) {
+                return t.post("/v1/platform/audit_streams/" + enc(id) + "/test", null, new TypeReference<>() {
+                });
+            }
         }
     }
 }

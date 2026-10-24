@@ -66,4 +66,11 @@ public final class LogoutNotifyEndpoints {
                 new TypeReference<>() {
                 });
     }
+
+    /** The delivery log, newest first, paged by cursor: pass the previous page's {@code next_cursor} as {@code startingAfter}. Each may be null. */
+    public net.atlasauth.atlas.models.CursorPage<LogoutNotifyDelivery> listDeliveries(String id, Integer limit, String startingAfter) {
+        return t.get("/v1/logout_notify_endpoints/" + enc(id) + "/deliveries", Params.of().set("limit", limit).set("starting_after", startingAfter).map(),
+                new TypeReference<>() {
+                });
+    }
 }

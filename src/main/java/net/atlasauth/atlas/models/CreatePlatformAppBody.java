@@ -19,6 +19,11 @@ public final class CreatePlatformAppBody {
     @JsonIgnore
     private final Map<String, Object> additionalFields = new LinkedHashMap<>();
 
+    /** A stable key of your own: a repeat create with it returns the existing object (200, no secret). */
+    public String externalRef;
+    /** Provisioning tags (strings, numbers and booleans); on an update they replace the stored tags. */
+    public Map<String, Object> metadata;
+
     public CreatePlatformAppBody() {
     }
 
@@ -37,6 +42,9 @@ public final class CreatePlatformAppBody {
     }
     public CreatePlatformAppBody createDevelopmentSibling(Boolean v) { this.createDevelopmentSibling = v; return this; }
     public CreatePlatformAppBody tags(List<String> v) { this.tags = v; return this; }
+
+    public CreatePlatformAppBody externalRef(String v) { this.externalRef = v; return this; }
+    public CreatePlatformAppBody metadata(Map<String, Object> v) { this.metadata = v; return this; }
 
     /**
      * Set any field by its wire name, including an explicit {@code null} (which

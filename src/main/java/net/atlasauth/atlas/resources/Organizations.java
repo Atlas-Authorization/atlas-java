@@ -177,6 +177,13 @@ public final class Organizations {
             });
         }
 
+        /** {@code GET /v1/organizations/{id}/memberships} paged by cursor: pass the previous page's {@code next_cursor} as {@code startingAfter}. Each may be null. */
+        public CursorPage<OrganizationMembership> list(String orgId, Integer limit, String startingAfter) {
+            return t.get("/v1/organizations/" + enc(orgId) + "/memberships", Params.of().set("limit", limit).set("starting_after", startingAfter).map(),
+                    new TypeReference<>() {
+                    });
+        }
+
         public JsonNode add(String orgId, String userId, String role, String idempotencyKey) {
             Map<String, Object> body = Params.of().set("user_id", userId).set("role", role).map();
             return t.post("/v1/organizations/" + enc(orgId) + "/memberships", body, idempotencyKey,

@@ -95,6 +95,12 @@ public final class Messaging {
         });
     }
 
+    /** {@code GET /v1/messaging_providers/{channel}} — One channel ({@code email} or {@code sms}) with its configured state, secrets omitted. */
+    public MessagingProvider channel(String channel) {
+        return t.get("/v1/messaging_providers/" + net.atlasauth.atlas.http.Transport.enc(channel), new TypeReference<>() {
+        });
+    }
+
     /**
      * Configure (or update) the email provider with typed settings and a mode:
      * {@code development} lets a development instance send without a verified domain (409 on a

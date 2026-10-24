@@ -12,6 +12,13 @@ public final class ListEventsParams {
     public Long limit;
     public String startingAfter;
 
+    /** ISO 8601 or epoch ms: only events at or after this moment. */
+    public String since;
+    /** ISO 8601 or epoch ms: only events before this moment. */
+    public String until;
+    /** {@code asc} or {@code desc}. */
+    public String order;
+
     public ListEventsParams() {
     }
 
@@ -21,6 +28,10 @@ public final class ListEventsParams {
     public ListEventsParams limit(Long v) { this.limit = v; return this; }
     public ListEventsParams startingAfter(String v) { this.startingAfter = v; return this; }
 
+    public ListEventsParams since(String v) { this.since = v; return this; }
+    public ListEventsParams until(String v) { this.until = v; return this; }
+    public ListEventsParams order(String v) { this.order = v; return this; }
+
     /** The query map the transport serializes. */
     public Map<String, Object> toQuery() {
         return Params.of()
@@ -29,6 +40,9 @@ public final class ListEventsParams {
                 .set("to", to)
                 .set("limit", limit)
                 .set("starting_after", startingAfter)
+                .set("since", since)
+                .set("until", until)
+                .set("order", order)
                 .map();
     }
 }

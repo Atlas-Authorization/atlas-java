@@ -50,16 +50,33 @@ public final class WebhookVerifier {
         return verify(rawBody, headers, System.currentTimeMillis());
     }
 
+    /**
+     * Verify a delivery that may carry a v2 signature. An endpoint whose {@code signature_versions} include
+     * {@code v2} signs HMAC-SHA256 over {@code <id>.<timestamp>.<url>.<body>}, where {@code url} is the exact
+     * URL Atlas POSTed to (the endpoint's {@code url}), so a captured delivery cannot be replayed to another URL.
+     * A delivery verifies when any {@code v1} entry (over {@code id.timestamp.body}) or any {@code v2} entry
+     * matches; entries of unknown versions are ignored. With {@code requireV2} only a {@code v2} entry is accepted.
+     */
+    public WebhookVerification verify(byte[] rawBody, Map<String, ?> headers, String endpointUrl, boolean requireV2) {
+        return verify(rawBody, headers, System.currentTimeMillis(), endpointUrl, requireV2);
+    }
+
     /** Verify a delivery against {@code nowMs} (epoch ms). */
     public WebhookVerification verify(byte[] rawBody, Map<String, ?> headers, long nowMs) {
+        return verify(rawBody, headers, nowMs, null, false);
+    }
+
+    /** {@link #verify(byte[], Map, String, boolean)} against {@code nowMs} (epoch ms). */
+    public WebhookVerification verify(byte[] rawBody, Map<String, ?> headers, long nowMs, String endpointUrl, boolean requireV2) {
         String id = header(headers, "atlas-id");
         String tsRaw = header(headers, "atlas-timestamp");
         String signature = header(headers, "atlas-signature");
         if (isBlank(id) || isBlank(tsRaw) || isBlank(signature)) {
             return WebhookVerification.failure("missing_headers");
         }
-        List<String> provided = signatures(signature);
-        if (provided.isEmpty()) {
+        List<String> provided = requireV2 ? new ArrayList<>() : signatures(signature, "v1");
+        List<String> providedV2 = endpointUrl != null ? signatures(signature, "v2") : new ArrayList<>();
+        if (provided.isEmpty() && providedV2.isEmpty()) {
             return WebhookVerification.failure("malformed_signature");
         }
 
@@ -73,21 +90,19 @@ public final class WebhookVerifier {
             return WebhookVerification.failure("stale_timestamp");
         }
 
-        String expected;
-        try {
-            Mac mac = Mac.getInstance("HmacSHA256");
-            mac.init(new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
-            mac.update((id + "." + timestamp + ".").getBytes(StandardCharsets.UTF_8));
-            mac.update(rawBody);
-            expected = Base64.getEncoder().encodeToString(mac.doFinal());
-        } catch (Exception e) {
-            throw new IllegalStateException("HmacSHA256 is unavailable", e);
-        }
+        String expected = hmac(id + "." + timestamp + ".", rawBody);
+        String expectedV2 = endpointUrl != null ? hmac(id + "." + timestamp + "." + endpointUrl + ".", rawBody) : null;
         // Compare every entry (no early exit), each in constant time.
         byte[] want = expected.getBytes(StandardCharsets.UTF_8);
         boolean matched = false;
         for (String candidate : provided) {
             if (MessageDigest.isEqual(want, candidate.getBytes(StandardCharsets.UTF_8))) matched = true;
+        }
+        if (expectedV2 != null) {
+            byte[] wantV2 = expectedV2.getBytes(StandardCharsets.UTF_8);
+            for (String candidate : providedV2) {
+                if (MessageDigest.isEqual(wantV2, candidate.getBytes(StandardCharsets.UTF_8))) matched = true;
+            }
         }
         if (!matched) {
             return WebhookVerification.failure("signature_mismatch");
@@ -108,15 +123,27 @@ public final class WebhookVerifier {
      * entry, or several separated by spaces (while an endpoint secret rotates, Atlas signs with the
      * old and the new secret). Entries of another version are skipped.
      */
-    private static List<String> signatures(String header) {
+    private static List<String> signatures(String header, String version) {
         List<String> out = new ArrayList<>();
         for (String entry : header.trim().split("\\s+")) {
             int comma = entry.indexOf(',');
-            if (comma > 0 && comma < entry.length() - 1 && "v1".equals(entry.substring(0, comma))) {
+            if (comma > 0 && comma < entry.length() - 1 && version.equals(entry.substring(0, comma))) {
                 out.add(entry.substring(comma + 1));
             }
         }
         return out;
+    }
+
+    private String hmac(String prefix, byte[] rawBody) {
+        try {
+            Mac mac = Mac.getInstance("HmacSHA256");
+            mac.init(new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
+            mac.update(prefix.getBytes(StandardCharsets.UTF_8));
+            mac.update(rawBody);
+            return Base64.getEncoder().encodeToString(mac.doFinal());
+        } catch (Exception e) {
+            throw new IllegalStateException("HmacSHA256 is unavailable", e);
+        }
     }
 
     private static String header(Map<String, ?> headers, String name) {

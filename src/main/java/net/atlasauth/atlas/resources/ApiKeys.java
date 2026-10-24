@@ -139,4 +139,11 @@ public final class ApiKeys {
         return t.get("/v1/api_keys/revoked", q, new TypeReference<>() {
         });
     }
+
+    /** The revocation feed paged by cursor: pass the previous page's {@code next_cursor} as {@code startingAfter}. Each may be null. */
+    public net.atlasauth.atlas.models.CursorPage<RevokedApiKey> listRevoked(String since, Long limit, String startingAfter) {
+        Map<String, Object> q = Params.of().set("since", since).set("limit", limit).set("starting_after", startingAfter).map();
+        return t.get("/v1/api_keys/revoked", q, new TypeReference<>() {
+        });
+    }
 }

@@ -3,6 +3,7 @@ package net.atlasauth.atlas.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * A registered OAuth client (relying application) of this instance.
@@ -37,7 +38,15 @@ public record OAuthClient(
         /** The pairwise sector document, if registered. */ String sectorIdentifierUri,
         /** When the current secret stops authenticating (epoch ms); null = never. */ Long clientSecretExpiresAt,
         /** jwt or opaque access tokens for this client; null inherits from the API / instance. */ String accessTokenFormat,
-        /** This client's token lifetime overrides (seconds); a null field is inherited. */ OAuthTokenLifetimes tokenLifetimes) {
+        /** This client's token lifetime overrides (seconds); a null field is inherited. */ OAuthTokenLifetimes tokenLifetimes,
+        /** Provisioning tags (strings, numbers and booleans). */ Map<String, Object> metadata,
+        /** Your idempotent-create key. */ String externalRef,
+        /** True on a create that sent an {@code external_ref} and got the existing object back (200, no secret). */ Boolean idempotentReplay) {
+    /** The shape before the provisioning fields ({@code metadata}, {@code externalRef}, {@code idempotentReplay}). */
+    public OAuthClient(String object, String id, String clientId, String name, String logoUrl, List<String> redirectUris, List<String> allowedScopes, List<String> grantTypes, String tokenEndpointAuthMethod, String secretPrefix, boolean isPublic, boolean firstParty, long createdAt, long updatedAt, boolean skipLogoutConfirmation, Long previousSecretExpiresAt, boolean disabled, boolean requirePkce, String subjectType, String sectorIdentifierUri, Long clientSecretExpiresAt, String accessTokenFormat, OAuthTokenLifetimes tokenLifetimes) {
+        this(object, id, clientId, name, logoUrl, redirectUris, allowedScopes, grantTypes, tokenEndpointAuthMethod, secretPrefix, isPublic, firstParty, createdAt, updatedAt, skipLogoutConfirmation, previousSecretExpiresAt, disabled, requirePkce, subjectType, sectorIdentifierUri, clientSecretExpiresAt, accessTokenFormat, tokenLifetimes, null, null, null);
+    }
+
 
     /** The 1.11 shape, before the custom-data, add-on, enterprise and token-format fields. */
     public OAuthClient(String object, String id, String clientId, String name, String logoUrl, List<String> redirectUris, List<String> allowedScopes, List<String> grantTypes, String tokenEndpointAuthMethod, String secretPrefix, boolean isPublic, boolean firstParty, long createdAt, long updatedAt, boolean skipLogoutConfirmation, Long previousSecretExpiresAt, boolean disabled, boolean requirePkce, String subjectType, String sectorIdentifierUri, Long clientSecretExpiresAt) {

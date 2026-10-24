@@ -37,6 +37,13 @@ public final class CreateOAuthClientBody {
     @JsonIgnore
     private final Map<String, Object> additionalFields = new LinkedHashMap<>();
 
+    /** Require PKCE for a confidential client too (default true; false only for a legacy integration). */
+    public Boolean requirePkce;
+    /** A stable key of your own: a repeat create with it returns the existing object (200, no secret). */
+    public String externalRef;
+    /** Provisioning tags (strings, numbers and booleans); on an update they replace the stored tags. */
+    public Map<String, Object> metadata;
+
     public CreateOAuthClientBody() {
     }
 
@@ -60,6 +67,10 @@ public final class CreateOAuthClientBody {
 
     public CreateOAuthClientBody accessTokenFormat(String v) { this.accessTokenFormat = v; return this; }
     public CreateOAuthClientBody tokenLifetimes(OAuthTokenLifetimes v) { this.tokenLifetimes = v; return this; }
+
+    public CreateOAuthClientBody requirePkce(Boolean v) { this.requirePkce = v; return this; }
+    public CreateOAuthClientBody externalRef(String v) { this.externalRef = v; return this; }
+    public CreateOAuthClientBody metadata(Map<String, Object> v) { this.metadata = v; return this; }
 
     /**
      * Set any field by its wire name, including an explicit {@code null} (which

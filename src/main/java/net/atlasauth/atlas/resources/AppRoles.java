@@ -85,4 +85,11 @@ public final class AppRoles {
         return t.delete("/v1/users/" + enc(userId) + "/app_roles/" + enc(idOrKey), new TypeReference<>() {
         });
     }
+
+    /** The users holding a role, oldest assignment first, paged by cursor: pass the previous page's {@code next_cursor} as {@code startingAfter}. */
+    public JsonNode listUsersAfter(String idOrKey, Integer limit, String startingAfter) {
+        return t.get("/v1/app_roles/" + enc(idOrKey) + "/users", Params.of("limit", limit).set("starting_after", startingAfter).map(),
+                new TypeReference<>() {
+                });
+    }
 }

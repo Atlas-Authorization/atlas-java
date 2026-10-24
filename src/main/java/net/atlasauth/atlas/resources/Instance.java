@@ -1,8 +1,12 @@
 package net.atlasauth.atlas.resources;
 
+import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import net.atlasauth.atlas.Params;
 import net.atlasauth.atlas.http.Transport;
+import static net.atlasauth.atlas.http.Transport.enc;
 import net.atlasauth.atlas.models.CookieConsent;
 import net.atlasauth.atlas.models.ChatlyIntegration;
 import net.atlasauth.atlas.models.CookieConsentBody;
@@ -13,7 +17,9 @@ import net.atlasauth.atlas.models.OriginMove;
 import net.atlasauth.atlas.models.OriginMoveBody;
 import net.atlasauth.atlas.models.InstanceConfig;
 import net.atlasauth.atlas.models.InstanceUpdateResult;
+import net.atlasauth.atlas.models.IntegrationToken;
 import net.atlasauth.atlas.models.Preflight;
+import net.atlasauth.atlas.models.SetIntegrationBody;
 import net.atlasauth.atlas.models.UpdateInstanceBody;
 
 /** The {@code /v1/instance} configuration resource. */
@@ -125,5 +131,101 @@ public final class Instance {
      */
     public InstanceUpdateResult setCaptchaConfig(Map<String, Object> captcha) {
         return update(new UpdateInstanceBody().authConfig(Map.of("captcha", captcha)));
+    }
+
+    /**
+     * {@code GET /v1/instance/preflight} with filters. {@code minSeverity} (error, warning, info) keeps only
+     * findings at least that severe ({@code ok} still covers every finding); {@code includeSuppressed} also
+     * lists the findings that do not apply to how the instance integrates. Both may be null.
+     */
+    public Preflight preflight(String minSeverity, Boolean includeSuppressed) {
+        return t.get("/v1/instance/preflight", Params.of("min_severity", minSeverity).set("include_suppressed", includeSuppressed).map(), new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/instance/unknown_fields_report} — Which body fields your callers sent that the endpoints ignored, over the last {@code days} (null = the default). */
+    public JsonNode unknownFieldsReport(Integer days) {
+        return t.get("/v1/instance/unknown_fields_report", Params.of("days", days).map(), new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/openapi/diff} — What changed in the API since a date ({@code since} such as {@code 2026-10-01}); {@code surface} is {@code bapi}, {@code fapi} or {@code platform} (null = all). */
+    public JsonNode openapiDiff(String since, String surface) {
+        return t.get("/v1/openapi/diff", Params.of("since", since).set("surface", surface).map(), new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/integration-health} — Probe every integration the instance depends on. */
+    public JsonNode integrationHealth() {
+        return integrationHealth(null, null);
+    }
+
+    /** {@code GET /v1/integration-health} — {@code only} limits the probe to those checks; {@code probe} false skips the live probes. Both may be null. */
+    public JsonNode integrationHealth(List<String> only, Boolean probe) {
+        Map<String, Object> q = Params.of("probe", probe).map();
+        if (only != null && !only.isEmpty()) {
+            q.put("only", String.join(",", only));
+        }
+        return t.get("/v1/integration-health", q, new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/integration-health/providers} — The providers the health check knows. */
+    public JsonNode integrationHealthProviders() {
+        return t.get("/v1/integration-health/providers", new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/embed} — The embed snippet and the CSP / framing requirements for an origin ({@code shape} is {@code button} or {@code widget}). */
+    public JsonNode embed(String instance, String origin, String shape) {
+        return t.get("/v1/embed", Params.of("instance", instance).set("origin", origin).set("shape", shape).map(), new TypeReference<>() {
+        });
+    }
+
+    // ---- identity integrations ---------------------------------------------
+
+    /** {@code GET /v1/instance/integrations} — Every integration (the presets, connected or not, and every custom one) with its health. */
+    public JsonNode listIntegrations() {
+        return t.get("/v1/instance/integrations", new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/instance/integrations/{id}} — One integration. */
+    public JsonNode getIntegration(String id) {
+        return t.get("/v1/instance/integrations/" + enc(id), new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code PUT /v1/instance/integrations/{id}} — Connect or replace an identity integration (chatly,
+     * forumulate, cookiemunch, referalli or your own). Use {@code atlas.withDryRun()} to validate and save nothing.
+     */
+    public JsonNode setIntegration(String id, SetIntegrationBody body) {
+        return t.put("/v1/instance/integrations/" + enc(id), body, new TypeReference<>() {
+        });
+    }
+
+    /** {@code DELETE /v1/instance/integrations/{id}} — Disconnect an integration. */
+    public JsonNode deleteIntegration(String id) {
+        return t.delete("/v1/instance/integrations/" + enc(id), new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/instance/integrations/{id}/deliveries} — Event and back-channel logout deliveries to the integration, newest first. {@code trace} finds one operation by trace id; {@code kind} is {@code event} or {@code backchannel_logout}. Each may be null. */
+    public JsonNode integrationDeliveries(String id, Integer limit, String trace, String kind) {
+        return t.get("/v1/instance/integrations/" + enc(id) + "/deliveries", Params.of("limit", limit).set("trace", trace).set("kind", kind).map(), new TypeReference<>() {
+        });
+    }
+
+    /** {@code POST /v1/instance/integrations/{id}/events_secret} — Reveal the event receiver's signing secret (audited). */
+    public JsonNode revealIntegrationEventsSecret(String id) {
+        return t.post("/v1/instance/integrations/" + enc(id) + "/events_secret", null, new TypeReference<>() {
+        });
+    }
+
+    /** {@code POST /v1/instance/integrations/{id}/atlas_id_tokens} — Mint an integration token for a Sign in with Atlas user from their Atlas ID access token. */
+    public IntegrationToken integrationAtlasIdToken(String id, String accessToken) {
+        return t.post("/v1/instance/integrations/" + enc(id) + "/atlas_id_tokens", Params.of("access_token", accessToken).map(), new TypeReference<>() {
+        });
     }
 }

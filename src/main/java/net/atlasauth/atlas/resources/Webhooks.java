@@ -4,16 +4,21 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import net.atlasauth.atlas.Params;
 import net.atlasauth.atlas.http.Transport;
 import net.atlasauth.atlas.models.CreateWebhookEndpointBody;
+import net.atlasauth.atlas.models.CursorPage;
 import net.atlasauth.atlas.models.DeletedObject;
 import net.atlasauth.atlas.models.ListPage;
 import net.atlasauth.atlas.models.RotateWebhookSecretBody;
 import net.atlasauth.atlas.models.UpdateWebhookEndpointBody;
 import net.atlasauth.atlas.models.WebhookDelivery;
 import net.atlasauth.atlas.models.WebhookDeliveryQueued;
+import net.atlasauth.atlas.models.UpsertWebhookEndpointBody;
+import net.atlasauth.atlas.models.WebhookBulkResult;
 import net.atlasauth.atlas.models.WebhookEndpoint;
 import net.atlasauth.atlas.models.WebhookEndpointList;
 import net.atlasauth.atlas.models.WebhookEndpointWithSecret;
 import net.atlasauth.atlas.models.WebhookSecret;
+import net.atlasauth.atlas.models.WebhookTestResult;
+import net.atlasauth.atlas.models.WebhookWindowBody;
 
 import java.util.Map;
 
@@ -47,6 +52,19 @@ public final class Webhooks {
         });
     }
 
+    /**
+     * {@code GET /v1/webhook_endpoints/{id}/deliveries} — The delivery log with every filter, newest first.
+     * Each argument may be null: {@code limit} 1-1000 (server default 50), {@code startingAfter} (the
+     * {@code next_cursor} of the previous page), {@code status} (pending, success, failed),
+     * {@code eventType} (comma-separated event names), {@code since} / {@code until} (epoch ms).
+     */
+    public CursorPage<WebhookDelivery> deliveries(String id, Integer limit, String startingAfter, String status, String eventType, Long since, Long until) {
+        Map<String, Object> q = Params.of().set("limit", limit).set("starting_after", startingAfter)
+                .set("status", status).set("event_type", eventType).set("since", since).set("until", until).map();
+        return t.get("/v1/webhook_endpoints/" + enc(id) + "/deliveries", q, new TypeReference<>() {
+        });
+    }
+
     // ---- nested sub-resources ---------------------------------------------
 
     public static final class Endpoints {
@@ -58,6 +76,80 @@ public final class Webhooks {
 
         public ListPage<WebhookEndpoint> list() {
             return t.get("/v1/webhook_endpoints", new TypeReference<>() {
+            });
+        }
+
+        /** {@code GET /v1/webhook_endpoints/{id}} — One endpoint with its health. */
+        public WebhookEndpoint get(String id) {
+            return t.get("/v1/webhook_endpoints/" + enc(id), new TypeReference<>() {
+            });
+        }
+
+        /**
+         * {@code GET /v1/webhook_endpoints} — The endpoints plus the subscribable event types. With
+         * {@code includeDeprecated} the deprecated event spellings are in the catalogue; {@code metadata}
+         * keeps only endpoints whose provisioning tags match every pair. Both may be null.
+         */
+        public WebhookEndpointList listWithEvents(Boolean includeDeprecated, Map<String, Object> metadata) {
+            Map<String, Object> q = Params.putMetadata(new java.util.LinkedHashMap<>(), metadata);
+            if (includeDeprecated != null) {
+                q.put("include_deprecated", includeDeprecated);
+            }
+            return t.get("/v1/webhook_endpoints", q, new TypeReference<>() {
+            });
+        }
+
+        /**
+         * {@code PUT /v1/webhook_endpoints/by_url} — Find the endpoint with this URL and update it, or create it
+         * (then {@code secret} is set, once). Safe to run on every deploy.
+         */
+        public WebhookEndpointWithSecret upsertByUrl(UpsertWebhookEndpointBody body) {
+            return upsertByUrl(body, null);
+        }
+
+        /** {@link #upsertByUrl(UpsertWebhookEndpointBody)} with an {@code Idempotency-Key}. */
+        public WebhookEndpointWithSecret upsertByUrl(UpsertWebhookEndpointBody body, String idempotencyKey) {
+            return t.request("PUT", "/v1/webhook_endpoints/by_url", null, body, idempotencyKey, false, new TypeReference<>() {
+            });
+        }
+
+        /**
+         * {@code POST /v1/webhook_endpoints/{id}/test?wait=} — Send {@code webhook.test} now and return the
+         * result inline: status, HTTP status, latency, response snippet, error and the signature header sent.
+         * {@code wait} is at most 10 seconds ({@code "10s"}, {@code "5000ms"}); null = {@code 10s}.
+         */
+        public WebhookTestResult testNow(String id, String wait) {
+            Map<String, Object> q = Params.of("wait", wait != null ? wait : "10s").map();
+            return t.request("POST", "/v1/webhook_endpoints/" + enc(id) + "/test", q, null, null, false, new TypeReference<>() {
+            });
+        }
+
+        /**
+         * {@code POST /v1/webhook_endpoints/{id}/redeliver} — Redeliver every event whose latest attempt in
+         * the window ({@code since} / {@code until}, epoch ms) has the {@code status} (failed by default, or success).
+         */
+        public WebhookBulkResult redeliverWindow(String id, WebhookWindowBody body) {
+            return redeliverWindow(id, body, null);
+        }
+
+        /** {@link #redeliverWindow(String, WebhookWindowBody)} with an {@code Idempotency-Key}. */
+        public WebhookBulkResult redeliverWindow(String id, WebhookWindowBody body, String idempotencyKey) {
+            return t.post("/v1/webhook_endpoints/" + enc(id) + "/redeliver", body, idempotencyKey, new TypeReference<>() {
+            });
+        }
+
+        /**
+         * {@code POST /v1/webhook_endpoints/{id}/replay} — Re-send everything since {@code since} that the
+         * endpoint subscribes to and has not received ({@code eventType} limits it). When {@code hasMore},
+         * continue from {@code nextSince}.
+         */
+        public WebhookBulkResult replay(String id, WebhookWindowBody body) {
+            return replay(id, body, null);
+        }
+
+        /** {@link #replay(String, WebhookWindowBody)} with an {@code Idempotency-Key}. */
+        public WebhookBulkResult replay(String id, WebhookWindowBody body, String idempotencyKey) {
+            return t.post("/v1/webhook_endpoints/" + enc(id) + "/replay", body, idempotencyKey, new TypeReference<>() {
             });
         }
 

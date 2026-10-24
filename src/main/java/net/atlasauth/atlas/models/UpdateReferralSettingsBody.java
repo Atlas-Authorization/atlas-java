@@ -46,7 +46,7 @@ public final class UpdateReferralSettingsBody {
     public String codeLookupUrl;
     public Boolean signupCodeField;
     /**
-     * The referral programs whose script or cookie the browser reads, in order (referally,
+     * The referral programs whose script or cookie the browser reads, in order (referalli,
      * rewardful, tolt, promotekit, firstpromoter, partnerstack, dub). {@code clear("browser_sources")}
      * goes back to the provider's default.
      */

@@ -240,12 +240,12 @@ class ReferralsTest {
 
     @Test
     void v2SettingsFieldsPingTestAndCallPaging() throws IOException {
-        mock.reply(200, "{\"object\":\"referral_settings\",\"enabled\":true,\"provider\":\"referally\",\"signing_secret_set\":true,\"api_key_set\":false,"
+        mock.reply(200, "{\"object\":\"referral_settings\",\"enabled\":true,\"provider\":\"referalli\",\"signing_secret_set\":true,\"api_key_set\":false,"
                 + "\"url_params\":[\"ref\"],\"auto_enroll_users\":false,\"tracking_token\":\"tt_public_1\",\"code_lookup_url\":null,\"signup_code_field\":true,"
                 + "\"forward_lifecycle\":true,\"mirror_to_public_metadata\":false,\"include_referral_claims\":true,"
                 + "\"connection\":{\"last_test\":null,\"last_ping\":{\"ok\":true,\"org_name\":\"Acme\",\"clock_skew_ms\":90000,\"clock_skew_warning\":true},"
                 + "\"alert\":{\"code\":\"signature_rejected\",\"message\":\"401\",\"at\":9,\"call_id\":\"rfc_9\"},\"failed_calls_7d\":1,\"retrying_calls\":0,\"last_success_at\":null},"
-                + "\"providers\":[{\"id\":\"referally\",\"capabilities\":{\"signup\":true,\"erase\":true,\"export\":true,\"partner\":true,\"auto_enroll\":true,\"signal\":true,\"alias\":true,\"user\":true,\"ping\":true},"
+                + "\"providers\":[{\"id\":\"referalli\",\"capabilities\":{\"signup\":true,\"erase\":true,\"export\":true,\"partner\":true,\"auto_enroll\":true,\"signal\":true,\"alias\":true,\"user\":true,\"ping\":true},"
                 + "\"needs\":[\"endpoint_url\",\"connection_id\",\"signing_secret\"]}]}");
         ReferralSettings view = atlas.referrals().get();
         assertEquals("tt_public_1", view.trackingToken());
@@ -255,7 +255,7 @@ class ReferralsTest {
         assertTrue(view.providers().get(0).capabilities().ping());
 
         mock.reply(200, SETTINGS);
-        atlas.referrals().update(new UpdateReferralSettingsBody().provider("referally").trackingToken("tt_public_1")
+        atlas.referrals().update(new UpdateReferralSettingsBody().provider("referalli").trackingToken("tt_public_1")
                 .forwardLifecycle(false).mirrorToPublicMetadata(true).includeReferralClaims(true).signupCodeField(true)
                 .clear("code_lookup_url"));
         JsonNode body = om.readTree(mock.requestBody);

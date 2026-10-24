@@ -11,6 +11,9 @@ public final class ListConfigChangelogParams {
     public Long limit;
     public String startingAfter;
 
+    /** Also list writes that changed nothing (default false). */
+    public Boolean includeNoOp;
+
     public ListConfigChangelogParams() {
     }
 
@@ -19,6 +22,8 @@ public final class ListConfigChangelogParams {
     public ListConfigChangelogParams limit(Long v) { this.limit = v; return this; }
     public ListConfigChangelogParams startingAfter(String v) { this.startingAfter = v; return this; }
 
+    public ListConfigChangelogParams includeNoOp(Boolean v) { this.includeNoOp = v; return this; }
+
     /** The query map the transport serializes. */
     public Map<String, Object> toQuery() {
         return Params.of()
@@ -26,6 +31,7 @@ public final class ListConfigChangelogParams {
                 .set("since", since)
                 .set("limit", limit)
                 .set("starting_after", startingAfter)
+                .set("include_no_op", includeNoOp)
                 .map();
     }
 }

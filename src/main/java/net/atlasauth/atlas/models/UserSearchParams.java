@@ -31,6 +31,11 @@ public final class UserSearchParams {
     /** Adds {@code total_count} to the page. */
     public Boolean includeTotalCount;
 
+    /** Epoch ms: only users updated after this moment (an incremental sync). */
+    public Long updatedAfter;
+    /** Epoch ms. */
+    public Long updatedBefore;
+
     public UserSearchParams() {
     }
 
@@ -50,6 +55,9 @@ public final class UserSearchParams {
     public UserSearchParams orderBy(String v) { this.orderBy = v; return this; }
     public UserSearchParams includeTotalCount(Boolean v) { this.includeTotalCount = v; return this; }
 
+    public UserSearchParams updatedAfter(Long v) { this.updatedAfter = v; return this; }
+    public UserSearchParams updatedBefore(Long v) { this.updatedBefore = v; return this; }
+
     /** The query string this search sends. */
     public Map<String, Object> toQuery() {
         return Params.of()
@@ -68,6 +76,8 @@ public final class UserSearchParams {
                 .set("created_before", createdBefore)
                 .set("order_by", orderBy)
                 .set("include_total_count", includeTotalCount == null ? null : includeTotalCount.toString())
+                .set("updated_after", updatedAfter)
+                .set("updated_before", updatedBefore)
                 .map();
     }
 }

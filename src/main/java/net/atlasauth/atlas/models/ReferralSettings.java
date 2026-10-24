@@ -13,7 +13,7 @@ import java.util.List;
 public record ReferralSettings(
         String object,
         boolean enabled,
-        /** webhook (the Atlas referral protocol), referally or another built-in vendor adapter id. */ String provider,
+        /** webhook (the Atlas referral protocol), referalli (or the old referally) or another built-in vendor adapter id. */ String provider,
         String endpointUrl,
         String programId,
         String connectionId,
@@ -31,14 +31,14 @@ public record ReferralSettings(
         Connection connection,
         List<Provider> providers,
         Long updatedAt,
-        /** Public tracking token (the referally provider derives the code lookup from it). Not a secret. */ String trackingToken,
+        /** Public tracking token (the referalli provider derives the code lookup from it). Not a secret. */ String trackingToken,
         /** Public, CORS-enabled URL template with {code} for "X invited you" on hosted sign-up. */ String codeLookupUrl,
         /** Show an optional "Referral code" field on hosted sign-up. */ Boolean signupCodeField,
         /** Forward email, name and suspension changes to the platform (default true). */ Boolean forwardLifecycle,
         /** Mirror the result into public_metadata.referral (default false). */ Boolean mirrorToPublicMetadata,
         /** Add the user's own code as a referral_code claim to session and ID tokens (default false). */ Boolean includeReferralClaims,
         /** Two-way sync: where the platform sends referral changes made after sign-up, and the latest one received. */ Inbound inbound,
-        /** The referral programs whose script or cookie the browser reads, in order (referally, rewardful, tolt, promotekit, firstpromoter, partnerstack, dub); the provider's default unless set. */ List<String> browserSources,
+        /** The referral programs whose script or cookie the browser reads, in order (referalli, rewardful, tolt, promotekit, firstpromoter, partnerstack, dub); the provider's default unless set. */ List<String> browserSources,
         /** Whether browserSources is the provider's default. */ Boolean browserSourcesDefault,
         /** Which consent manager decides on the tracking cookie's ids: auto (any common one), one manager (cookiemunch, onetrust, cookiebot, didomi, usercentrics, osano, cookieyes, complianz, klaro, tcf, consent_mode), or app (only the app's own decision). */ String consentProvider) {
 

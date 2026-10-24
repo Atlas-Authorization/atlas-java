@@ -54,6 +54,44 @@ public class AtlasApiException extends AtlasException {
         return errors.stream().anyMatch(e -> code.equals(e.code()));
     }
 
+    /** True when the key lacked a required scope: accepts {@code INSUFFICIENT_SCOPE} and the former {@code SCOPE_MISSING}. */
+    public boolean isInsufficientScope() {
+        return hasCode(ErrorCodes.INSUFFICIENT_SCOPE) || hasCode(ErrorCodes.SCOPE_MISSING);
+    }
+
+    /** The scope an {@code INSUFFICIENT_SCOPE} (or {@code SCOPE_MISSING}) error says the call needed, or null. */
+    public String requiredScope() {
+        for (ErrorItem e : errors) {
+            if ((ErrorCodes.INSUFFICIENT_SCOPE.equals(e.code()) || ErrorCodes.SCOPE_MISSING.equals(e.code())) && e.meta() != null) {
+                Object v = e.meta().get("required_scope");
+                if (v instanceof String s) {
+                    return s;
+                }
+            }
+        }
+        return null;
+    }
+
+    /** True when a multi-factor sign-in is needed first ({@code STEP_UP_REQUIRED}). */
+    public boolean isStepUpRequired() {
+        return hasCode(ErrorCodes.STEP_UP_REQUIRED);
+    }
+
+    /** True when no endpoint matched the method and path ({@code ROUTE_NOT_FOUND}). */
+    public boolean isRouteNotFound() {
+        return hasCode(ErrorCodes.ROUTE_NOT_FOUND);
+    }
+
+    /** The closest documented paths of a {@code ROUTE_NOT_FOUND} error, or an empty list. */
+    public List<String> didYouMean() {
+        for (ErrorItem e : errors) {
+            if (ErrorCodes.ROUTE_NOT_FOUND.equals(e.code()) && e.didYouMean() != null) {
+                return e.didYouMean();
+            }
+        }
+        return List.of();
+    }
+
     /**
      * Build the most specific {@code AtlasApiException} subclass for a status.
      */

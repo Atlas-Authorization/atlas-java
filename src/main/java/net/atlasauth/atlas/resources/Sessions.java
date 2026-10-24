@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.atlasauth.atlas.Params;
 import net.atlasauth.atlas.http.Transport;
+import net.atlasauth.atlas.models.IntegrationToken;
 import net.atlasauth.atlas.models.ListPage;
 import net.atlasauth.atlas.models.MintedSession;
 import net.atlasauth.atlas.models.Session;
@@ -67,6 +68,16 @@ public final class Sessions {
      */
     public SessionTouch touch(String id) {
         return t.post("/v1/sessions/" + enc(id) + "/touch", null, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code POST /v1/sessions/{id}/integration_tokens/{integration}} — Mint an identity-integration token for
+     * this session (the server-side form of {@code getToken({ for })}): a preset such as {@code chatly}, or a
+     * custom integration id. The token lives at most 120 seconds.
+     */
+    public IntegrationToken getIntegrationToken(String id, String integration) {
+        return t.post("/v1/sessions/" + enc(id) + "/integration_tokens/" + enc(integration), null, new TypeReference<>() {
         });
     }
 

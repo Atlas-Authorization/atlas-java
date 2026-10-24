@@ -42,6 +42,22 @@ public final class Params {
         return map;
     }
 
+    /**
+     * Add a provisioning metadata filter as {@code metadata[key]=value} query entries (keys sorted
+     * for stable URLs). A null or empty filter adds nothing.
+     */
+    public static Map<String, Object> putMetadata(Map<String, Object> query, Map<String, ?> filter) {
+        if (filter != null) {
+            for (String key : new java.util.TreeSet<>(filter.keySet())) {
+                Object v = filter.get(key);
+                if (v != null) {
+                    query.put("metadata[" + key + "]", String.valueOf(v));
+                }
+            }
+        }
+        return query;
+    }
+
     /** {@code true} when nothing was set — lets a caller send no body at all. */
     public boolean isEmpty() {
         return map.isEmpty();

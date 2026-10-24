@@ -2,6 +2,7 @@ package net.atlasauth.atlas;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,5 +18,13 @@ public record ErrorItem(
         String code,
         String message,
         String param,
-        Map<String, Object> meta) {
+        Map<String, Object> meta,
+        /** The code's page in the error reference ({@code https://atlasauth.net/errors/<code>}). */ String docsUrl,
+        /** On {@code ROUTE_NOT_FOUND} only: the closest documented paths. */ List<String> didYouMean,
+        /** On {@code ROUTE_NOT_FOUND} only: the methods the path does support. */ List<String> allowedMethods) {
+
+    /** The shape without {@code docsUrl}, {@code didYouMean}, {@code allowedMethods}. */
+    public ErrorItem(String code, String message, String param, Map<String, Object> meta) {
+        this(code, message, param, meta, null, null, null);
+    }
 }

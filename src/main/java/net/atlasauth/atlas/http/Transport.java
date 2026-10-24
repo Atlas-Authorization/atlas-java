@@ -48,6 +48,8 @@ public final class Transport {
     private final Boolean strict;
     private final Consumer<UnknownFieldsWarning> onUnknownFields;
     private final String missingKeyMessage;
+    private final boolean dryRun;
+    private final String traceparent;
 
     public Transport(String secretKey, String baseUrl, HttpClient http, ObjectMapper mapper, Duration timeout) {
         this(secretKey, baseUrl, http, mapper, timeout, null, null, null);
@@ -62,6 +64,20 @@ public final class Transport {
      */
     public Transport(String secretKey, String baseUrl, HttpClient http, ObjectMapper mapper, Duration timeout,
                      Boolean strict, Consumer<UnknownFieldsWarning> onUnknownFields, String missingKeyMessage) {
+        this(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage, false, null);
+    }
+
+    /**
+     * @param dryRun      {@code true} sends every write (POST, PUT, PATCH, DELETE) with {@code ?dry_run=true}
+     *                    and without an {@code Idempotency-Key}: Atlas validates it and answers with the
+     *                    changes it would make, changing nothing
+     * @param traceparent a W3C {@code traceparent} sent on every call ({@code null} = none)
+     */
+    public Transport(String secretKey, String baseUrl, HttpClient http, ObjectMapper mapper, Duration timeout,
+                     Boolean strict, Consumer<UnknownFieldsWarning> onUnknownFields, String missingKeyMessage,
+                     boolean dryRun, String traceparent) {
+        this.dryRun = dryRun;
+        this.traceparent = traceparent;
         this.secretKey = secretKey;
         this.baseUrl = baseUrl.replaceAll("/+$", "");
         this.http = http;
@@ -83,7 +99,17 @@ public final class Transport {
 
     /** A copy of this transport that sends {@code Atlas-Strict: <strict>} on writes ({@code null} = never). */
     public Transport withStrict(Boolean strict) {
-        return new Transport(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage);
+        return new Transport(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage, dryRun, traceparent);
+    }
+
+    /** A copy of this transport that sends every write as a dry run ({@code ?dry_run=true}). */
+    public Transport withDryRun(boolean dryRun) {
+        return new Transport(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage, dryRun, traceparent);
+    }
+
+    /** A copy of this transport that sends a W3C {@code traceparent} on every call ({@code null} = none). */
+    public Transport withTraceparent(String traceparent) {
+        return new Transport(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage, dryRun, traceparent);
     }
 
     // ---- Convenience verbs -------------------------------------------------
@@ -195,6 +221,15 @@ public final class Transport {
             throw new IllegalStateException(missingKeyMessage != null ? missingKeyMessage
                     : "No API key is configured for this call.");
         }
+        boolean dry = dryRun && !"GET".equalsIgnoreCase(method);
+        if (dry) {
+            Map<String, Object> withDry = new java.util.LinkedHashMap<>();
+            if (query != null) {
+                withDry.putAll(query);
+            }
+            withDry.put("dry_run", true);
+            query = withDry;
+        }
         URI uri = URI.create(baseUrl + (path.startsWith("/") ? path : "/" + path) + serializeQuery(query));
 
         HttpRequest.Builder builder = HttpRequest.newBuilder(uri)
@@ -205,8 +240,11 @@ public final class Transport {
         if (contentType != null) {
             builder.header("content-type", contentType);
         }
-        if (idempotencyKey != null && !idempotencyKey.isEmpty()) {
+        if (idempotencyKey != null && !idempotencyKey.isEmpty() && !dry) {
             builder.header("idempotency-key", idempotencyKey);
+        }
+        if (traceparent != null && !traceparent.isEmpty()) {
+            builder.header("traceparent", traceparent);
         }
         if (extraHeaders != null) {
             for (Map.Entry<String, String> h : extraHeaders.entrySet()) {

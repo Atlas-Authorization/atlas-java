@@ -132,4 +132,18 @@ public final class Design {
     public DesignSettings updateForOrganization(String id, AtlasDesign design) {
         return updateForOrganization(id, new DesignBody().design(design));
     }
+
+    /** {@code PUT /v1/instance/design} — Import a brand from a design-tokens document at an https URL ({@code brand_url}); Atlas fetches it and maps it onto the design. */
+    public DesignSettings importBrandUrl(String brandUrl) {
+        return t.put("/v1/instance/design", Params.of("brand_url", brandUrl).map(), new TypeReference<>() {
+        });
+    }
+
+    /** {@code PUT /v1/instance/design} — Remove the imported brand ({@code brand: null}). */
+    public DesignSettings removeBrand() {
+        Map<String, Object> body = new java.util.LinkedHashMap<>();
+        body.put("brand", null);
+        return t.put("/v1/instance/design", body, new TypeReference<>() {
+        });
+    }
 }

@@ -32,6 +32,11 @@ public final class CreateAtlasIdAppBody {
     @JsonIgnore
     private final Map<String, Object> additionalFields = new LinkedHashMap<>();
 
+    /** A stable key of your own: a repeat create with it returns the existing object (200, no secret). */
+    public String externalRef;
+    /** Provisioning tags (strings, numbers and booleans); on an update they replace the stored tags. */
+    public Map<String, Object> metadata;
+
     public CreateAtlasIdAppBody() {
     }
 
@@ -47,6 +52,9 @@ public final class CreateAtlasIdAppBody {
     public CreateAtlasIdAppBody allowedScopes(List<String> v) { this.allowedScopes = v; return this; }
     public CreateAtlasIdAppBody branding(AtlasIdAppBrandingInput v) { this.branding = v; return this; }
     public CreateAtlasIdAppBody type(String v) { this.type = v; return this; }
+
+    public CreateAtlasIdAppBody externalRef(String v) { this.externalRef = v; return this; }
+    public CreateAtlasIdAppBody metadata(Map<String, Object> v) { this.metadata = v; return this; }
 
     /**
      * Set any field by its wire name, including an explicit {@code null} (which

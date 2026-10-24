@@ -29,7 +29,7 @@ import static net.atlasauth.atlas.http.Transport.enc;
  * {@code referralCode}, {@code referralLink}). A late answer arrives as the
  * {@code user.referral_resolved} webhook, whose {@code data} is the full {@link net.atlasauth.atlas.models.User}
  * (and {@code user.referral_attributed} when it attributes the user). {@code provider} is
- * {@code webhook} (the Atlas referral protocol), {@code referally} or another built-in adapter.
+ * {@code webhook} (the Atlas referral protocol), {@code referalli} (the old {@code referally} is still accepted) or another built-in adapter.
  * {@code signingSecret} and {@code apiKey} are write-only.
  */
 public final class Referrals {
@@ -175,6 +175,17 @@ public final class Referrals {
     /** {@code GET /v1/instance/referrals/calls/{id}} — one call of the delivery log (or by the platform's request id). */
     public JsonNode getCall(String id) {
         return t.get("/v1/instance/referrals/calls/" + enc(id), new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code POST /v1/instance/referrals/{provider}/install} — One-click install: connect the instance to a
+     * referral platform (for example {@code referalli}; the old spelling {@code referally} is accepted) and
+     * get back the URL to finish the install in. {@code returnTo} (an https URL) is where the platform sends
+     * the person afterwards; may be null.
+     */
+    public JsonNode install(String provider, String returnTo) {
+        return t.post("/v1/instance/referrals/" + enc(provider) + "/install", Params.of("return_to", returnTo).map(), new TypeReference<>() {
         });
     }
 }
