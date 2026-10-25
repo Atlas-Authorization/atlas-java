@@ -89,6 +89,12 @@ public final class ErrorCodes {
     public static final String LIMIT_EXCEEDED = "LIMIT_EXCEEDED";
     /** 422 — managed WAF provision/deprovision on an instance with no WAF configuration saved ({@code meta.action}). */
     public static final String MANAGED_WAF_NOT_CONFIGURED = "MANAGED_WAF_NOT_CONFIGURED";
+    /** 403 — a Sign in with Atlas test or review account tried something outside the app(s) it is confined to (another app, the Atlas dashboard, account settings). */
+    public static final String TEST_ACCOUNT_RESTRICTED = "TEST_ACCOUNT_RESTRICTED";
+    /** 409 — the account already holds the maximum number of test and review accounts (25 by default, across all its apps). */
+    public static final String PROVISIONED_ACCOUNT_LIMIT_REACHED = "PROVISIONED_ACCOUNT_LIMIT_REACHED";
+    /** 422 — the setting or address needs a DNS-verified domain on the account (test mode, the verified-domains-only restriction, a test-account address off your domains), or an expired account tried to sign in. */
+    public static final String DOMAIN_NOT_VERIFIED = "DOMAIN_NOT_VERIFIED";
     /** The session was revoked. */
     public static final String SESSION_REVOKED = "SESSION_REVOKED";
     /** The session timed out from inactivity. */

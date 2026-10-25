@@ -727,3 +727,12 @@ GET /v1/integration-health
 GET /v1/integration-health/providers
 GET /v1/embed
 POST /v1/instance/referrals/{id}/install
+GET /v1/platform/atlas_id_apps/{id}/provisioned_accounts
+POST /v1/platform/atlas_id_apps/{id}/provisioned_accounts
+GET /v1/platform/atlas_id_apps/{id}/provisioned_accounts/{id2}
+DELETE /v1/platform/atlas_id_apps/{id}/provisioned_accounts/{id2}
+POST /v1/platform/atlas_id_apps/{id}/provisioned_accounts/{id2}/password
+GET /v1/platform/domains
+POST /v1/platform/domains
+POST /v1/platform/domains/{id}/verify
+DELETE /v1/platform/domains/{id}

@@ -5,6 +5,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.atlasauth.atlas.Params;
 import net.atlasauth.atlas.http.Transport;
 import net.atlasauth.atlas.models.AcceptedPlatformApp;
+import net.atlasauth.atlas.models.AccountDomain;
+import net.atlasauth.atlas.models.AccountDomainList;
+import net.atlasauth.atlas.models.AtlasIdProvisionedAccount;
+import net.atlasauth.atlas.models.AtlasIdProvisionedAccountDeleted;
+import net.atlasauth.atlas.models.AtlasIdProvisionedAccountList;
+import net.atlasauth.atlas.models.CreateAtlasIdProvisionedAccountBody;
+import net.atlasauth.atlas.models.RotateAtlasIdProvisionedPasswordBody;
 import net.atlasauth.atlas.models.AccountlessApp;
 import net.atlasauth.atlas.models.AtlasDesign;
 import net.atlasauth.atlas.models.AtlasIdApp;
@@ -62,6 +69,7 @@ public final class Platform {
     private final Transport t;
     private final DesignAssets designAssets;
     private final AtlasIdApps atlasIdApps;
+    private final Domains domains;
     private final Apps apps;
     private final AtlasIdPublisherResource atlasIdPublisher;
     private final PlatformKeys keys;
@@ -73,6 +81,7 @@ public final class Platform {
         this.t = t;
         this.designAssets = new DesignAssets(t);
         this.atlasIdApps = new AtlasIdApps(t);
+        this.domains = new Domains(t);
         this.apps = new Apps(t);
         this.atlasIdPublisher = new AtlasIdPublisherResource(t);
     }
@@ -160,6 +169,11 @@ public final class Platform {
         return atlasIdApps;
     }
 
+    /** Domains the account verified by DNS ({@code /v1/platform/domains}); they gate test sign-in mode. */
+    public Domains domains() {
+        return domains;
+    }
+
     /** Apps (instances) owned by the platform ({@code /v1/platform/apps}). */
     public Apps apps() {
         return apps;
@@ -200,14 +214,139 @@ public final class Platform {
         }
     }
 
+    // ---- ProvisionedAccounts -----------------------------------------
+
+    /**
+     * Test and review accounts of a Sign in with Atlas app. Needs the scope {@code platform:atlas_id_apps:provision} or the
+     * per-app {@code atlas_id_apps:<app id>:provision}. Passwords come back exactly once, on create and on rotation; pass a
+     * {@code secretRecipient} ({@code x25519:<base64 public key>}) to receive them sealed as {@code sealedPassword}. Models
+     * and bodies never print the password.
+     */
+    public static final class ProvisionedAccounts {
+        private final Transport t;
+
+        ProvisionedAccounts(Transport t) {
+            this.t = t;
+        }
+
+        private static String base(String appId) {
+            return "/v1/platform/atlas_id_apps/" + enc(appId) + "/provisioned_accounts";
+        }
+
+        /** {@code GET /v1/platform/atlas_id_apps/{id}/provisioned_accounts} — The app's test and review accounts, with the account-wide cap and total. */
+        public AtlasIdProvisionedAccountList list(String appId) {
+            return t.get(base(appId), new TypeReference<>() {
+            });
+        }
+
+        /** {@code POST /v1/platform/atlas_id_apps/{id}/provisioned_accounts} — Create a test or review account confined to the app. The password is returned once. */
+        public AtlasIdProvisionedAccount create(String appId, CreateAtlasIdProvisionedAccountBody body) {
+            return t.post(base(appId), body, new TypeReference<>() {
+            });
+        }
+
+        /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+        public AtlasIdProvisionedAccount create(String appId, CreateAtlasIdProvisionedAccountBody body, String idempotencyKey) {
+            return t.post(base(appId), body, idempotencyKey, new TypeReference<>() {
+            });
+        }
+
+        /** As above, with the password sealed to {@code secretRecipient} ({@code sealedPassword}; the plaintext field is absent). */
+        public AtlasIdProvisionedAccount create(String appId, CreateAtlasIdProvisionedAccountBody body, String idempotencyKey, String secretRecipient) {
+            return t.withSecretRecipient(secretRecipient).post(base(appId), body, idempotencyKey, new TypeReference<>() {
+            });
+        }
+
+        /** {@code GET /v1/platform/atlas_id_apps/{id}/provisioned_accounts/{account}} — One account (never carries a password). */
+        public AtlasIdProvisionedAccount get(String appId, String accountId) {
+            return t.get(base(appId) + "/" + enc(accountId), new TypeReference<>() {
+            });
+        }
+
+        /** {@code DELETE /v1/platform/atlas_id_apps/{id}/provisioned_accounts/{account}} — Delete the account and end every session and grant it holds. */
+        public AtlasIdProvisionedAccountDeleted remove(String appId, String accountId) {
+            return t.delete(base(appId) + "/" + enc(accountId), new TypeReference<>() {
+            });
+        }
+
+        /** {@code POST /v1/platform/atlas_id_apps/{id}/provisioned_accounts/{account}/password} — A new password generated by Atlas, returned once. */
+        public AtlasIdProvisionedAccount rotatePassword(String appId, String accountId) {
+            return rotatePassword(appId, accountId, null, null);
+        }
+
+        /** As above, with a password of your own (at least 12 characters). */
+        public AtlasIdProvisionedAccount rotatePassword(String appId, String accountId, RotateAtlasIdProvisionedPasswordBody body) {
+            return rotatePassword(appId, accountId, body, null);
+        }
+
+        /** As above, with the new password sealed to {@code secretRecipient} ({@code sealedPassword}); {@code body} and the recipient may each be null. */
+        public AtlasIdProvisionedAccount rotatePassword(String appId, String accountId, RotateAtlasIdProvisionedPasswordBody body, String secretRecipient) {
+            Transport tr = secretRecipient == null ? t : t.withSecretRecipient(secretRecipient);
+            return tr.post(base(appId) + "/" + enc(accountId) + "/password", body, new TypeReference<>() {
+            });
+        }
+    }
+
+    // ---- Domains -----------------------------------------------------
+
+    /** Domains the account verified by DNS ({@code /v1/platform/domains}); they gate test sign-in mode and the test-account domain restriction. */
+    public static final class Domains {
+        private final Transport t;
+
+        Domains(Transport t) {
+            this.t = t;
+        }
+
+        /** {@code GET /v1/platform/domains} — The claimed domains and the list of verified ones. */
+        public AccountDomainList list() {
+            return t.get("/v1/platform/domains", new TypeReference<>() {
+            });
+        }
+
+        /** {@code POST /v1/platform/domains} — Claim a domain; returns the TXT record to publish. */
+        public AccountDomain claim(String domain) {
+            return t.post("/v1/platform/domains", Map.of("domain", domain), new TypeReference<>() {
+            });
+        }
+
+        /** {@code POST /v1/platform/domains/{id}/verify} — Look up the TXT record now. */
+        public AccountDomain check(String domainId) {
+            return t.post("/v1/platform/domains/" + enc(domainId) + "/verify", null, new TypeReference<>() {
+            });
+        }
+
+        /** Alias of {@link #check(String)}. */
+        public AccountDomain verify(String domainId) {
+            return check(domainId);
+        }
+
+        /** {@code DELETE /v1/platform/domains/{id}} — Remove a claimed domain. */
+        public JsonNode remove(String domainId) {
+            return t.delete("/v1/platform/domains/" + enc(domainId), new TypeReference<>() {
+            });
+        }
+    }
+
     // ---- AtlasIdApps -------------------------------------------------
 
     /** Sign in with Atlas apps ({@code /v1/platform/atlas_id_apps}). */
     public static final class AtlasIdApps {
         private final Transport t;
 
+        private final ProvisionedAccounts provisionedAccounts;
+
         AtlasIdApps(Transport t) {
             this.t = t;
+            this.provisionedAccounts = new ProvisionedAccounts(t);
+        }
+
+        /**
+         * Test and review accounts of an app ({@code /v1/platform/atlas_id_apps/{id}/provisioned_accounts}): real Atlas
+         * accounts confined to the app, for reviewer logins, CI and demos. Needs the scope
+         * {@code platform:atlas_id_apps:provision} or the per-app {@code atlas_id_apps:<app id>:provision}.
+         */
+        public ProvisionedAccounts provisionedAccounts() {
+            return provisionedAccounts;
         }
 
         /** {@code POST /v1/platform/atlas_id_apps/design/preview} — Preview a Sign in with Atlas app design without saving it: the compiled bundle plus the rendered Sign in with Atlas page (the Atlas trust strip, the destination line and "Secured by Atlas" are always there). */

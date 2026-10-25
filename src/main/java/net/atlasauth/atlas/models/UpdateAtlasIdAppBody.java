@@ -29,6 +29,10 @@ public final class UpdateAtlasIdAppBody {
     public AtlasIdAppBrandingInput branding;
     /** Per-app webhook (public https): user.updated, user.deleted and grant.revoked for this app's users. The first set returns webhook_secret once; {@code set("webhook_url", null)} removes it. */
     public String webhookUrl;
+    /** Test sign-in mode: {@code +atlas_test} addresses on a verified domain sign in to this app with the fixed code 424242. Needs a verified domain. A risk you opt into: anyone who knows the pattern can sign in without reading mail. */
+    public Boolean testMode;
+    /** Test and review accounts must use an address on a domain you verified. Needs a verified domain. */
+    public Boolean provisionedVerifiedDomainsOnly;
 
     @JsonIgnore
     private final Map<String, Object> additionalFields = new LinkedHashMap<>();
@@ -51,6 +55,8 @@ public final class UpdateAtlasIdAppBody {
     public UpdateAtlasIdAppBody allowedScopes(List<String> v) { this.allowedScopes = v; return this; }
     public UpdateAtlasIdAppBody branding(AtlasIdAppBrandingInput v) { this.branding = v; return this; }
     public UpdateAtlasIdAppBody webhookUrl(String v) { this.webhookUrl = v; return this; }
+    public UpdateAtlasIdAppBody testMode(Boolean v) { this.testMode = v; return this; }
+    public UpdateAtlasIdAppBody provisionedVerifiedDomainsOnly(Boolean v) { this.provisionedVerifiedDomainsOnly = v; return this; }
 
     public UpdateAtlasIdAppBody metadata(Map<String, Object> v) { this.metadata = v; return this; }
 

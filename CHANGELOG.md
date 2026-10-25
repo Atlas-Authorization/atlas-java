@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.18.0 — 2026-10-25
+
+### Added
+
+- **Test and review accounts.** `atlas.platform().atlasIdApps().provisionedAccounts()` (`ProvisionedAccounts`): `list`, `create`, `get`, `remove` and `rotatePassword` for `/v1/platform/atlas_id_apps/{id}/provisioned_accounts`, with typed `AtlasIdProvisionedAccount`, `AtlasIdProvisionedAccountList`, `CreateAtlasIdProvisionedAccountBody` and `RotateAtlasIdProvisionedPasswordBody`. The password comes back exactly once, on create and on rotation; pass a secret recipient (`create(..., idempotencyKey, secretRecipient)`, `rotatePassword(..., body, secretRecipient)`) to receive it sealed as `sealedPassword`. The password never appears in the models' or bodies' `toString()`.
+- **Account domains.** `atlas.platform().domains()`: `list`, `claim`, `check` (alias `verify`) and `remove` for `/v1/platform/domains`, with typed `AccountDomain` and `AccountDomainList`. Verified domains gate test sign-in mode.
+- **Test sign-in mode.** `AtlasIdApp` and `AtlasIdAppWithSecret` gain `testMode` and `provisionedVerifiedDomainsOnly`; `UpdateAtlasIdAppBody` gains `testMode(...)` and `provisionedVerifiedDomainsOnly(...)`.
+- Scopes: the provisioning routes need `platform:atlas_id_apps:provision`, or `atlas_id_apps:<app id>:provision` for a single app.
+- Error codes `ErrorCodes.TEST_ACCOUNT_RESTRICTED` (403), `ErrorCodes.PROVISIONED_ACCOUNT_LIMIT_REACHED` (409) and `ErrorCodes.DOMAIN_NOT_VERIFIED` (422, also returned when an expired test account signs in).
+- API coverage list: the provisioned-account and domain operations.
+
 ## 1.17.0 — 2026-10-25
 
 ### Added

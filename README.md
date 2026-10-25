@@ -255,6 +255,27 @@ WebhookSecret rotated = atlas.webhooks().endpoints().rotateSecret(endpointId,
 rotated.previousSecretExpiresAt();  // epoch ms, or null when the old secret already stopped
 ```
 
+### Test and review accounts (1.18)
+
+Real Sign in with Atlas accounts confined to one app, for app-store reviewers, CI and demos. Needs a platform key with the
+scope `platform:atlas_id_apps:provision` (or `atlas_id_apps:<app id>:provision` for a single app).
+
+```java
+var accounts = atlas.platform().atlasIdApps().provisionedAccounts();
+AtlasIdProvisionedAccount reviewer = accounts.create(app.id(), new CreateAtlasIdProvisionedAccountBody()
+        .email("review@example.com").label("app-store reviewer"));
+reviewer.password();                                    // shown once; pass a secret recipient to get sealedPassword instead
+accounts.rotatePassword(app.id(), reviewer.id());
+accounts.remove(app.id(), reviewer.id());               // ends its sessions and grants
+
+// Test sign-in mode needs a DNS-verified domain
+AccountDomain d = atlas.platform().domains().claim("example.com");   // publish d.verification(), then:
+atlas.platform().domains().check(d.id());
+atlas.platform().atlasIdApps().update(app.id(), new UpdateAtlasIdAppBody().testMode(true).provisionedVerifiedDomainsOnly(true));
+```
+
+Errors: `TEST_ACCOUNT_RESTRICTED` (403), `PROVISIONED_ACCOUNT_LIMIT_REACHED` (409), `DOMAIN_NOT_VERIFIED` (422).
+
 ### Integrator platform (1.15)
 
 Scoped credentials, the privacy executor, identity integrations, dry runs and trace context. Atlas keys come in
