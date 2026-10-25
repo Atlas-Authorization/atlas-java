@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.17.0 — 2026-10-25
+
+### Added
+
+- **Partner platforms.** `atlas.partnerPlatforms()` (`PartnerPlatforms`): `list`, `get`, `set`, `remove`, `registration`, `storeToken` and `deliveries` for `/v1/partner_platforms`, with typed `PartnerPlatform`, `PartnerPlatformList`, `PartnerPlatformRegistration`, `PartnerDelivery`, `SetPartnerPlatformBody` and `StorePartnerPlatformTokenBody`. The partner token is write-only: it is stored encrypted, never appears in a response model, and the body class does not print it.
+- **Per-call audience.** `SetIntegrationBody.perCallAudience(...)` (`param`, `template`, `allowed`, `any_matching`; `clear("per_call_audience")` turns it off) and `sessions().getIntegrationToken(id, integration, audience, audienceParams)` to mint a token for one audience (a site id, a channel, an organization id).
+- **Privacy orchestrator.** `SetPrivacyOrchestratorBody` gains `siteId`, `partnerLinkId` and `cancelDeletionOnSignIn`. An outbound partner link's `source` can be `registration`.
+- `UserSearchParams.includeDeleted` (`GET /v1/users`), and `UserEmailMatch.deleted`.
+- `OperatorConfiguration` gains `audiences` and `accessTokenClaims`.
+- Error code `ErrorCodes.MANAGED_WAF_NOT_CONFIGURED` (422, `meta.action`).
+- The Sign in with Atlas grant routes under `/v1/platform/atlas_id_apps/{id}` also accept an instance secret key (documented on `platform()` and `atlasIdGrants()`).
+- API coverage list: the partner platform operations.
+
 ## 1.16.0 — 2026-10-24
 
 ### Added

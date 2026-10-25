@@ -333,7 +333,7 @@ BackchannelLogoutHandler.Response r = handler.handle(request.getMethod(), body);
 ```
 
 Also new: `status()`, `delivery()` (health, egress IPs), `auditExports()`, `notices()`, `securityAdvisories()`,
-`subProcessors()`, `entitlements()`, `partnerLinks()`, `atlasIdGrants()`, `instance().unknownFieldsReport` /
+`subProcessors()`, `entitlements()`, `partnerLinks()`, `partnerPlatforms()`, `atlasIdGrants()`, `instance().unknownFieldsReport` /
 `openapiDiff` / `integrationHealth` / `embed`. Sealed (`X-Secret-Recipient`) secrets are not supported in this SDK yet.
 
 ### Trusted reverse proxy

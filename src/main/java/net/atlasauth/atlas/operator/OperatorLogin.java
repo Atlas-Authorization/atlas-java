@@ -54,7 +54,13 @@ public final class OperatorLogin {
             String scope,
             String tokenExchangeEndpoint,
             String tokenExchangeAudience,
-            Integer rootActionMaxMfaAgeSeconds) {
+            Integer rootActionMaxMfaAgeSeconds,
+            /** Other products that accept Atlas operators (pass one as the audience of a login). */ java.util.List<String> audiences,
+            /** The claims an operator access token carries. */ java.util.List<String> accessTokenClaims) {
+        /** The shape before audiences and accessTokenClaims. */
+        public OperatorConfiguration(String issuer, String deviceAuthorizationEndpoint, String tokenEndpoint, String clientId, String scope, String tokenExchangeEndpoint, String tokenExchangeAudience, Integer rootActionMaxMfaAgeSeconds) {
+            this(issuer, deviceAuthorizationEndpoint, tokenEndpoint, clientId, scope, tokenExchangeEndpoint, tokenExchangeAudience, rootActionMaxMfaAgeSeconds, null, null);
+        }
     }
 
     /** The RFC 8628 device authorization response, with the configuration the flow runs against. */

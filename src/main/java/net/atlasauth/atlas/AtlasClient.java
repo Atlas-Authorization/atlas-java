@@ -86,6 +86,7 @@ import net.atlasauth.atlas.resources.Webhooks;
 import net.atlasauth.atlas.resources.SecretKeys;
 import net.atlasauth.atlas.resources.Keys;
 import net.atlasauth.atlas.resources.PartnerLinks;
+import net.atlasauth.atlas.resources.PartnerPlatforms;
 import net.atlasauth.atlas.resources.AtlasIdGrants;
 import net.atlasauth.atlas.resources.Privacy;
 import net.atlasauth.atlas.resources.Integrations;
@@ -215,6 +216,7 @@ public final class AtlasClient {
     private final SecretKeys secretKeys;
     private final Keys keys;
     private final PartnerLinks partnerLinks;
+    private final PartnerPlatforms partnerPlatforms;
     private final AtlasIdGrants atlasIdGrants;
     private final Privacy privacy;
     private final Integrations integrations;
@@ -336,6 +338,7 @@ public final class AtlasClient {
         this.secretKeys = new SecretKeys(transport);
         this.keys = new Keys(transport);
         this.partnerLinks = new PartnerLinks(transport);
+        this.partnerPlatforms = new PartnerPlatforms(transport);
         this.atlasIdGrants = new AtlasIdGrants(transport);
         this.privacy = new Privacy(transport);
         this.integrations = new Integrations(transport);
@@ -724,6 +727,11 @@ public final class AtlasClient {
     /** Credentials integrated partner services hold on this instance, and the ones it holds for partner APIs. */
     public PartnerLinks partnerLinks() {
         return partnerLinks;
+    }
+
+    /** This instance as a partner platform of another product: signed partner deliveries, registration and the stored partner token. */
+    public PartnerPlatforms partnerPlatforms() {
+        return partnerPlatforms;
     }
 
     /** Sign in with Atlas grants for the apps this instance manages (privacy requests). */

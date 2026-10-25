@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.Map;
 
-/** Body for {@code PUT /v1/instance/privacy_orchestrator}. {@link #clear(String...)} sends case_url, cancel_url, api_key or completion_webhook_url as null. */
+/** Body for {@code PUT /v1/instance/privacy_orchestrator}. {@link #clear(String...)} sends case_url, cancel_url, api_key, completion_webhook_url, partner_link_id or site_id as null. */
 public final class SetPrivacyOrchestratorBody extends ExtensibleBody {
     /** A preset id (cookiemunch, custom) or your own lower-case id. */
     public String provider;
@@ -20,6 +20,12 @@ public final class SetPrivacyOrchestratorBody extends ExtensibleBody {
     /** Write-only. */
     public String apiKey;
     public Boolean usePartnerLink;
+    /** Call through this partner link (implies {@code usePartnerLink}). */
+    public String partnerLinkId;
+    /** The orchestrator-side site a case is for. */
+    public String siteId;
+    /** Cancel a self-scheduled deletion when the person signs back in during the grace period. */
+    public Boolean cancelDeletionOnSignIn;
     public Boolean openClosureCases;
     /** true mints (or rotates) a secret and signs every case call; false stops signing. */
     public Boolean signRequests;
@@ -37,6 +43,9 @@ public final class SetPrivacyOrchestratorBody extends ExtensibleBody {
     public SetPrivacyOrchestratorBody authScheme(String v) { this.authScheme = v; return this; }
     public SetPrivacyOrchestratorBody apiKey(String v) { this.apiKey = v; return this; }
     public SetPrivacyOrchestratorBody usePartnerLink(Boolean v) { this.usePartnerLink = v; return this; }
+    public SetPrivacyOrchestratorBody partnerLinkId(String v) { this.partnerLinkId = v; return this; }
+    public SetPrivacyOrchestratorBody siteId(String v) { this.siteId = v; return this; }
+    public SetPrivacyOrchestratorBody cancelDeletionOnSignIn(Boolean v) { this.cancelDeletionOnSignIn = v; return this; }
     public SetPrivacyOrchestratorBody openClosureCases(Boolean v) { this.openClosureCases = v; return this; }
     public SetPrivacyOrchestratorBody signRequests(Boolean v) { this.signRequests = v; return this; }
     public SetPrivacyOrchestratorBody completionWebhookUrl(String v) { this.completionWebhookUrl = v; return this; }

@@ -293,14 +293,14 @@ public final class Platform {
             });
         }
 
-        /** {@code GET /v1/platform/atlas_id_apps/{id}/users} — Privacy requests: is this person (verified email, exact match) one of the app's users? Anyone else gets an empty list. */
+        /** {@code GET /v1/platform/atlas_id_apps/{id}/users} (an instance secret key is accepted too, see {@code atlasIdGrants()}) — Privacy requests: is this person (verified email, exact match) one of the app's users? Anyone else gets an empty list. */
         public ListPage<AtlasIdAppUser> findUsers(String id, String email) {
             return t.get("/v1/platform/atlas_id_apps/" + enc(id) + "/users", Params.of().set("email", email).map(),
                     new TypeReference<>() {
                     });
         }
 
-        /** {@code DELETE /v1/platform/atlas_id_apps/{id}/grants/{grantId}} — Revoke one user's grant; the next sign-in shows the consent screen again. */
+        /** {@code DELETE /v1/platform/atlas_id_apps/{id}/grants/{grantId}} (an instance secret key is accepted too, see {@code atlasIdGrants()}) — Revoke one user's grant; the next sign-in shows the consent screen again. */
         public AtlasIdGrantRevocation revokeGrant(String id, String grantId) {
             return t.delete("/v1/platform/atlas_id_apps/" + enc(id) + "/grants/" + enc(grantId), new TypeReference<>() {
             });

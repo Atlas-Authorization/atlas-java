@@ -87,6 +87,8 @@ public final class ErrorCodes {
     public static final String IDENTIFIER_NOT_FOUND = "IDENTIFIER_NOT_FOUND";
     /** A usage debit would exceed one of the API key's spend caps (the {@code code} of a refused debit). */
     public static final String LIMIT_EXCEEDED = "LIMIT_EXCEEDED";
+    /** 422 — managed WAF provision/deprovision on an instance with no WAF configuration saved ({@code meta.action}). */
+    public static final String MANAGED_WAF_NOT_CONFIGURED = "MANAGED_WAF_NOT_CONFIGURED";
     /** The session was revoked. */
     public static final String SESSION_REVOKED = "SESSION_REVOKED";
     /** The session timed out from inactivity. */

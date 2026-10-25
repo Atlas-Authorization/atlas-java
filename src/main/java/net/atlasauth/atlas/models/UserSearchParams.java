@@ -30,6 +30,8 @@ public final class UserSearchParams {
     public String orderBy;
     /** Adds {@code total_count} to the page. */
     public Boolean includeTotalCount;
+    /** Also list soft-deleted users still in their scrub window (each with {@code deleted_at} set). Default false. */
+    public Boolean includeDeleted;
 
     /** Epoch ms: only users updated after this moment (an incremental sync). */
     public Long updatedAfter;
@@ -55,6 +57,7 @@ public final class UserSearchParams {
     public UserSearchParams orderBy(String v) { this.orderBy = v; return this; }
     public UserSearchParams includeTotalCount(Boolean v) { this.includeTotalCount = v; return this; }
 
+    public UserSearchParams includeDeleted(Boolean v) { this.includeDeleted = v; return this; }
     public UserSearchParams updatedAfter(Long v) { this.updatedAfter = v; return this; }
     public UserSearchParams updatedBefore(Long v) { this.updatedBefore = v; return this; }
 
@@ -76,6 +79,7 @@ public final class UserSearchParams {
                 .set("created_before", createdBefore)
                 .set("order_by", orderBy)
                 .set("include_total_count", includeTotalCount == null ? null : includeTotalCount.toString())
+                .set("include_deleted", includeDeleted == null ? null : includeDeleted.toString())
                 .set("updated_after", updatedAfter)
                 .set("updated_before", updatedBefore)
                 .map();

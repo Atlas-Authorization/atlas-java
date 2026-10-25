@@ -147,6 +147,10 @@ public final class Transport {
         return request("POST", path, null, body, idempotencyKey, false, type);
     }
 
+    public <T> T postWithQuery(String path, Map<String, Object> query, Object body, TypeReference<T> type) {
+        return request("POST", path, query, body, null, false, type);
+    }
+
     public <T> T patch(String path, Object body, TypeReference<T> type) {
         return request("PATCH", path, null, body, null, false, type);
     }

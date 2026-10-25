@@ -11,6 +11,7 @@ import net.atlasauth.atlas.models.Session;
 import net.atlasauth.atlas.models.SessionTemplateToken;
 import net.atlasauth.atlas.models.SessionTouch;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static net.atlasauth.atlas.http.Transport.enc;
@@ -78,6 +79,20 @@ public final class Sessions {
      */
     public IntegrationToken getIntegrationToken(String id, String integration) {
         return t.post("/v1/sessions/" + enc(id) + "/integration_tokens/" + enc(integration), null, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@link #getIntegrationToken(String, String)} for a per-call audience. {@code audience} is the full audience,
+     * {@code audienceParams} carries the integration's own parameter (a site id, a channel, an organization id; the
+     * parameter named in its {@code per_call_audience.param}). Either may be null. The token's {@code aud} is that
+     * audience when the integration permits it; a value it does not permit is refused (403).
+     */
+    public IntegrationToken getIntegrationToken(String id, String integration, String audience, Map<String, String> audienceParams) {
+        Map<String, Object> query = new LinkedHashMap<>();
+        if (audienceParams != null) query.putAll(audienceParams);
+        if (audience != null && !audience.isEmpty()) query.put("audience", audience);
+        return t.postWithQuery("/v1/sessions/" + enc(id) + "/integration_tokens/" + enc(integration), query, null, new TypeReference<>() {
         });
     }
 
