@@ -10,7 +10,7 @@ import net.atlasauth.atlas.resources.Groups;
 import net.atlasauth.atlas.resources.Migrations;
 import net.atlasauth.atlas.resources.ManagedGrants;
 import net.atlasauth.atlas.resources.LeastPrivilege;
-import net.atlasauth.atlas.resources.DeliveryHealth;
+import net.atlasauth.atlas.resources.DeliveryHealthTargets;
 import net.atlasauth.atlas.resources.Flags;
 import net.atlasauth.atlas.resources.MfaFactors;
 import net.atlasauth.atlas.resources.Marketing;
@@ -180,7 +180,7 @@ public final class AtlasClient {
     private final Migrations migrations;
     private final ManagedGrants managedGrants;
     private final LeastPrivilege leastPrivilege;
-    private final DeliveryHealth deliveryHealth;
+    private final DeliveryHealthTargets deliveryHealth;
     private final Flags flags;
     private final MfaFactors mfaFactors;
     private final Marketing marketing;
@@ -345,7 +345,7 @@ public final class AtlasClient {
         this.migrations = new Migrations(transport);
         this.managedGrants = new ManagedGrants(transport);
         this.leastPrivilege = new LeastPrivilege(transport);
-        this.deliveryHealth = new DeliveryHealth(transport);
+        this.deliveryHealth = new DeliveryHealthTargets(transport);
         this.flags = new Flags(transport);
         this.mfaFactors = new MfaFactors(transport);
         this.marketing = new Marketing(transport);
@@ -540,7 +540,7 @@ public final class AtlasClient {
     }
 
     /** The {@code deliveryHealth} resource. */
-    public DeliveryHealth deliveryHealth() {
+    public DeliveryHealthTargets deliveryHealth() {
         return deliveryHealth;
     }
 

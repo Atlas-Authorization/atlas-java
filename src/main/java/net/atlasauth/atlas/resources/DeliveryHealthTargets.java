@@ -12,11 +12,11 @@ import java.util.Map;
 import static net.atlasauth.atlas.http.Transport.enc;
 
 /** The {@code /v1/delivery_health} resource. */
-public final class DeliveryHealth {
+public final class DeliveryHealthTargets {
 
     private final Transport t;
 
-    public DeliveryHealth(Transport t) {
+    public DeliveryHealthTargets(Transport t) {
         this.t = t;
     }
 
