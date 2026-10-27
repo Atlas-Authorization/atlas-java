@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- **Backend API parity.** 452 further operations, each with typed request and response models (`Map` bodies for free-form shapes), an optional-parameter overload, and an `Idempotency-Key` overload on every POST. New resources on `AtlasClient`: `appCatalog`, `ldapServerClients`, `journeys`, `groups` (with `rules`), `migrations` (with `imports`), `managedGrants`, `leastPrivilege`, `deliveryHealth`, `flags`, `mfaFactors` (with `yubikeys` and `smartCardMappings`), `marketing`, `auditEventSchemas`, `directoryPullSources`, `relayAgents`, `oauthClientProfiles`, `passkeyApi`, `vc` (credential types, credentials, presentation requests), `listen`, `agentRegistration`, `agents`, `agentAccessRequests`, `workflows`, `pageTemplates`, `serviceConnectors`, `desktopMfa`, `identityVerification`, `iga` (entitlements, requests, grants, delegations, SoD, lifecycle, campaigns), `scimProvisioningPresets`, `vault` (with `keyProvider`), `connections` (with `oauthClients` and `webhooks`), `ssf` (streams, receivers), `networkZones`, `accessPolicies`, `abac` (policies, templates, links, schema, evaluation, AuthZEN), `resources` (types, assignments, checks), `orgRoleGrants`, `devices`, `authzDecisions`, `policyBundles`, `proxyApps` and `mcpGateways` (with `budgets`).
+- **Added to existing resources.** `users` (required actions, notes, history, minor status, guardians, search and saved views, links, device keys), `organizations` (webhook endpoints, connected apps, connection secret), `oauthClients` (app settings, trusted issuers, workload identity, consent and login requests, exchange policy, profile, delegated UI), `orgLdapConnections` (sync, relay, sync runs), `analytics` (funnels, reports, alert rules, API usage), `instance().integrations()`, `actions().calls`, `fga` and `openFga` (`listUsers`, `readChanges`), `attackProtection` and `riskBasedMfa` secrets, and `integrations().runCardAction`.
+- `Transport.getBytes` returns a raw response body; `policyBundles().archive` uses it, and `listen().streamSession` returns the event stream as text.
+- Compatibility: no existing public method, overload or constructor changed. `delivery().health()` and `health(kind, state)` are untouched; the single-target read is the new `deliveryHealth().get(kind, id)` (class `DeliveryHealthTargets`, named so no new class shares a simple name with an existing one). `Transport` keeps its API; its response handling now reads bytes internally.
+- API coverage list: the 452 operations.
+- **Risk-event timeline.** `atlas.riskBasedMfa()`: `listEvents` (`GET /v1/risk_events`; `userId`, `level`, `limit`, `before`), `eventMetrics` (`GET /v1/risk_events/metrics`) and `eventFeedback(id, verdict)` (`POST /v1/risk_events/{id}/feedback`, verdict `legit` or `fraud`), with typed `RiskEvent` and `RiskEventMetrics`.
+- **Fraud lookup.** `atlas.riskBasedMfa().fraudLookup(FraudLookupBody)` (`POST /v1/fraud/lookup`) with typed `FraudLookup`.
+- `RiskBasedMfa` and `UpdateRiskBasedMfaBody` gain `mode`, `levelActions`, `reputation`, `fraud`, `baseline` and `midSession`.
+- API coverage list: the four new operations.
+
 ## 1.18.0 — 2026-10-25
 
 ### Added

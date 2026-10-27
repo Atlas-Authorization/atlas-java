@@ -178,6 +178,12 @@ public final class Transport {
         });
     }
 
+    /** Return the raw response bytes (for example a gzip archive) for a GET with a query. */
+    public byte[] getBytes(String path, Map<String, Object> query) {
+        return request("GET", path, query, null, null, false, new TypeReference<byte[]>() {
+        });
+    }
+
     /**
      * Send raw bytes (an image upload) with the given {@code Content-Type} instead
      * of a JSON body; the response is decoded as JSON like any other call.
@@ -284,9 +290,9 @@ public final class Transport {
         }
         builder.method(method, publisher);
 
-        HttpResponse<String> response;
+        HttpResponse<byte[]> response;
         try {
-            response = http.send(builder.build(), HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+            response = http.send(builder.build(), HttpResponse.BodyHandlers.ofByteArray());
         } catch (IOException e) {
             throw new AtlasConnectionException("Atlas API request to " + uri + " failed: " + e.getMessage(), e);
         } catch (InterruptedException e) {
@@ -295,7 +301,8 @@ public final class Transport {
         }
 
         int status = response.statusCode();
-        String text = response.body();
+        byte[] bytes = response.body();
+        String text = bytes == null ? null : new String(bytes, StandardCharsets.UTF_8);
         response.headers().firstValue(UNKNOWN_FIELDS_HEADER).ifPresent(v -> reportUnknown(method, path, v));
 
         if (status < 200 || status >= 300) {
@@ -303,6 +310,11 @@ public final class Transport {
         }
         if (status == 204 || text == null || text.isEmpty()) {
             return null;
+        }
+        if (type != null && type.getType() == byte[].class) {
+            @SuppressWarnings("unchecked")
+            T asBytes = (T) bytes;
+            return asBytes;
         }
         if (raw) {
             @SuppressWarnings("unchecked")

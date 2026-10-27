@@ -20,6 +20,7 @@ final class MockBackend implements AutoCloseable {
 
     volatile String method;
     volatile String path;
+    volatile String rawPath;
     volatile String rawQuery;
     volatile String authorization;
     volatile String idempotencyKey;
@@ -47,6 +48,7 @@ final class MockBackend implements AutoCloseable {
     private void handle(HttpExchange exchange) throws IOException {
         this.method = exchange.getRequestMethod();
         this.path = exchange.getRequestURI().getPath();
+        this.rawPath = exchange.getRequestURI().getRawPath();
         this.rawQuery = exchange.getRequestURI().getRawQuery();
         this.authorization = exchange.getRequestHeaders().getFirst("authorization");
         this.idempotencyKey = exchange.getRequestHeaders().getFirst("idempotency-key");

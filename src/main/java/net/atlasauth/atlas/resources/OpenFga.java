@@ -24,6 +24,9 @@ import net.atlasauth.atlas.models.OpenFgaWriteModelResult;
 
 import java.util.List;
 import java.util.Map;
+import net.atlasauth.atlas.models.OpenFgaListUsersBody;
+import net.atlasauth.atlas.models.OpenFgaListUsersResponse;
+import net.atlasauth.atlas.models.OpenFgaReadChangesResponse;
 
 import static net.atlasauth.atlas.http.Transport.enc;
 
@@ -148,6 +151,29 @@ public final class OpenFga {
     /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
     public OpenFgaExpandResult expand(String store, OpenFgaExpandBody body, String idempotencyKey) {
         return t.post("/v1/openfga/stores/" + enc(store) + "/expand", body, idempotencyKey, new TypeReference<>() {
+        });
+    }
+
+    /** {@code POST /v1/openfga/stores/{store}/list-users} - List the users that have a relation on an object (OpenFGA-wire ListUsers): concrete users, usersets (`user_filters[0].relation`), and the `type:*` wildcard with `excluded_users`. Honours contextual tuples and tuple conditions; pages with `page_size` / `continuation_token`. Scope: {@code fga:read}. */
+    public OpenFgaListUsersResponse listUsers(String store, OpenFgaListUsersBody body) {
+        return listUsers(store, body, null);
+    }
+
+    /** As above, with every optional parameter and an {@code Idempotency-Key} so a retry replays the first response. */
+    public OpenFgaListUsersResponse listUsers(String store, OpenFgaListUsersBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/openfga/stores/" + enc(store) + "/list-users", null, body, idempotencyKey, false, new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/openfga/stores/{store}/changes} - Read the tuple changelog (OpenFGA-wire ReadChanges): every tuple write and delete in order, resumable with `continuation_token` (the token is returned even on the last page - pass it later to receive only newer changes). Scope: {@code fga:read}. */
+    public OpenFgaReadChangesResponse readChanges(String store) {
+        return readChanges(store, null, null, null, null);
+    }
+
+    /** As above, with every optional parameter. */
+    public OpenFgaReadChangesResponse readChanges(String store, String type, Long pageSize, String continuationToken, String startTime) {
+        Map<String, Object> q = Params.of().set("type", type).set("page_size", pageSize).set("continuation_token", continuationToken).set("start_time", startTime).map();
+        return t.request("GET", "/v1/openfga/stores/" + enc(store) + "/changes", q, null, null, false, new TypeReference<>() {
         });
     }
 }

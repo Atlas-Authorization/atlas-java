@@ -7,6 +7,8 @@ import net.atlasauth.atlas.http.Transport;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import net.atlasauth.atlas.models.IntegrationsRunCardActionBody;
+import net.atlasauth.atlas.models.IntegrationsRunCardActionResponse;
 
 import static net.atlasauth.atlas.http.Transport.enc;
 
@@ -56,6 +58,17 @@ public final class Integrations {
     /** {@code GET /v1/public/instances/{id}} — The public metadata of an instance: issuer, JWKS, token schema and its integrations (no key needed). */
     public JsonNode instanceMetadata(String instanceId) {
         return t.get("/v1/public/instances/" + enc(instanceId), new TypeReference<>() {
+        });
+    }
+
+    /** {@code POST /v1/integrations/{integration}/card/actions/{action}} - Run a card action. revoke_sessions signs the user out of every device (their sessions end, back-channel logouts go out) and is audited with the agent the integration names. Partner link with sessions:write, or the secret key. Scope: {@code sessions:write}. */
+    public IntegrationsRunCardActionResponse runCardAction(String integration, String action, IntegrationsRunCardActionBody body) {
+        return runCardAction(integration, action, body, null);
+    }
+
+    /** As above, with every optional parameter and an {@code Idempotency-Key} so a retry replays the first response. */
+    public IntegrationsRunCardActionResponse runCardAction(String integration, String action, IntegrationsRunCardActionBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/integrations/" + enc(integration) + "/card/actions/" + enc(action), null, body, idempotencyKey, false, new TypeReference<>() {
         });
     }
 }

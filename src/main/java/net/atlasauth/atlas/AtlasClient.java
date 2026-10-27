@@ -3,6 +3,47 @@ package net.atlasauth.atlas;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.atlasauth.atlas.http.Json;
 import net.atlasauth.atlas.http.Transport;
+import net.atlasauth.atlas.resources.AppCatalog;
+import net.atlasauth.atlas.resources.LdapServerClients;
+import net.atlasauth.atlas.resources.Journeys;
+import net.atlasauth.atlas.resources.Groups;
+import net.atlasauth.atlas.resources.Migrations;
+import net.atlasauth.atlas.resources.ManagedGrants;
+import net.atlasauth.atlas.resources.LeastPrivilege;
+import net.atlasauth.atlas.resources.DeliveryHealthTargets;
+import net.atlasauth.atlas.resources.Flags;
+import net.atlasauth.atlas.resources.MfaFactors;
+import net.atlasauth.atlas.resources.Marketing;
+import net.atlasauth.atlas.resources.AuditEventSchemas;
+import net.atlasauth.atlas.resources.DirectoryPullSources;
+import net.atlasauth.atlas.resources.RelayAgents;
+import net.atlasauth.atlas.resources.OauthClientProfiles;
+import net.atlasauth.atlas.resources.PasskeyApi;
+import net.atlasauth.atlas.resources.Vc;
+import net.atlasauth.atlas.resources.Listen;
+import net.atlasauth.atlas.resources.AgentRegistration;
+import net.atlasauth.atlas.resources.Agents;
+import net.atlasauth.atlas.resources.AgentAccessRequests;
+import net.atlasauth.atlas.resources.Workflows;
+import net.atlasauth.atlas.resources.PageTemplates;
+import net.atlasauth.atlas.resources.ServiceConnectors;
+import net.atlasauth.atlas.resources.DesktopMfa;
+import net.atlasauth.atlas.resources.IdentityVerification;
+import net.atlasauth.atlas.resources.Iga;
+import net.atlasauth.atlas.resources.ScimProvisioningPresets;
+import net.atlasauth.atlas.resources.Vault;
+import net.atlasauth.atlas.resources.Connections;
+import net.atlasauth.atlas.resources.Ssf;
+import net.atlasauth.atlas.resources.NetworkZones;
+import net.atlasauth.atlas.resources.AccessPolicies;
+import net.atlasauth.atlas.resources.Abac;
+import net.atlasauth.atlas.resources.Resources;
+import net.atlasauth.atlas.resources.OrgRoleGrants;
+import net.atlasauth.atlas.resources.Devices;
+import net.atlasauth.atlas.resources.AuthzDecisions;
+import net.atlasauth.atlas.resources.PolicyBundles;
+import net.atlasauth.atlas.resources.ProxyApps;
+import net.atlasauth.atlas.resources.McpGateways;
 import net.atlasauth.atlas.resources.ActionGallery;
 import net.atlasauth.atlas.resources.ActionTemplates;
 import net.atlasauth.atlas.resources.Actions;
@@ -132,6 +173,47 @@ public final class AtlasClient {
     public static final String DEFAULT_API_URL = "https://api.atlasauth.net";
 
     private final Transport transport;
+    private final AppCatalog appCatalog;
+    private final LdapServerClients ldapServerClients;
+    private final Journeys journeys;
+    private final Groups groups;
+    private final Migrations migrations;
+    private final ManagedGrants managedGrants;
+    private final LeastPrivilege leastPrivilege;
+    private final DeliveryHealthTargets deliveryHealth;
+    private final Flags flags;
+    private final MfaFactors mfaFactors;
+    private final Marketing marketing;
+    private final AuditEventSchemas auditEventSchemas;
+    private final DirectoryPullSources directoryPullSources;
+    private final RelayAgents relayAgents;
+    private final OauthClientProfiles oauthClientProfiles;
+    private final PasskeyApi passkeyApi;
+    private final Vc vc;
+    private final Listen listen;
+    private final AgentRegistration agentRegistration;
+    private final Agents agents;
+    private final AgentAccessRequests agentAccessRequests;
+    private final Workflows workflows;
+    private final PageTemplates pageTemplates;
+    private final ServiceConnectors serviceConnectors;
+    private final DesktopMfa desktopMfa;
+    private final IdentityVerification identityVerification;
+    private final Iga iga;
+    private final ScimProvisioningPresets scimProvisioningPresets;
+    private final Vault vault;
+    private final Connections connections;
+    private final Ssf ssf;
+    private final NetworkZones networkZones;
+    private final AccessPolicies accessPolicies;
+    private final Abac abac;
+    private final Resources resources;
+    private final OrgRoleGrants orgRoleGrants;
+    private final Devices devices;
+    private final AuthzDecisions authzDecisions;
+    private final PolicyBundles policyBundles;
+    private final ProxyApps proxyApps;
+    private final McpGateways mcpGateways;
 
     private final Users users;
     private final Sessions sessions;
@@ -256,6 +338,47 @@ public final class AtlasClient {
                 b.dryRun, b.traceparent, b.secretRecipient);
 
         this.users = new Users(transport);
+        this.appCatalog = new AppCatalog(transport);
+        this.ldapServerClients = new LdapServerClients(transport);
+        this.journeys = new Journeys(transport);
+        this.groups = new Groups(transport);
+        this.migrations = new Migrations(transport);
+        this.managedGrants = new ManagedGrants(transport);
+        this.leastPrivilege = new LeastPrivilege(transport);
+        this.deliveryHealth = new DeliveryHealthTargets(transport);
+        this.flags = new Flags(transport);
+        this.mfaFactors = new MfaFactors(transport);
+        this.marketing = new Marketing(transport);
+        this.auditEventSchemas = new AuditEventSchemas(transport);
+        this.directoryPullSources = new DirectoryPullSources(transport);
+        this.relayAgents = new RelayAgents(transport);
+        this.oauthClientProfiles = new OauthClientProfiles(transport);
+        this.passkeyApi = new PasskeyApi(transport);
+        this.vc = new Vc(transport);
+        this.listen = new Listen(transport);
+        this.agentRegistration = new AgentRegistration(transport);
+        this.agents = new Agents(transport);
+        this.agentAccessRequests = new AgentAccessRequests(transport);
+        this.workflows = new Workflows(transport);
+        this.pageTemplates = new PageTemplates(transport);
+        this.serviceConnectors = new ServiceConnectors(transport);
+        this.desktopMfa = new DesktopMfa(transport);
+        this.identityVerification = new IdentityVerification(transport);
+        this.iga = new Iga(transport);
+        this.scimProvisioningPresets = new ScimProvisioningPresets(transport);
+        this.vault = new Vault(transport);
+        this.connections = new Connections(transport);
+        this.ssf = new Ssf(transport);
+        this.networkZones = new NetworkZones(transport);
+        this.accessPolicies = new AccessPolicies(transport);
+        this.abac = new Abac(transport);
+        this.resources = new Resources(transport);
+        this.orgRoleGrants = new OrgRoleGrants(transport);
+        this.devices = new Devices(transport);
+        this.authzDecisions = new AuthzDecisions(transport);
+        this.policyBundles = new PolicyBundles(transport);
+        this.proxyApps = new ProxyApps(transport);
+        this.mcpGateways = new McpGateways(transport);
         this.sessions = new Sessions(transport);
         this.organizations = new Organizations(transport);
         this.roles = new Roles(transport);
@@ -379,6 +502,211 @@ public final class AtlasClient {
     /** The shared HTTP core, exposed for advanced callers hitting an un-modeled route. */
     public Transport transport() {
         return transport;
+    }
+
+    /** The {@code appCatalog} resource. */
+    public AppCatalog appCatalog() {
+        return appCatalog;
+    }
+
+    /** The {@code ldapServerClients} resource. */
+    public LdapServerClients ldapServerClients() {
+        return ldapServerClients;
+    }
+
+    /** The {@code journeys} resource. */
+    public Journeys journeys() {
+        return journeys;
+    }
+
+    /** The {@code groups} resource. */
+    public Groups groups() {
+        return groups;
+    }
+
+    /** The {@code migrations} resource. */
+    public Migrations migrations() {
+        return migrations;
+    }
+
+    /** The {@code managedGrants} resource. */
+    public ManagedGrants managedGrants() {
+        return managedGrants;
+    }
+
+    /** The {@code leastPrivilege} resource. */
+    public LeastPrivilege leastPrivilege() {
+        return leastPrivilege;
+    }
+
+    /** The {@code deliveryHealth} resource. */
+    public DeliveryHealthTargets deliveryHealth() {
+        return deliveryHealth;
+    }
+
+    /** The {@code flags} resource. */
+    public Flags flags() {
+        return flags;
+    }
+
+    /** The {@code mfaFactors} resource. */
+    public MfaFactors mfaFactors() {
+        return mfaFactors;
+    }
+
+    /** The {@code marketing} resource. */
+    public Marketing marketing() {
+        return marketing;
+    }
+
+    /** The {@code auditEventSchemas} resource. */
+    public AuditEventSchemas auditEventSchemas() {
+        return auditEventSchemas;
+    }
+
+    /** The {@code directoryPullSources} resource. */
+    public DirectoryPullSources directoryPullSources() {
+        return directoryPullSources;
+    }
+
+    /** The {@code relayAgents} resource. */
+    public RelayAgents relayAgents() {
+        return relayAgents;
+    }
+
+    /** The {@code oauthClientProfiles} resource. */
+    public OauthClientProfiles oauthClientProfiles() {
+        return oauthClientProfiles;
+    }
+
+    /** The {@code passkeyApi} resource. */
+    public PasskeyApi passkeyApi() {
+        return passkeyApi;
+    }
+
+    /** The {@code vc} resource. */
+    public Vc vc() {
+        return vc;
+    }
+
+    /** The {@code listen} resource. */
+    public Listen listen() {
+        return listen;
+    }
+
+    /** The {@code agentRegistration} resource. */
+    public AgentRegistration agentRegistration() {
+        return agentRegistration;
+    }
+
+    /** The {@code agents} resource. */
+    public Agents agents() {
+        return agents;
+    }
+
+    /** The {@code agentAccessRequests} resource. */
+    public AgentAccessRequests agentAccessRequests() {
+        return agentAccessRequests;
+    }
+
+    /** The {@code workflows} resource. */
+    public Workflows workflows() {
+        return workflows;
+    }
+
+    /** The {@code pageTemplates} resource. */
+    public PageTemplates pageTemplates() {
+        return pageTemplates;
+    }
+
+    /** The {@code serviceConnectors} resource. */
+    public ServiceConnectors serviceConnectors() {
+        return serviceConnectors;
+    }
+
+    /** The {@code desktopMfa} resource. */
+    public DesktopMfa desktopMfa() {
+        return desktopMfa;
+    }
+
+    /** The {@code identityVerification} resource. */
+    public IdentityVerification identityVerification() {
+        return identityVerification;
+    }
+
+    /** The {@code iga} resource. */
+    public Iga iga() {
+        return iga;
+    }
+
+    /** The {@code scimProvisioningPresets} resource. */
+    public ScimProvisioningPresets scimProvisioningPresets() {
+        return scimProvisioningPresets;
+    }
+
+    /** The {@code vault} resource. */
+    public Vault vault() {
+        return vault;
+    }
+
+    /** The {@code connections} resource. */
+    public Connections connections() {
+        return connections;
+    }
+
+    /** The {@code ssf} resource. */
+    public Ssf ssf() {
+        return ssf;
+    }
+
+    /** The {@code networkZones} resource. */
+    public NetworkZones networkZones() {
+        return networkZones;
+    }
+
+    /** The {@code accessPolicies} resource. */
+    public AccessPolicies accessPolicies() {
+        return accessPolicies;
+    }
+
+    /** The {@code abac} resource. */
+    public Abac abac() {
+        return abac;
+    }
+
+    /** The {@code resources} resource. */
+    public Resources resources() {
+        return resources;
+    }
+
+    /** The {@code orgRoleGrants} resource. */
+    public OrgRoleGrants orgRoleGrants() {
+        return orgRoleGrants;
+    }
+
+    /** The {@code devices} resource. */
+    public Devices devices() {
+        return devices;
+    }
+
+    /** The {@code authzDecisions} resource. */
+    public AuthzDecisions authzDecisions() {
+        return authzDecisions;
+    }
+
+    /** The {@code policyBundles} resource. */
+    public PolicyBundles policyBundles() {
+        return policyBundles;
+    }
+
+    /** The {@code proxyApps} resource. */
+    public ProxyApps proxyApps() {
+        return proxyApps;
+    }
+
+    /** The {@code mcpGateways} resource. */
+    public McpGateways mcpGateways() {
+        return mcpGateways;
     }
 
     public Users users() {

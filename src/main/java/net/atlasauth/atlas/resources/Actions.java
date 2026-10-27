@@ -14,6 +14,8 @@ import net.atlasauth.atlas.models.UpdateActionBody;
 
 import java.util.List;
 import java.util.Map;
+import com.fasterxml.jackson.databind.JsonNode;
+import net.atlasauth.atlas.models.ActionsCallsResponse;
 
 import static net.atlasauth.atlas.http.Transport.enc;
 
@@ -77,6 +79,18 @@ public final class Actions {
     public ActionBindingList setBindings(String trigger, List<String> actionIds) {
         Map<String, Object> body = Params.of("action_ids", actionIds).map();
         return t.put("/v1/actions/bindings/" + enc(trigger), body, new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/actions/{id}/calls} - The call log of an `http` Action (an Action that calls your own endpoint), newest first, with 24 hour stats: calls, denied, failed, timeouts and p95 latency. Real calls and dry-run tests are both logged (`test`). 409 for a `node` Action. Scope: {@code actions:read}. */
+    public ActionsCallsResponse calls(String id) {
+        return calls(id, null, null, null, null);
+    }
+
+    /** As above, with every optional parameter. */
+    public ActionsCallsResponse calls(String id, Long limit, String status, Boolean test, String startingAfter) {
+        Map<String, Object> q = Params.of().set("limit", limit).set("status", status).set("test", test).set("starting_after", startingAfter).map();
+        return t.request("GET", "/v1/actions/" + enc(id) + "/calls", q, null, null, false, new TypeReference<>() {
         });
     }
 }
