@@ -122,7 +122,6 @@ import net.atlasauth.atlas.models.OAuthClientsSetExchangePolicyBody;
 import net.atlasauth.atlas.models.OAuthClientsSetProfileBody;
 import net.atlasauth.atlas.models.OAuthClientsTrustedIssuersCreateBody;
 import net.atlasauth.atlas.models.OauthClientProfilesSetBody;
-import net.atlasauth.atlas.models.ObjectMapper;
 import net.atlasauth.atlas.models.OpenFgaListUsersBody;
 import net.atlasauth.atlas.models.OrgLdapConnectionsSetRelayBody;
 import net.atlasauth.atlas.models.OrgLdapConnectionsSetSyncBody;
@@ -608,8 +607,8 @@ class ParityOperationsTest {
         expect("PUT", "/v1/users/a%20b%2Fc/entitlements", null, "{\"plan\":\"s\"}", null, c -> c.flags().assignUserEntitlements("a b/c", new FlagsAssignOrganizationEntitlementsBody().plan("s")));
         expect("POST", "/v1/fga/stores/a%20b%2Fc/list-users", null, "{\"relation\":\"s\"}", "idem-1", c -> c.fga().listUsers("a b/c", new FgaListUsersBody().relation("s"), "idem-1"));
         expect("GET", "/v1/fga/stores/a%20b%2Fc/changes", "type=s", null, null, c -> c.fga().readChanges("a b/c", "s", null, null, null, null, null));
-        expect("POST", "/v1/openfga/stores/a%20b%2Fc/list-users", null, "{\"relation\":\"s\"}", "idem-1", c -> c.openfga().listUsers("a b/c", new OpenFgaListUsersBody().relation("s"), "idem-1"));
-        expect("GET", "/v1/openfga/stores/a%20b%2Fc/changes", "type=s", null, null, c -> c.openfga().readChanges("a b/c", "s", null, null, null));
+        expect("POST", "/v1/openfga/stores/a%20b%2Fc/list-users", null, "{\"relation\":\"s\"}", "idem-1", c -> c.openFga().listUsers("a b/c", new OpenFgaListUsersBody().relation("s"), "idem-1"));
+        expect("GET", "/v1/openfga/stores/a%20b%2Fc/changes", "type=s", null, null, c -> c.openFga().readChanges("a b/c", "s", null, null, null));
         expect("PUT", "/v1/attack_protection/app_attestation_secret", null, "{\"secret\":\"s\"}", null, c -> c.attackProtection().setAppAttestationSecret(new AttackProtectionSetAppAttestationSecretBody().secret("s")));
         expect("DELETE", "/v1/attack_protection/app_attestation_secret", "kind=s", null, null, c -> c.attackProtection().removeAppAttestationSecret("s"));
         expect("PUT", "/v1/risk_based_mfa/reputation_secret", null, "{\"secret\":\"s\"}", null, c -> c.riskBasedMfa().setReputationSecret(new RiskBasedMfaSetReputationSecretBody().secret("s")));
