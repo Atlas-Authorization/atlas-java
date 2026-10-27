@@ -1,0 +1,21 @@
+package net.atlasauth.atlas.models;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
+import java.util.Map;
+
+/** Body for {@code PATCH /v1/app_catalog/installed/{id}}. */
+public final class AppCatalogUpdateBody {
+    public String name;
+    public List<String> allowedEmailDomains;
+    /** Who may open the app. mode everyone (default) or assigned; with assigned, only the listed users, members of the listed instance groups (id or slug, inherited), members of the listed organizations or holders of the listed organization roles. allowed_email_domains applies on top. */
+    public Map<String, Object> assignment;
+
+    public AppCatalogUpdateBody() {
+    }
+
+    public AppCatalogUpdateBody name(String v) { this.name = v; return this; }
+    public AppCatalogUpdateBody allowedEmailDomains(List<String> v) { this.allowedEmailDomains = v; return this; }
+    public AppCatalogUpdateBody assignment(Map<String, Object> v) { this.assignment = v; return this; }
+}

@@ -32,6 +32,9 @@ import net.atlasauth.atlas.models.UpdateOrganizationBody;
 
 import java.util.List;
 import java.util.Map;
+import net.atlasauth.atlas.models.ConnectionsSecretResponse;
+import net.atlasauth.atlas.models.OrganizationsListConnectedAppsResponse;
+import net.atlasauth.atlas.models.OrganizationsRevokeConnectedAppResponse;
 
 import static net.atlasauth.atlas.http.Transport.enc;
 
@@ -508,5 +511,40 @@ public final class Organizations {
         Map<String, Object> payload = Params.of().set("values", values).map();
         return t.patch("/v1/organizations/" + enc(id) + "/settings", payload, new TypeReference<>() {
         });
+    }
+
+    /** {@code GET /v1/organizations/{id}/connected_apps} - List the apps (OAuth clients) that hold an active grant in this organization's context, one entry per grant. Scope: {@code organizations:read}. */
+    public OrganizationsListConnectedAppsResponse listConnectedApps(String id) {
+        return listConnectedApps(id, null, null);
+    }
+
+    /** As above, with every optional parameter. */
+    public OrganizationsListConnectedAppsResponse listConnectedApps(String id, Long limit, String startingAfter) {
+        Map<String, Object> q = Params.of().set("limit", limit).set("starting_after", startingAfter).map();
+        return t.request("GET", "/v1/organizations/" + enc(id) + "/connected_apps", q, null, null, false, new TypeReference<>() {
+        });
+    }
+
+    /** {@code DELETE /v1/organizations/{id}/connected_apps/{grantId}} - Revoke one connected app grant of the organization: its tokens and any session minted from it stop working. Emits grant.revoked; audited as organization.connected_app_revoked. Scope: {@code organizations:write}. */
+    public OrganizationsRevokeConnectedAppResponse revokeConnectedApp(String id, String grantId) {
+        return t.request("DELETE", "/v1/organizations/" + enc(id) + "/connected_apps/" + enc(grantId), null, null, null, false, new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/organizations/{id}/connections/{connectionId}/secret} - The same read, scoped to an organization: 404 unless the connection is owned by that organization. Needs connections:secret_read; audited. Scope: {@code connections:secret_read}. */
+    public ConnectionsSecretResponse getConnectionSecret(String id, String connectionId) {
+        return getConnectionSecret(id, connectionId, null);
+    }
+
+    /** As above, with every optional parameter. */
+    public ConnectionsSecretResponse getConnectionSecret(String id, String connectionId, String version) {
+        Map<String, Object> q = Params.of().set("version", version).map();
+        return t.request("GET", "/v1/organizations/" + enc(id) + "/connections/" + enc(connectionId) + "/secret", q, null, null, false, new TypeReference<>() {
+        });
+    }
+
+    /** The {@code webhookEndpoints} sub-resource. */
+    public OrganizationsWebhookEndpoints webhookEndpoints() {
+        return new OrganizationsWebhookEndpoints(t);
     }
 }

@@ -45,7 +45,7 @@ AtlasClient atlas = AtlasClient.builder()
         .secretKey(System.getenv("ATLAS_SECRET_KEY")) // sk_...
         .build();
 
-User user = atlas.users().get("usr_123");
+User user = atlas.users().get("user_123");
 
 User created = atlas.users().create(
         new net.atlasauth.atlas.models.CreateUserBody("ada@example.com")
@@ -110,8 +110,8 @@ anything changes. Set it for the whole client, or per call:
 ```java
 AtlasClient strict = AtlasClient.builder().secretKey(secret).strict(true).build();
 
-atlas.withStrict(true).users().update("usr_123", body);   // just this call
-atlas.withStrict(false).users().update("usr_123", body);  // opt out when the instance defaults to strict
+atlas.withStrict(true).users().update("user_123", body);   // just this call
+atlas.withStrict(false).users().update("user_123", body);  // opt out when the instance defaults to strict
 ```
 
 ### Clearing a field
@@ -596,7 +596,7 @@ specific subclass for the status, so you can catch broadly or narrowly:
 import net.atlasauth.atlas.*;
 
 try {
-    atlas.users().get("usr_missing");
+    atlas.users().get("user_missing");
 } catch (NotFoundException e) {
     // 404
 } catch (RateLimitException e) {

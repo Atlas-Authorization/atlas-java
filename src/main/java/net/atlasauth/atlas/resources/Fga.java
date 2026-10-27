@@ -20,6 +20,10 @@ import net.atlasauth.atlas.models.FgaWriteResult;
 import net.atlasauth.atlas.models.ListPage;
 
 import java.util.Map;
+import com.fasterxml.jackson.databind.JsonNode;
+import net.atlasauth.atlas.models.FgaListUsersBody;
+import net.atlasauth.atlas.models.FgaListUsersResponse;
+import net.atlasauth.atlas.models.FgaReadChangesResponse;
 
 import static net.atlasauth.atlas.http.Transport.enc;
 
@@ -245,5 +249,28 @@ public final class Fga {
         public FgaAuthorizationModel get(String modelId) {
             return fga.models.get(storeId, modelId);
         }
+    }
+
+    /** {@code POST /v1/fga/stores/{id}/list-users} - List the users that have a relation on an object, filtered to one user type (or to `type#relation` usersets via `user_filters[0].relation`). Exact for wildcards (`type:*` plus `excluded_users` under `but not`), nested groups and contextual tuples; tuple conditions are evaluated against `context`. Pages with `page_size` / `continuation_token`; `consistency` / `consistency_token` behave as on check. Scope: {@code fga:read}. */
+    public FgaListUsersResponse listUsers(String id, FgaListUsersBody body) {
+        return listUsers(id, body, null);
+    }
+
+    /** As above, with every optional parameter and an {@code Idempotency-Key} so a retry replays the first response. */
+    public FgaListUsersResponse listUsers(String id, FgaListUsersBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/fga/stores/" + enc(id) + "/list-users", null, body, idempotencyKey, false, new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/fga/stores/{id}/changes} - Read the store's tuple changelog: every tuple write and delete in commit order, resumable with `continuation_token` (returned even on the last page - pass it later to receive only newer changes). Filter by object `type` and `start_time`. Scope: {@code fga:read}. */
+    public FgaReadChangesResponse readChanges(String id) {
+        return readChanges(id, null, null, null, null, null, null);
+    }
+
+    /** As above, with every optional parameter. */
+    public FgaReadChangesResponse readChanges(String id, String type, Long pageSize, String continuationToken, String startTime, Long limit, String startingAfter) {
+        Map<String, Object> q = Params.of().set("type", type).set("page_size", pageSize).set("continuation_token", continuationToken).set("start_time", startTime).set("limit", limit).set("starting_after", startingAfter).map();
+        return t.request("GET", "/v1/fga/stores/" + enc(id) + "/changes", q, null, null, false, new TypeReference<>() {
+        });
     }
 }

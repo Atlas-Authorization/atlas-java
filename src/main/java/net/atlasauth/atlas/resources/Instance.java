@@ -228,4 +228,9 @@ public final class Instance {
         return t.post("/v1/instance/integrations/" + enc(id) + "/atlas_id_tokens", Params.of("access_token", accessToken).map(), new TypeReference<>() {
         });
     }
+
+    /** The {@code integrations} sub-resource. */
+    public InstanceIntegrations integrations() {
+        return new InstanceIntegrations(t);
+    }
 }

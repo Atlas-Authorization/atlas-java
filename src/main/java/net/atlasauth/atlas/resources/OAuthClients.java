@@ -20,6 +20,13 @@ import net.atlasauth.atlas.models.UpdateOAuthClientBody;
 
 import java.util.List;
 import java.util.Map;
+import net.atlasauth.atlas.models.OAuthClientsDeleteExchangePolicyResponse;
+import net.atlasauth.atlas.models.OAuthClientsGetExchangePolicyResponse;
+import net.atlasauth.atlas.models.OAuthClientsSetDelegatedUiBody;
+import net.atlasauth.atlas.models.OAuthClientsSetDelegatedUiResponse;
+import net.atlasauth.atlas.models.OAuthClientsSetExchangePolicyBody;
+import net.atlasauth.atlas.models.OAuthClientsSetProfileBody;
+import net.atlasauth.atlas.models.OAuthClientsSetProfileResponse;
 
 import static net.atlasauth.atlas.http.Transport.enc;
 
@@ -147,5 +154,60 @@ public final class OAuthClients {
     public ListPage<ImportedOAuthClient> importClients(ImportOAuthClientsBody body, String idempotencyKey) {
         return t.post("/v1/oauth_clients/import", body, idempotencyKey, new TypeReference<>() {
         });
+    }
+
+    /** {@code GET /v1/oauth_clients/{id}/exchange_policy} - Read the token-exchange policy of an OAuth client (the defaults, with configured=false, when none is set). Scope: {@code oauth_clients:read}. */
+    public OAuthClientsGetExchangePolicyResponse getExchangePolicy(String id) {
+        return t.request("GET", "/v1/oauth_clients/" + enc(id) + "/exchange_policy", null, null, null, false, new TypeReference<>() {
+        });
+    }
+
+    /** {@code PUT /v1/oauth_clients/{id}/exchange_policy} - Set the token-exchange policy of an OAuth client: allowed audiences and scopes, whether it may impersonate (no actor_token), whether delegation needs may_act, and the maximum act-chain depth. Audited as oauth_exchange_policy.updated. Scope: {@code oauth_clients:write}. */
+    public OAuthClientsGetExchangePolicyResponse setExchangePolicy(String id, OAuthClientsSetExchangePolicyBody body) {
+        return t.request("PUT", "/v1/oauth_clients/" + enc(id) + "/exchange_policy", null, body, null, false, new TypeReference<>() {
+        });
+    }
+
+    /** {@code DELETE /v1/oauth_clients/{id}/exchange_policy} - Remove the token-exchange policy of an OAuth client, restoring the defaults. Scope: {@code oauth_clients:write}. */
+    public OAuthClientsDeleteExchangePolicyResponse deleteExchangePolicy(String id) {
+        return t.request("DELETE", "/v1/oauth_clients/" + enc(id) + "/exchange_policy", null, null, null, false, new TypeReference<>() {
+        });
+    }
+
+    /** {@code PUT /v1/oauth_clients/{id}/profile} - Assign a policy profile to an OAuth client (profile null clears it). The client must already conform (auth method, redirect URIs); the profile is then enforced at /oauth2/authorize, /oauth2/par and /oauth2/token. Scope: {@code oauth_clients:write}. */
+    public OAuthClientsSetProfileResponse setProfile(String id, OAuthClientsSetProfileBody body) {
+        return t.request("PUT", "/v1/oauth_clients/" + enc(id) + "/profile", null, body, null, false, new TypeReference<>() {
+        });
+    }
+
+    /** {@code PUT /v1/oauth_clients/{id}/delegated_ui} - Set (or clear, with null) the URLs of your own sign-in and consent pages for an OAuth client. /oauth2/authorize then sends the browser there with a login_challenge / consent_challenge instead of Atlas's pages. A client URL overrides the instance-wide oauthProvider.loginUrl / consentUrl. Scope: {@code oauth_clients:write}. */
+    public OAuthClientsSetDelegatedUiResponse setDelegatedUi(String id, OAuthClientsSetDelegatedUiBody body) {
+        return t.request("PUT", "/v1/oauth_clients/" + enc(id) + "/delegated_ui", null, body, null, false, new TypeReference<>() {
+        });
+    }
+
+    /** The {@code appSettings} sub-resource. */
+    public OAuthClientsAppSettings appSettings() {
+        return new OAuthClientsAppSettings(t);
+    }
+
+    /** The {@code workloadIdentity} sub-resource. */
+    public OAuthClientsWorkloadIdentity workloadIdentity() {
+        return new OAuthClientsWorkloadIdentity(t);
+    }
+
+    /** The {@code trustedIssuers} sub-resource. */
+    public OAuthClientsTrustedIssuers trustedIssuers() {
+        return new OAuthClientsTrustedIssuers(t);
+    }
+
+    /** The {@code loginRequests} sub-resource. */
+    public OAuthClientsLoginRequests loginRequests() {
+        return new OAuthClientsLoginRequests(t);
+    }
+
+    /** The {@code consentRequests} sub-resource. */
+    public OAuthClientsConsentRequests consentRequests() {
+        return new OAuthClientsConsentRequests(t);
     }
 }

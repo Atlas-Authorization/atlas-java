@@ -48,6 +48,12 @@ import net.atlasauth.atlas.models.UserState;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import net.atlasauth.atlas.models.UsersCreateLinkBody;
+import net.atlasauth.atlas.models.UsersCreateLinkResponse;
+import net.atlasauth.atlas.models.UsersDeleteDeviceKeyResponse;
+import net.atlasauth.atlas.models.UsersHistoryResponse;
+import net.atlasauth.atlas.models.UsersListDeviceKeysResponse;
+import net.atlasauth.atlas.models.UsersMinorStatusResponse;
 
 import static net.atlasauth.atlas.http.Transport.enc;
 
@@ -497,5 +503,83 @@ public final class Users {
         Map<String, Object> q = Params.of().set("limit", limit).set("starting_after", startingAfter).map();
         return t.get("/v1/users/" + enc(id) + "/sign_in_history", q, new TypeReference<>() {
         });
+    }
+
+    /** {@code GET /v1/users/{id}/history} - The user change history, newest first: every profile, metadata and status change (ban, lock, directives and their reversal) with who made it, the reason and expiry, and each changed field with its value before and after. A password change and private_metadata values are recorded as redacted (the field name only). Pages with starting_after. Scope: {@code users:read}. */
+    public UsersHistoryResponse history(String id) {
+        return history(id, null, null, null);
+    }
+
+    /** As above, with every optional parameter. */
+    public UsersHistoryResponse history(String id, Long limit, String startingAfter, String action) {
+        Map<String, Object> q = Params.of().set("limit", limit).set("starting_after", startingAfter).set("action", action).map();
+        return t.request("GET", "/v1/users/" + enc(id) + "/history", q, null, null, false, new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/users/{id}/minor_status} - A user's parental-consent state (not_required for anyone at or above the age of digital consent) and their guardian links, newest first. Scope: {@code users:read}. */
+    public UsersMinorStatusResponse minorStatus(String id) {
+        return t.request("GET", "/v1/users/" + enc(id) + "/minor_status", null, null, null, false, new TypeReference<>() {
+        });
+    }
+
+    /** {@code POST /v1/users/{id}/minor_status/assess} - Re-assess a user from their date-of-birth trait now (for users created before age gating was turned on). 400 when compliance.minors is off. Scope: {@code users:write}. */
+    public UsersMinorStatusResponse assessMinor(String id) {
+        return assessMinor(id, null);
+    }
+
+    /** As above, with every optional parameter and an {@code Idempotency-Key} so a retry replays the first response. */
+    public UsersMinorStatusResponse assessMinor(String id, String idempotencyKey) {
+        return t.request("POST", "/v1/users/" + enc(id) + "/minor_status/assess", null, null, idempotencyKey, false, new TypeReference<>() {
+        });
+    }
+
+    /** {@code POST /v1/users/{id}/links} - Mint an email-verification or password-reset link (and code) for a user WITHOUT sending it, for support tools and invite flows that deliver it themselves. type "email_verification" needs an unverified address (default: the primary); the url opens GET /v1/client/email_addresses/verify and the code works wherever the address is verified by code. type "password_reset" needs a verified address and returns the url and/or code the instance's password-reset setting would have mailed, plus the reset attempt_id; redeeming it is the ordinary reset (it still asks for the second factor and sets a new password). Single-use, expires_in_seconds 60 to 86400 (default 3600). Audited as user.link_generated, never with the secret. Treat the response as a credential. -&gt; 201. Scope: {@code users:write}. */
+    public UsersCreateLinkResponse createLink(String id, UsersCreateLinkBody body) {
+        return createLink(id, body, null);
+    }
+
+    /** As above, with every optional parameter and an {@code Idempotency-Key} so a retry replays the first response. */
+    public UsersCreateLinkResponse createLink(String id, UsersCreateLinkBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/users/" + enc(id) + "/links", null, body, idempotencyKey, false, new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/users/{id}/device_keys} - List a user's device keys (native biometric sign-in). Never returns key material. Scope: {@code users:read}. */
+    public UsersListDeviceKeysResponse listDeviceKeys(String id) {
+        return listDeviceKeys(id, null, null);
+    }
+
+    /** As above, with every optional parameter. */
+    public UsersListDeviceKeysResponse listDeviceKeys(String id, Long limit, String startingAfter) {
+        Map<String, Object> q = Params.of().set("limit", limit).set("starting_after", startingAfter).map();
+        return t.request("GET", "/v1/users/" + enc(id) + "/device_keys", q, null, null, false, new TypeReference<>() {
+        });
+    }
+
+    /** {@code DELETE /v1/users/{id}/device_keys/{keyId}} - Revoke one of a user's device keys so that device can no longer sign in. Scoped to the user; the account holder is notified when account-change notices are on. Scope: {@code users:write}. */
+    public UsersDeleteDeviceKeyResponse deleteDeviceKey(String id, String keyId) {
+        return t.request("DELETE", "/v1/users/" + enc(id) + "/device_keys/" + enc(keyId), null, null, null, false, new TypeReference<>() {
+        });
+    }
+
+    /** The {@code requiredActions} sub-resource. */
+    public UsersRequiredActions requiredActions() {
+        return new UsersRequiredActions(t);
+    }
+
+    /** The {@code notes} sub-resource. */
+    public UsersNotes notes() {
+        return new UsersNotes(t);
+    }
+
+    /** The {@code guardians} sub-resource. */
+    public UsersGuardians guardians() {
+        return new UsersGuardians(t);
+    }
+
+    /** The {@code search} sub-resource. */
+    public UsersSearch search() {
+        return new UsersSearch(t);
     }
 }
