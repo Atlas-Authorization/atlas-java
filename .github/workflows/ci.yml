@@ -17,3 +17,7 @@ jobs:
           java-version: "17"
           cache: maven
       - run: mvn -B -q test
+      # Framework integrations (Ktor, Quarkus, Micronaut) build against the SDK just compiled above.
+      - run: mvn -B -q install -DskipTests
+      - run: mvn -B test
+        working-directory: integrations
