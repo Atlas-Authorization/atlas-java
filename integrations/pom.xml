@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!--
+    Framework integrations on top of atlas-java. Build the SDK first (`mvn -B install -DskipTests`
+    in the parent directory), then `mvn -B test` here builds and tests every integration.
+  -->
+  <groupId>net.atlasauth</groupId>
+  <artifactId>atlas-java-integrations</artifactId>
+  <version>0.1.0</version>
+  <packaging>pom</packaging>
+  <name>Atlas JVM framework integrations</name>
+
+  <modules>
+    <module>ktor</module>
+    <module>quarkus</module>
+    <module>micronaut</module>
+  </modules>
+
+  <properties>
+    <maven.compiler.release>17</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <atlas-java.version>1.18.0</atlas-java.version>
+    <junit.version>5.10.2</junit.version>
+  </properties>
+</project>
