@@ -118,6 +118,58 @@ public final class WebhookVerifier {
         return new WebhookVerification(true, null, event, id, timestamp);
     }
 
+    /** {@link #verifyStandard(String, byte[], Map, long, long)} against the current time with the default five-minute tolerance. */
+    public static WebhookVerification verifyStandard(String secret, byte[] rawBody, Map<String, ?> headers) {
+        return verifyStandard(secret, rawBody, headers, System.currentTimeMillis() / 1000, REPLAY_TOLERANCE_MS / 1000);
+    }
+
+    /**
+     * Verify an APPLICATION webhook (the events an app publishes to its customers' endpoints through
+     * {@code appEvents()}): Standard Webhooks. {@code webhook-id}, {@code webhook-timestamp} (decimal epoch
+     * SECONDS), {@code webhook-signature: v1,<base64>} (several space-separated entries during a secret rotation;
+     * any one matching verifies), HMAC-SHA256 over {@code <id>.<timestamp>.<raw body>} keyed with the
+     * base64-decoded part of {@code whsec_<base64>}. Returns the same {@link WebhookVerification} as
+     * {@link #verify} ({@code timestamp} in seconds). Matches {@code verifyStandardWebhook} in {@code @atlasauth/backend}.
+     *
+     * @throws IllegalArgumentException when {@code secret} is not {@code whsec_} followed by base64
+     */
+    public static WebhookVerification verifyStandard(String secret, byte[] rawBody, Map<String, ?> headers, long nowSec, long toleranceSec) {
+        byte[] key = Base64.getDecoder().decode(secret.startsWith("whsec_") ? secret.substring(6) : secret);
+        String id = header(headers, "webhook-id");
+        String tsRaw = header(headers, "webhook-timestamp");
+        String signature = header(headers, "webhook-signature");
+        if (isBlank(id) || isBlank(tsRaw) || isBlank(signature)) {
+            return WebhookVerification.failure("missing_headers");
+        }
+        List<String> provided = signatures(signature, "v1");
+        if (provided.isEmpty()) {
+            return WebhookVerification.failure("malformed_signature");
+        }
+        if (!tsRaw.matches("\\d{1,18}")) {
+            return WebhookVerification.failure("stale_timestamp");
+        }
+        long timestamp = Long.parseLong(tsRaw);
+        if (Math.abs(nowSec - timestamp) > toleranceSec) {
+            return WebhookVerification.failure("stale_timestamp");
+        }
+        byte[] want = hmac(key, id + "." + timestamp + ".", rawBody).getBytes(StandardCharsets.UTF_8);
+        boolean matched = false;
+        for (String candidate : provided) {
+            if (MessageDigest.isEqual(want, candidate.getBytes(StandardCharsets.UTF_8))) matched = true;
+        }
+        if (!matched) {
+            return WebhookVerification.failure("signature_mismatch");
+        }
+        JsonNode event = null;
+        try {
+            JsonNode parsed = MAPPER.readTree(rawBody);
+            if (parsed != null && parsed.isObject()) event = parsed;
+        } catch (Exception ignored) {
+            // A valid signature over a non-JSON body: verified, with no event.
+        }
+        return new WebhookVerification(true, null, event, id, timestamp);
+    }
+
     /**
      * The {@code v1} signatures in an {@code atlas-signature} header: one {@code v1,<base64>}
      * entry, or several separated by spaces (while an endpoint secret rotates, Atlas signs with the
@@ -135,9 +187,13 @@ public final class WebhookVerifier {
     }
 
     private String hmac(String prefix, byte[] rawBody) {
+        return hmac(secret.getBytes(StandardCharsets.UTF_8), prefix, rawBody);
+    }
+
+    private static String hmac(byte[] key, String prefix, byte[] rawBody) {
         try {
             Mac mac = Mac.getInstance("HmacSHA256");
-            mac.init(new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
+            mac.init(new SecretKeySpec(key, "HmacSHA256"));
             mac.update(prefix.getBytes(StandardCharsets.UTF_8));
             mac.update(rawBody);
             return Base64.getEncoder().encodeToString(mac.doFinal());

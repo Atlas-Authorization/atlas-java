@@ -6,6 +6,7 @@ import net.atlasauth.atlas.Params;
 import net.atlasauth.atlas.http.Transport;
 import net.atlasauth.atlas.models.TestInstance;
 import net.atlasauth.atlas.models.TestUsersPurged;
+import net.atlasauth.atlas.models.TestingSignInUrl;
 import net.atlasauth.atlas.models.TestingToken;
 
 import java.util.List;
@@ -47,6 +48,23 @@ public final class Testing {
     /** {@code POST /v1/testing_tokens} — Mint a short-lived signed testing token (development instances only) that @atlasauth/testing presents to the sign-in gate to skip the human-only CAPTCHA. */
     public TestingToken createTestingToken() {
         return t.post("/v1/testing_tokens", null, new TypeReference<>() {
+        });
+    }
+
+    /** {@link #createSignInUrl(String, String, Long)} with the default lifetime. */
+    public TestingSignInUrl createSignInUrl(String userId, String redirectUrl) {
+        return createSignInUrl(userId, redirectUrl, null);
+    }
+
+    /**
+     * {@code POST /v1/testing/sign_in_url} - a ready one-time URL that signs a browser in as {@code userId} and lands
+     * on {@code redirectUrl} (an allowed origin or localhost). Development instances only (403
+     * {@code TESTING_UNAVAILABLE} otherwise).
+     */
+    public TestingSignInUrl createSignInUrl(String userId, String redirectUrl, Long expiresInSeconds) {
+        Map<String, Object> payload = Params.of().set("user_id", userId).set("redirect_url", redirectUrl)
+                .set("expires_in_seconds", expiresInSeconds).map();
+        return t.post("/v1/testing/sign_in_url", payload, new TypeReference<>() {
         });
     }
 }

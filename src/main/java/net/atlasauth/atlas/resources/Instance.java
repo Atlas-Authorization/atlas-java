@@ -21,14 +21,32 @@ import net.atlasauth.atlas.models.IntegrationToken;
 import net.atlasauth.atlas.models.Preflight;
 import net.atlasauth.atlas.models.SetIntegrationBody;
 import net.atlasauth.atlas.models.UpdateInstanceBody;
+import net.atlasauth.atlas.models.HostedPagesSettings;
+import net.atlasauth.atlas.models.SignInWithAtlasSettings;
+import net.atlasauth.atlas.models.UpdateHostedPagesBody;
+import net.atlasauth.atlas.models.UpdateSignInWithAtlasBody;
 
 /** The {@code /v1/instance} configuration resource. */
 public final class Instance {
 
     private final Transport t;
+    private final SignInWithAtlas signInWithAtlas;
+    private final HostedPages hostedPages;
 
     public Instance(Transport t) {
         this.t = t;
+        this.signInWithAtlas = new SignInWithAtlas(t);
+        this.hostedPages = new HostedPages(t);
+    }
+
+    /** "Sign in with Atlas" on the instance ({@code /v1/instance/sign_in_with_atlas}). */
+    public SignInWithAtlas signInWithAtlas() {
+        return signInWithAtlas;
+    }
+
+    /** Where the hosted pages send the browser ({@code /v1/instance/hosted_pages}). */
+    public HostedPages hostedPages() {
+        return hostedPages;
     }
 
     public InstanceConfig get() {
@@ -36,6 +54,7 @@ public final class Instance {
         });
     }
 
+    /** {@code PATCH /v1/instance}. {@link InstanceUpdateResult#warnings()} lists what the write did not do as sent. */
     public InstanceUpdateResult update(UpdateInstanceBody body) {
         return t.patch("/v1/instance", body, new TypeReference<>() {
         });
@@ -232,5 +251,47 @@ public final class Instance {
     /** The {@code integrations} sub-resource. */
     public InstanceIntegrations integrations() {
         return new InstanceIntegrations(t);
+    }
+
+    /** {@code /v1/instance/sign_in_with_atlas}. */
+    public static final class SignInWithAtlas {
+        private final Transport t;
+
+        SignInWithAtlas(Transport t) {
+            this.t = t;
+        }
+
+        /** {@code GET /v1/instance/sign_in_with_atlas}. */
+        public SignInWithAtlasSettings get() {
+            return t.get("/v1/instance/sign_in_with_atlas", new TypeReference<>() {
+            });
+        }
+
+        /** {@code PATCH /v1/instance/sign_in_with_atlas} - {@code enabled(true)} links a connection to the Atlas issuer, else creates one. */
+        public SignInWithAtlasSettings update(UpdateSignInWithAtlasBody body) {
+            return t.patch("/v1/instance/sign_in_with_atlas", body, new TypeReference<>() {
+            });
+        }
+    }
+
+    /** {@code /v1/instance/hosted_pages}. */
+    public static final class HostedPages {
+        private final Transport t;
+
+        HostedPages(Transport t) {
+            this.t = t;
+        }
+
+        /** {@code GET /v1/instance/hosted_pages}. */
+        public HostedPagesSettings get() {
+            return t.get("/v1/instance/hosted_pages", new TypeReference<>() {
+            });
+        }
+
+        /** {@code PATCH /v1/instance/hosted_pages} - a set URL makes that hosted page answer 302 there; a cleared one serves the page again. */
+        public HostedPagesSettings update(UpdateHostedPagesBody body) {
+            return t.patch("/v1/instance/hosted_pages", body, new TypeReference<>() {
+            });
+        }
     }
 }

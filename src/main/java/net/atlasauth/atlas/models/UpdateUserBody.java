@@ -19,6 +19,10 @@ public final class UpdateUserBody {
      * to the referral platform as an alias.
      */
     public String externalId;
+    /** Absolute https avatar URL (at most 2048 characters). */
+    public String imageUrl;
+    /** Alias of {@code imageUrl}; send one or the other. */
+    public String profileImageUrl;
 
     @JsonIgnore
     private final Map<String, Object> additionalFields = new LinkedHashMap<>();
@@ -28,6 +32,12 @@ public final class UpdateUserBody {
     public UpdateUserBody publicMetadata(Map<String, Object> v) { this.publicMetadata = v; return this; }
     public UpdateUserBody privateMetadata(Map<String, Object> v) { this.privateMetadata = v; return this; }
     public UpdateUserBody referralCode(String v) { this.referralCode = v; this.additionalFields.remove("referral_code"); return this; }
+
+    public UpdateUserBody imageUrl(String v) { this.imageUrl = v; this.additionalFields.remove("image_url"); return this; }
+    public UpdateUserBody profileImageUrl(String v) { this.profileImageUrl = v; return this; }
+
+    /** Remove the user's image ({@code image_url: null}). */
+    public UpdateUserBody clearImageUrl() { this.imageUrl = null; this.additionalFields.put("image_url", null); return this; }
 
     public UpdateUserBody externalId(String v) { this.externalId = v; this.additionalFields.remove("external_id"); return this; }
 

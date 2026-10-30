@@ -16,6 +16,10 @@ public final class ImportExportUserRow {
     public Object publicMetadata;
     public Object privateMetadata;
     public List<ImportExportExternalAccount> externalAccounts;
+    /** Absolute https avatar URL; applied on create and upsert. */
+    public String imageUrl;
+    /** Alias of {@code imageUrl}. */
+    public String profileImageUrl;
 
     public ImportExportUserRow() {
     }
@@ -32,4 +36,6 @@ public final class ImportExportUserRow {
     public ImportExportUserRow publicMetadata(Object v) { this.publicMetadata = v; return this; }
     public ImportExportUserRow privateMetadata(Object v) { this.privateMetadata = v; return this; }
     public ImportExportUserRow externalAccounts(List<ImportExportExternalAccount> v) { this.externalAccounts = v; return this; }
+    public ImportExportUserRow imageUrl(String v) { this.imageUrl = v; return this; }
+    public ImportExportUserRow profileImageUrl(String v) { this.profileImageUrl = v; return this; }
 }

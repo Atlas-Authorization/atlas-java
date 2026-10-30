@@ -1,5 +1,7 @@
 package net.atlasauth.atlas.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +28,9 @@ public final class CreateApiKeyBody {
     public Long expiresAt;
     /** Per-key spend caps, metered with {@code ApiKeys.recordUsage}. */
     public List<ApiKeyLimit> limits;
+    /** Bring over a key minted elsewhere by its hash: no secret is returned, and the original secret verifies. */
+    @JsonProperty("import")
+    public ApiKeyImport importKey;
 
     public CreateApiKeyBody() {
     }
@@ -41,6 +46,7 @@ public final class CreateApiKeyBody {
     public CreateApiKeyBody claims(Map<String, Object> v) { this.claims = v; return this; }
     public CreateApiKeyBody expiresAt(Long v) { this.expiresAt = v; return this; }
     public CreateApiKeyBody limits(List<ApiKeyLimit> v) { this.limits = v; return this; }
+    public CreateApiKeyBody importKey(ApiKeyImport v) { this.importKey = v; return this; }
 
     public CreateApiKeyBody expiresInSeconds(Long v) { this.expiresInSeconds = v; return this; }
     public CreateApiKeyBody prefix(String v) { this.prefix = v; return this; }

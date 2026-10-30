@@ -23,7 +23,7 @@
   <properties>
     <maven.compiler.release>17</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <atlas-java.version>1.18.0</atlas-java.version>
+    <atlas-java.version>1.19.0</atlas-java.version>
     <junit.version>5.10.2</junit.version>
   </properties>
 </project>

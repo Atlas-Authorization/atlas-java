@@ -255,6 +255,25 @@ WebhookSecret rotated = atlas.webhooks().endpoints().rotateSecret(endpointId,
 rotated.previousSecretExpiresAt();  // epoch ms, or null when the old secret already stopped
 ```
 
+### Application webhooks (1.19)
+
+Send your app's own events to endpoints your customers' organizations register. Atlas signs them with
+Standard Webhooks headers; receivers verify with `WebhookVerifier.verifyStandard`:
+
+```java
+atlas.appEvents().types().create(new AppEventTypeBody("call.completed").description("A call finished."));
+atlas.appEvents().endpoints().create("org_123",
+        new AppWebhookEndpointBody("https://hooks.example.com/atlas").enabledEvents(List.of("call.completed")));
+atlas.appEvents().publish(new PublishAppEventBody("org_123", "call.completed", Map.of("call_id", "c1")), "c1");
+
+// on the receiving side
+WebhookVerification v = WebhookVerifier.verifyStandard("whsec_...", rawBody, headers);
+```
+
+A one-time browser sign-in (support handoffs, end-to-end tests) replaces the deprecated sign-in tokens:
+`atlas.sessions().createBrowserTicket(userId, "https://app.example.com/", 60L).url()`. On development
+instances, `atlas.testing().createSignInUrl(userId, redirectUrl)` does the same for tests.
+
 ### Test and review accounts (1.18)
 
 Real Sign in with Atlas accounts confined to one app, for app-store reviewers, CI and demos. Needs a platform key with the

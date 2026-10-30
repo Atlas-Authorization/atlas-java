@@ -1,8 +1,33 @@
 # Changelog
 
-## Unreleased
+## 1.19.0 — 2026-10-30
 
 ### Added
+
+- **Application webhooks.** `atlas.appEvents()`: `publish` (body plus `Idempotency-Key`; `AppEvent` carries `idempotentReplay`, `deliveriesQueued`, `endpointIds`), `list` (by organization), `get`; `appEvents().types()` (the event catalog: `list`, `create`, `get`, `update`, `delete`, by `aet_` id or type name); `appEvents().endpoints()` (one organization's endpoints at `/v1/organizations/{id}/app_webhook_endpoints`: `list`, `create`, `get`, `update`, `delete`, `rotateSecret`, `revealSecret`, `test` (with `wait`), `deliveries`, `redeliver`, `replay`, and `appEventTypes` for the picker list at `/v1/organizations/{id}/app_event_types`). Typed `AppEvent`, `AppEventType`, `PublishAppEventBody`, `AppEventTypeBody`, `AppWebhookEndpointBody`. Organization members manage these endpoints with the `org:webhooks:manage` permission.
+- **Standard Webhooks verifier.** `WebhookVerifier.verifyStandard(secret, rawBody, headers[, nowSec, toleranceSec])` for application webhooks (`webhook-id`, `webhook-timestamp` in seconds, space-separated `v1,` signatures, `whsec_` base64 key). Returns the same `WebhookVerification`.
+- **Browser tickets.** `sessions().createBrowserTicket(userId[, redirectUrl, expiresInSeconds])` (`POST /v1/sessions` with `mode: "browser_ticket"`) returns a typed `BrowserTicket`. On development instances the ticket exchange is idempotent for 10 seconds for the same client.
+- **Sign-in URL for tests.** `testing().createSignInUrl(userId, redirectUrl[, expiresInSeconds])` (`POST /v1/testing/sign_in_url`, development instances only), typed `TestingSignInUrl`.
+- **Sign in with Atlas and hosted pages.** `instance().signInWithAtlas()` and `instance().hostedPages()` (`get`, `update`), typed `SignInWithAtlasSettings`, `HostedPagesSettings`, `UpdateSignInWithAtlasBody`, `UpdateHostedPagesBody` (with `clearSignInUrl()` etc.).
+- **Privacy integration.** `privacy().integration()` (`get`, `connect`): consent manager, orchestrator, completion webhook and executor key in one idempotent call; typed `PrivacyIntegration`, `PrivacyIntegrationConnectBody`. The executor key's secret is masked in `toString()`.
+- **Write warnings.** `InstanceUpdateResult.warnings()` (`InstanceUpdateWarning`: `code`, `message`, `field`, `hint`, `didYouMean`, `origin`) and `ReferralSettings.warnings()` (`ReferralSettingsWarning`) on PATCH.
+- **API keys.** `ApiKeyLimit.PERIOD_SECOND` and `PERIOD_MINUTE`; `ApiKeyVerification.effectiveScopes()`; `CreateApiKeyBody.importKey(ApiKeyImport)` (sent as `import`) brings over a key minted elsewhere by its hash. `DeclaredCookie` gains `purposes` and `lifetimeRange`.
+- **Users.** `imageUrl` and its alias `profileImageUrl` on `CreateUserBody`, `UpdateUserBody` (plus `clearImageUrl()`) and `ImportExportUserRow`; `User.externalAccounts()` with the new `UserExternalAccount` model.
+- **Webhook endpoints.** `CreateWebhookEndpointBody.active`.
+- **Managed email.** `ManagedEmail` gains `feedbackWebhookId` and `feedbackWebhookError`; `dns` now carries `status`, `last_error`, `attempts`, `next_check_at` and `started_at`. A create with `dns` may answer 202 while Atlas writes the records in the background.
+- `/v1/instance/secret_keys` is an alias of `/v1/secret_keys`; `secretKeys()` keeps using the latter.
+- API coverage list: the 27 new operations.
+- Compatibility: records that gained components keep their previous constructors.
+
+### Changed
+
+- `ManagedEmail.dnsResult` is no longer returned by the server (always null).
+
+### Deprecated
+
+- `signInTokens().create` and `revoke` (sunset 2027-04-01): use `sessions().createBrowserTicket`.
+
+### Added (full Backend API coverage)
 
 - **Backend API parity.** 452 further operations, each with typed request and response models (`Map` bodies for free-form shapes), an optional-parameter overload, and an `Idempotency-Key` overload on every POST. New resources on `AtlasClient`: `appCatalog`, `ldapServerClients`, `journeys`, `groups` (with `rules`), `migrations` (with `imports`), `managedGrants`, `leastPrivilege`, `deliveryHealth`, `flags`, `mfaFactors` (with `yubikeys` and `smartCardMappings`), `marketing`, `auditEventSchemas`, `directoryPullSources`, `relayAgents`, `oauthClientProfiles`, `passkeyApi`, `vc` (credential types, credentials, presentation requests), `listen`, `agentRegistration`, `agents`, `agentAccessRequests`, `workflows`, `pageTemplates`, `serviceConnectors`, `desktopMfa`, `identityVerification`, `iga` (entitlements, requests, grants, delegations, SoD, lifecycle, campaigns), `scimProvisioningPresets`, `vault` (with `keyProvider`), `connections` (with `oauthClients` and `webhooks`), `ssf` (streams, receivers), `networkZones`, `accessPolicies`, `abac` (policies, templates, links, schema, evaluation, AuthZEN), `resources` (types, assignments, checks), `orgRoleGrants`, `devices`, `authzDecisions`, `policyBundles`, `proxyApps` and `mcpGateways` (with `budgets`).
 - **Added to existing resources.** `users` (required actions, notes, history, minor status, guardians, search and saved views, links, device keys), `organizations` (webhook endpoints, connected apps, connection secret), `oauthClients` (app settings, trusted issuers, workload identity, consent and login requests, exchange policy, profile, delegated UI), `orgLdapConnections` (sync, relay, sync runs), `analytics` (funnels, reports, alert rules, API usage), `instance().integrations()`, `actions().calls`, `fga` and `openFga` (`listUsers`, `readChanges`), `attackProtection` and `riskBasedMfa` secrets, and `integrations().runCardAction`.
