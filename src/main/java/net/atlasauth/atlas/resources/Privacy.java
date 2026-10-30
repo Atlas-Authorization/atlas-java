@@ -3,6 +3,8 @@ package net.atlasauth.atlas.resources;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.atlasauth.atlas.http.Transport;
+import net.atlasauth.atlas.models.PrivacyIntegration;
+import net.atlasauth.atlas.models.PrivacyIntegrationConnectBody;
 import net.atlasauth.atlas.models.CreatePrivacyRequestBody;
 import net.atlasauth.atlas.models.PrivacyLookupBody;
 import net.atlasauth.atlas.models.PrivacyLookupResult;
@@ -21,10 +23,17 @@ import static net.atlasauth.atlas.http.Transport.enc;
 public final class Privacy {
     private final Transport t;
     private final Orchestrator orchestrator;
+    private final Integration integration;
 
     public Privacy(Transport t) {
         this.t = t;
         this.orchestrator = new Orchestrator(t);
+        this.integration = new Integration(t);
+    }
+
+    /** The consent manager, orchestrator, completion webhook and executor key in one view ({@code /v1/instance/privacy_integrations}). */
+    public Integration integration() {
+        return integration;
     }
 
     /** The instance's data-rights orchestrator connection. */
@@ -96,6 +105,31 @@ public final class Privacy {
         /** {@code DELETE /v1/instance/privacy_orchestrator} — Remove the connection. */
         public JsonNode delete() {
             return t.delete("/v1/instance/privacy_orchestrator", new TypeReference<>() {
+            });
+        }
+    }
+
+    /** {@code /v1/instance/privacy_integrations}. */
+    public static final class Integration {
+        private final Transport t;
+
+        Integration(Transport t) {
+            this.t = t;
+        }
+
+        /** {@code GET /v1/instance/privacy_integrations}. */
+        public PrivacyIntegration get() {
+            return t.get("/v1/instance/privacy_integrations", new TypeReference<>() {
+            });
+        }
+
+        /**
+         * {@code POST /v1/instance/privacy_integrations/connect} - wire the consent manager, orchestrator, completion
+         * webhook and executor key in one idempotent call. The executor key's {@code secret} comes back once; a re-run
+         * answers {@code executorKey.idempotentReplay}.
+         */
+        public PrivacyIntegration connect(PrivacyIntegrationConnectBody body) {
+            return t.post("/v1/instance/privacy_integrations/connect", body, new TypeReference<>() {
             });
         }
     }

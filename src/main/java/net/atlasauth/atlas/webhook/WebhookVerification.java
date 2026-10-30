@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * @param event the parsed envelope {@code {id, type, timestamp, instance_id, data}}; null unless verified
  * @param deliveryId the signed {@code atlas-id} header, the same on every retry of one event
  *     (deduplicate on it); null unless verified
- * @param timestamp the signed {@code atlas-timestamp} header (epoch ms); null unless verified
+ * @param timestamp the signed {@code atlas-timestamp} header (epoch ms; {@code webhook-timestamp} in seconds for {@code verifyStandard}); null unless verified
  */
 public record WebhookVerification(
         boolean verified, String reason, JsonNode event, String deliveryId, Long timestamp) {

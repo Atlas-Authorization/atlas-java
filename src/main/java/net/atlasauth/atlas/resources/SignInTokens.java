@@ -11,9 +11,8 @@ import static net.atlasauth.atlas.http.Transport.enc;
 /**
  * The {@code /v1/sign_in_tokens} resource — one-time sign-in tokens.
  *
- * @deprecated {@code POST /v1/sign_in_tokens} is deprecated (Sunset 2026-04-01);
- *     use {@code Sessions.create} ({@code POST /v1/sessions}), which mints a real
- *     redeemable session in one call.
+ * @deprecated The sign-in token API is deprecated (sunset 2027-04-01). Use
+ *     {@link Sessions#createBrowserTicket(String, String, Long)}: the same one-time ticket, plus a ready URL.
  */
 @Deprecated
 public final class SignInTokens {
@@ -24,16 +23,25 @@ public final class SignInTokens {
         this.t = t;
     }
 
+    /** @deprecated Use {@link Sessions#createBrowserTicket(String, String, Long)}. */
+    @Deprecated
     public SignInToken create(CreateSignInTokenBody body) {
         return create(body, null);
     }
 
+    /** @deprecated Use {@link Sessions#createBrowserTicket(String, String, Long)}. */
+    @Deprecated
     public SignInToken create(CreateSignInTokenBody body, String idempotencyKey) {
         return t.post("/v1/sign_in_tokens", body, idempotencyKey, new TypeReference<>() {
         });
     }
 
-    /** {@code POST /v1/sign_in_tokens/{id}/revoke} — DEPRECATED (Sunset 2027-04-01) — revoke an unused sign-in token before its 60s window elapses. */
+    /**
+     * {@code POST /v1/sign_in_tokens/{id}/revoke} - revoke an unused sign-in token before its 60s window elapses.
+     *
+     * @deprecated Sunset 2027-04-01. Use {@link Sessions#createBrowserTicket(String, String, Long)}.
+     */
+    @Deprecated
     public RevokedSignInToken revoke(String id) {
         return t.post("/v1/sign_in_tokens/" + enc(id) + "/revoke", null, new TypeReference<>() {
         });

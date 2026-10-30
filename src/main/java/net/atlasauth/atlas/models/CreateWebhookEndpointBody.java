@@ -8,6 +8,8 @@ public final class CreateWebhookEndpointBody extends WebhookEndpointSettingsBody
     public String url;
     /** Each entry is {@code "*"} or a known event name. */
     public List<String> enabledEvents;
+    /** False creates the endpoint switched off. Default true. */
+    public Boolean active;
 
     public CreateWebhookEndpointBody() {
     }
@@ -21,4 +23,5 @@ public final class CreateWebhookEndpointBody extends WebhookEndpointSettingsBody
 
     public CreateWebhookEndpointBody url(String v) { this.url = v; return this; }
     public CreateWebhookEndpointBody enabledEvents(List<String> v) { this.enabledEvents = v; return this; }
+    public CreateWebhookEndpointBody active(Boolean v) { this.active = v; return this; }
 }

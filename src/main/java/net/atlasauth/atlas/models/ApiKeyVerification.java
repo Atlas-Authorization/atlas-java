@@ -30,7 +30,13 @@ public record ApiKeyVerification(
         /** With code insufficient_scope: the required scopes the key lacks. */ java.util.List<String> missingScopes,
         /** With code rate_limited: when to retry (ms). */ Long retryAfterMs,
         /** Uses left after this verify; null = unlimited. */ Long remaining,
-        /** When the key expires (epoch ms), or null. */ Long expiresAt) {
+        /** When the key expires (epoch ms), or null. */ Long expiresAt,
+        /** The held scopes expanded through the instance scope implications ({@code calls:write} implies {@code calls:read}); {@code requiredScopes} is checked against this set. */ List<String> effectiveScopes) {
+
+    /** The 1.18 shape, without {@code effectiveScopes}. */
+    public ApiKeyVerification(String object, boolean valid, String id, String subjectType, String subjectId, Map<String, Object> claims, Long lastUsedAt, String name, List<String> scopes, Map<String, Object> constraints, List<ApiKeyLimit> limits, List<ApiKeyLimitState> usage, String code, java.util.List<String> missingScopes, Long retryAfterMs, Long remaining, Long expiresAt) {
+        this(object, valid, id, subjectType, subjectId, claims, lastUsedAt, name, scopes, constraints, limits, usage, code, missingScopes, retryAfterMs, remaining, expiresAt, null);
+    }
 
     /** The 1.10 shape, before the 1.11 fields. */
     public ApiKeyVerification(String object, boolean valid, String id, String subjectType, String subjectId, Map<String, Object> claims, Long lastUsedAt, String name, List<String> scopes, Map<String, Object> constraints, List<ApiKeyLimit> limits, List<ApiKeyLimitState> usage) {

@@ -24,6 +24,10 @@ public final class CreateUserBody {
     public CreateUserReferral referral;
     /** The user's own referral code, unique per instance (409 {@code REFERRAL_CODE_TAKEN}). */
     public String referralCode;
+    /** Absolute https avatar URL (at most 2048 characters). */
+    public String imageUrl;
+    /** Alias of {@code imageUrl}; send one or the other. */
+    public String profileImageUrl;
 
     public CreateUserBody() {
     }
@@ -43,4 +47,6 @@ public final class CreateUserBody {
     public CreateUserBody notify(Boolean v) { this.notify = v; return this; }
     public CreateUserBody referral(CreateUserReferral v) { this.referral = v; return this; }
     public CreateUserBody referralCode(String v) { this.referralCode = v; return this; }
+    public CreateUserBody imageUrl(String v) { this.imageUrl = v; return this; }
+    public CreateUserBody profileImageUrl(String v) { this.profileImageUrl = v; return this; }
 }

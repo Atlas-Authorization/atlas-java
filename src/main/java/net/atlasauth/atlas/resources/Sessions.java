@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.atlasauth.atlas.Params;
 import net.atlasauth.atlas.http.Transport;
+import net.atlasauth.atlas.models.BrowserTicket;
 import net.atlasauth.atlas.models.IntegrationToken;
 import net.atlasauth.atlas.models.ListPage;
 import net.atlasauth.atlas.models.MintedSession;
@@ -28,6 +29,8 @@ public final class Sessions {
     /**
      * {@code POST /v1/sessions} — mint a session for a user without the sign-in
      * flow. Returns the bearer jwt + refresh token in-body. Refused for a banned user.
+     * This is {@code mode: "session"} (the default); for {@code mode: "browser_ticket"} see
+     * {@link #createBrowserTicket(String, String, Long)}.
      */
     public MintedSession create(String userId) {
         return create(userId, null);
@@ -131,6 +134,25 @@ public final class Sessions {
         if (actorSub != null) {
             body.set("actor", Map.of("sub", actorSub));
         }
+        return t.post("/v1/sessions", body.map(), new TypeReference<>() {
+        });
+    }
+
+    /** {@link #createBrowserTicket(String, String, Long)} with the default lifetime and no redirect URL. */
+    public BrowserTicket createBrowserTicket(String userId) {
+        return createBrowserTicket(userId, null, null);
+    }
+
+    /**
+     * {@code POST /v1/sessions} with {@code mode: "browser_ticket"} - a one-time ticket that signs a BROWSER in as
+     * the user (support handoffs, end-to-end tests). No session is minted here. {@code redirectUrl} (on an allowed
+     * origin) makes the response carry a ready {@code url}; {@code expiresInSeconds} is 1 to 300 (default 60). The
+     * successor of the deprecated sign-in tokens. On development instances the ticket exchange is idempotent for
+     * 10 seconds for the same client; elsewhere a ticket redeems exactly once.
+     */
+    public BrowserTicket createBrowserTicket(String userId, String redirectUrl, Long expiresInSeconds) {
+        Params body = Params.of().set("user_id", userId).set("mode", "browser_ticket")
+                .set("redirect_url", redirectUrl).set("expires_in_seconds", expiresInSeconds);
         return t.post("/v1/sessions", body.map(), new TypeReference<>() {
         });
     }

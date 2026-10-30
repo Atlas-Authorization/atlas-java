@@ -130,6 +130,7 @@ import net.atlasauth.atlas.resources.PartnerLinks;
 import net.atlasauth.atlas.resources.PartnerPlatforms;
 import net.atlasauth.atlas.resources.AtlasIdGrants;
 import net.atlasauth.atlas.resources.Privacy;
+import net.atlasauth.atlas.resources.AppEvents;
 import net.atlasauth.atlas.resources.Integrations;
 import net.atlasauth.atlas.resources.Entitlements;
 import net.atlasauth.atlas.resources.Notices;
@@ -301,6 +302,7 @@ public final class AtlasClient {
     private final PartnerPlatforms partnerPlatforms;
     private final AtlasIdGrants atlasIdGrants;
     private final Privacy privacy;
+    private final AppEvents appEvents;
     private final Integrations integrations;
     private final Entitlements entitlements;
     private final Notices notices;
@@ -464,6 +466,7 @@ public final class AtlasClient {
         this.partnerPlatforms = new PartnerPlatforms(transport);
         this.atlasIdGrants = new AtlasIdGrants(transport);
         this.privacy = new Privacy(transport);
+        this.appEvents = new AppEvents(transport);
         this.integrations = new Integrations(transport);
         this.entitlements = new Entitlements(transport);
         this.notices = new Notices(transport);
@@ -1070,6 +1073,11 @@ public final class AtlasClient {
     /** The data-rights executor protocol ({@code /v1/privacy}) and the instance's orchestrator connection. */
     public Privacy privacy() {
         return privacy;
+    }
+
+    /** Application webhooks: publish your app's own events to the endpoints your customers' organizations register. */
+    public AppEvents appEvents() {
+        return appEvents;
     }
 
     /** The routes an integrated service calls: verify errors, the agent-sidebar card, public instance metadata. */

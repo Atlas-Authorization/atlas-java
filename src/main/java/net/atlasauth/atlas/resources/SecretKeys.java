@@ -13,7 +13,7 @@ import static net.atlasauth.atlas.http.Transport.enc;
 /**
  * {@code /v1/secret_keys} — scoped instance secret keys: mint one per service with only the scopes it needs,
  * an owner, an expiry and an IP allowlist; rotate with an overlap; revoke at once. The secret is in the
- * create / rotate response only.
+ * create / rotate response only. {@code /v1/instance/secret_keys} is an alias of the same routes.
  */
 public final class SecretKeys {
     private final Transport t;
