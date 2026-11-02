@@ -29,6 +29,20 @@ public final class CreateOAuthClientBody {
      * redirects straight back (with {@code state}) without the confirmation page.
      */
     public Boolean skipLogoutConfirmation;
+    /**
+     * First-party clients only (422 otherwise). Each refresh keeps the Atlas session it came
+     * from alive, and once that session has ended the refresh fails ({@code invalid_grant}).
+     */
+    public Boolean refreshTouchesSession;
+    /**
+     * Write-only: also add the redirect URIs' origins to the instance's {@code allowed_origins}
+     * (append only; the response lists them in {@code addedOrigins}).
+     */
+    public Boolean addRedirectOrigins;
+    /** Your own secret (32-256 random printable characters); omit and Atlas generates one (then {@code clientSecretReveal} is set). */
+    public String clientSecret;
+    /** Issue no authorization code for a user whose primary email is not verified. Default false. */
+    public Boolean requireVerifiedEmail;
     /** jwt or opaque; clear it with {@code set("access_token_format", null)}. */
     public String accessTokenFormat;
     /** Replaces the token lifetime overrides; clear them with {@code set("token_lifetimes", null)}. */
@@ -60,6 +74,10 @@ public final class CreateOAuthClientBody {
     public CreateOAuthClientBody logoUrl(String v) { this.logoUrl = v; return this; }
     public CreateOAuthClientBody firstParty(Boolean v) { this.firstParty = v; return this; }
     public CreateOAuthClientBody skipLogoutConfirmation(Boolean v) { this.skipLogoutConfirmation = v; return this; }
+    public CreateOAuthClientBody refreshTouchesSession(Boolean v) { this.refreshTouchesSession = v; return this; }
+    public CreateOAuthClientBody addRedirectOrigins(Boolean v) { this.addRedirectOrigins = v; return this; }
+    public CreateOAuthClientBody clientSecret(String v) { this.clientSecret = v; return this; }
+    public CreateOAuthClientBody requireVerifiedEmail(Boolean v) { this.requireVerifiedEmail = v; return this; }
 
     public CreateOAuthClientBody secretExpiresInSeconds(Long v) { this.secretExpiresInSeconds = v; return this; }
     public CreateOAuthClientBody subjectType(String v) { this.subjectType = v; return this; }

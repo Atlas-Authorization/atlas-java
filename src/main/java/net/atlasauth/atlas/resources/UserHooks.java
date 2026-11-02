@@ -14,7 +14,9 @@ import net.atlasauth.atlas.models.UpdateBeforeUserCreateHookBody;
  * from a self-service sign-up, it sends your endpoint a signed {@code POST} (the webhook headers;
  * verify it with {@link net.atlasauth.atlas.webhook.WebhookVerifier}) of type {@code user.before_create}, with
  * {@code data} {@code {user, strategy, referral}}, and stamps the {@code external_id} and metadata you
- * answer. A slow or failing hook never blocks a sign-up. The signing secret is write-only.
+ * answer, or refuse the sign-up with {@code {deny: true, reason}} (or HTTP 403): the person gets 403
+ * {@code SIGN_UP_DENIED} and no user is kept. A slow or failing hook does not block a sign-up unless the
+ * hook is set {@code failClosed}. The signing secret is write-only.
  */
 public final class UserHooks {
     private static final String PATH = "/v1/instance/hooks/before_user_create";

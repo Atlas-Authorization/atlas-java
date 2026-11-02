@@ -14,6 +14,8 @@ import net.atlasauth.atlas.models.ImportedOAuthClient;
 import net.atlasauth.atlas.models.ListPage;
 import net.atlasauth.atlas.models.OAuthClient;
 import net.atlasauth.atlas.models.OAuthClientGrant;
+import net.atlasauth.atlas.models.OAuthClientLogout;
+import net.atlasauth.atlas.models.OAuthClientSecretReveal;
 import net.atlasauth.atlas.models.OAuthClientWithSecret;
 import net.atlasauth.atlas.models.RotateOAuthClientSecretBody;
 import net.atlasauth.atlas.models.UpdateOAuthClientBody;
@@ -86,6 +88,15 @@ public final class OAuthClients {
         });
     }
 
+    /**
+     * {@code POST /v1/oauth_clients/{id}/secret/reveal} — The secret the latest create or rotate generated,
+     * once more: within 10 minutes, a single time, while it is still current (410 afterwards: rotate).
+     */
+    public OAuthClientSecretReveal revealSecret(String id) {
+        return t.post("/v1/oauth_clients/" + enc(id) + "/secret/reveal", null, new TypeReference<>() {
+        });
+    }
+
     /** Returns {@code {object,id,deleted,note}}. */
     public JsonNode delete(String id) {
         return t.delete("/v1/oauth_clients/" + enc(id), new TypeReference<>() {
@@ -101,6 +112,23 @@ public final class OAuthClients {
         return t.get("/v1/oauth_clients/" + enc(id) + "/backchannel_deliveries",
                 Params.of().set("limit", limit).set("starting_after", startingAfter).map(), new TypeReference<>() {
                 });
+    }
+
+    /** Same as {@link #logout(String, String, String)} without an idempotency key. */
+    public OAuthClientLogout logout(String id, String sid) {
+        return logout(id, sid, null);
+    }
+
+    /**
+     * {@code POST /v1/oauth_clients/{id}/logout} — sign a user out of this app AND of Atlas in one
+     * call: revokes this client's grants under {@code sid} (the id_token's {@code sid}) and the
+     * Atlas session itself; every other app gets a back-channel logout. {@code id} is the client
+     * id or its public {@code client_id}. Needs {@code oauth_clients:write} and
+     * {@code sessions:write}; no browser redirect to {@code /oauth2/logout} is needed afterwards.
+     */
+    public OAuthClientLogout logout(String id, String sid, String idempotencyKey) {
+        return t.post("/v1/oauth_clients/" + enc(id) + "/logout", Params.of("sid", sid).map(), idempotencyKey, new TypeReference<>() {
+        });
     }
 
     /** {@code POST /v1/oauth_clients/{id}/backchannel_logout/test} — Send a test back-channel logout now and return what the receiver answered. */

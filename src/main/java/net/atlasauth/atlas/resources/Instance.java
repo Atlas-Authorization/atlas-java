@@ -19,6 +19,8 @@ import net.atlasauth.atlas.models.InstanceConfig;
 import net.atlasauth.atlas.models.InstanceUpdateResult;
 import net.atlasauth.atlas.models.IntegrationToken;
 import net.atlasauth.atlas.models.Preflight;
+import net.atlasauth.atlas.models.ListPage;
+import net.atlasauth.atlas.models.PreflightAck;
 import net.atlasauth.atlas.models.SetIntegrationBody;
 import net.atlasauth.atlas.models.UpdateInstanceBody;
 import net.atlasauth.atlas.models.HostedPagesSettings;
@@ -159,6 +161,32 @@ public final class Instance {
      */
     public Preflight preflight(String minSeverity, Boolean includeSuppressed) {
         return t.get("/v1/instance/preflight", Params.of("min_severity", minSeverity).set("include_suppressed", includeSuppressed).map(), new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code GET /v1/instance/preflight/acks} — Every preflight acknowledgement, lapsed ones included
+     * ({@code active} false).
+     */
+    public ListPage<PreflightAck> listPreflightAcks() {
+        return t.get("/v1/instance/preflight/acks", new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code PUT /v1/instance/preflight/acks/{code}} — Acknowledge a known, accepted warning or info finding:
+     * it is still listed by {@link #preflight(String, Boolean)}, with {@code acknowledged}, and stops counting.
+     * {@code reason} is required (at most 500 characters); {@code expiresAt} is epoch ms (Long) or ISO 8601
+     * (String) in the future, or null for no expiry. A code that can be an error is refused (422).
+     */
+    public PreflightAck acknowledgePreflight(String code, String reason, Object expiresAt) {
+        return t.put("/v1/instance/preflight/acks/" + enc(code), Params.of("reason", reason).set("expires_at", expiresAt).map(), new TypeReference<>() {
+        });
+    }
+
+    /** {@code DELETE /v1/instance/preflight/acks/{code}} — Remove an acknowledgement: the findings count again. Returns {@code {object,code,deleted}}. */
+    public JsonNode deletePreflightAck(String code) {
+        return t.delete("/v1/instance/preflight/acks/" + enc(code), new TypeReference<>() {
         });
     }
 

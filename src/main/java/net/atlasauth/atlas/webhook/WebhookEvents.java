@@ -134,6 +134,12 @@ public final class WebhookEvents {
     /** A user joined / left a SCIM group ({@code data}: group_id, user_id, organization_id). */
     public static final String SCIM_GROUP_MEMBER_ADDED = "scim_group.member_added";
     public static final String SCIM_GROUP_MEMBER_REMOVED = "scim_group.member_removed";
+    /** A session ended on its own: {@code data.reason} is {@code idle_expired} or {@code expired} (its absolute lifetime ran out). */
+    public static final String SESSION_EXPIRED = "session.expired";
+    /** An instance invitation ({@code POST /v1/invitations}) was created / accepted (data.user_id is the new user) / revoked. */
+    public static final String INVITATION_CREATED = "invitation.created";
+    public static final String INVITATION_ACCEPTED = "invitation.accepted";
+    public static final String INVITATION_REVOKED = "invitation.revoked";
 
     /** Scope that lets a key reveal webhook signing secrets. */
     public static final String SCOPE_WEBHOOKS_REVEAL = "webhooks:reveal";

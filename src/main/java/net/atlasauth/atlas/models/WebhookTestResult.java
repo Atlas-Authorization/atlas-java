@@ -18,10 +18,17 @@ public record WebhookTestResult(
         /** Always {@code webhook.test}. */
         String eventType,
         /** Why the attempt failed: non_2xx, redirect, timeout, tls, dns, connection_refused, network or url_blocked; null on success. */
-        String errorKind) {
+        String errorKind,
+        /** The exact URL the attempt was POSTed to. */
+        String url) {
+
+    /** The 1.20 shape, without url. */
+    public WebhookTestResult(String object, String deliveryId, String eventId, String status, Integer httpStatus, Long latencyMs, String responseSnippet, String error, String signatureHeaderSent, boolean willRetry, String eventType, String errorKind) {
+        this(object, deliveryId, eventId, status, httpStatus, latencyMs, responseSnippet, error, signatureHeaderSent, willRetry, eventType, errorKind, null);
+    }
 
     /** The 1.19 shape, without eventType and errorKind. */
     public WebhookTestResult(String object, String deliveryId, String eventId, String status, Integer httpStatus, Long latencyMs, String responseSnippet, String error, String signatureHeaderSent, boolean willRetry) {
-        this(object, deliveryId, eventId, status, httpStatus, latencyMs, responseSnippet, error, signatureHeaderSent, willRetry, null, null);
+        this(object, deliveryId, eventId, status, httpStatus, latencyMs, responseSnippet, error, signatureHeaderSent, willRetry, null, null, null);
     }
 }

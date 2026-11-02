@@ -22,14 +22,14 @@ Maven:
 <dependency>
   <groupId>net.atlasauth</groupId>
   <artifactId>atlas-java</artifactId>
-  <version>1.20.0</version>
+  <version>1.21.0</version>
 </dependency>
 ```
 
 Gradle:
 
 ```kotlin
-implementation("net.atlasauth:atlas-java:1.20.0")
+implementation("net.atlasauth:atlas-java:1.21.0")
 ```
 
 ## The management client
@@ -198,6 +198,28 @@ atlas.design().update(new AtlasDesign().logo(new AtlasDesignLogo().assetId(logo.
 - `CreateOAuthClientBody` / `UpdateOAuthClientBody.skipLogoutConfirmation(true)` (first-party
   clients only) lets logout from that client with an exactly registered post-logout redirect
   URI return straight to your app without the confirmation page.
+- `atlas.oauthClients().logout(clientId, sid)` signs a user out of your app and of Atlas from
+  your backend (`sid` is the id_token's `sid`): it revokes the client's grants under that sid,
+  ends the Atlas session and queues a back-channel logout to every other app signed in through
+  it, with no browser redirect to `/oauth2/logout` (needs `oauth_clients:write` and
+  `sessions:write`). The result's `session()` is `revoked` or `already_ended`.
+- `refreshTouchesSession(true)` (first-party) keeps the Atlas session alive on every refresh and
+  makes the refresh fail (`invalid_grant`) once that session has ended. `addRedirectOrigins(true)`
+  on create / update also adds the redirect URIs' origins to `allowed_origins`; the response's
+  `addedOrigins()` lists them.
+- A generated client secret can be fetched once more within 10 minutes:
+  `atlas.oauthClients().revealSecret(id)` (the create / rotate answer's `clientSecretReveal()`
+  names the path and deadline). Or choose it: `CreateOAuthClientBody.clientSecret(...)`.
+  `requireVerifiedEmail(true)` issues no authorization code for a user whose email is unverified.
+- Preflight: `atlas.instance().acknowledgePreflight(code, reason, expiresAt)` marks a warning or
+  info finding as known and accepted (it is still listed, with `acknowledged()`, and stops
+  counting); `listPreflightAcks()` and `deletePreflightAck(code)` manage them. Errors cannot be
+  acknowledged.
+- `CreateAppInvitationBody.expiresInDays(30)` or `expiresAt(...)` sets an invitation's expiry;
+  `ListPlatformAppsParams.name(...)` / `namePrefix(...)` / `externalRef(...)` find apps, with
+  `limit` / `startingAfter` to page. `UpdateBeforeUserCreateHookBody.failClosed(true)` refuses
+  a sign-up when the hook fails. Password imports also accept `password_hash_algorithm`
+  `scrypt_node` / `scrypt_django` (with `password_hash_params.salt_encoding`).
 - `atlas.oauthProviders().list(List.of("google"), true)` filters the catalog; the
   upsert body takes `displayName`, `iconUrl`, `mode`, and wallet settings
   (`UpsertOAuthProviderBody.siwe(domain, chainIds, rpcUrl)`, `siws(...)`, `siwf(...)`).

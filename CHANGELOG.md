@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.21.0 — 2026-11-02
+
+### Added
+
+- **Back-channel sign-out from your backend.** `oauthClients().logout(id, sid[, idempotencyKey])` (`POST /v1/oauth_clients/{id}/logout`) signs the user out of your app and of Atlas in one call; typed `OAuthClientLogout` (`session`: `revoked` / `already_ended`, `grantsRevoked`, `backchannelLogouts`).
+- OAuth clients: `refreshTouchesSession` (first-party; a refresh keeps the Atlas session alive and fails once it has ended) on `OAuthClient`, `OAuthClientWithSecret`, `CreateOAuthClientBody` and `UpdateOAuthClientBody`; write-only `addRedirectOrigins` on the create and update bodies, with the response's `addedOrigins`. The earlier record constructors still work.
+- `instanceSecurity().setCaptchaSecret(secret, provider, siteKey)`: with a site key, storing the secret and switching `auth_config.captcha` to that provider happen in one atomic write; the answer has `switched` and `captcha`.
+- **Preflight acknowledgements.** `instance().listPreflightAcks()`, `acknowledgePreflight(code, reason, expiresAt)` and `deletePreflightAck(code)` (`/v1/instance/preflight/acks`), typed `PreflightAck`; `PreflightFinding` gains `acknowledged` (`PreflightAckSummary`).
+- **OAuth client secrets.** `oauthClients().revealSecret(id)` (`POST /v1/oauth_clients/{id}/secret/reveal`, typed `OAuthClientSecretReveal`); `CreateOAuthClientBody.clientSecret` (your own secret); `OAuthClientWithSecret.clientSecretReveal` (`path`, `expiresAt`). `requireVerifiedEmail` on `OAuthClient`, `OAuthClientWithSecret` and both bodies.
+- `User.status` (`active` / `suspended` / `banned`). `WebhookTestResult.url` and `WebhookDeliveryQueued.url`. `MessagingTestResult` gains `accepted`, `provider`, `providerMessageId` and `providerResponse`.
+- `CreateAppInvitationBody.expiresAt` (epoch ms or ISO 8601) and `expiresInDays`. `ListPlatformAppsParams` gains `name`, `namePrefix`, `externalRef`, `limit` and `startingAfter`.
+- `BeforeUserCreateHook.failClosed` and `UpdateBeforeUserCreateHookBody.failClosed`; the hook test answer gains `deny` and `reason`.
+- New `WebhookEvents` constants: `SESSION_EXPIRED`, `INVITATION_CREATED`, `INVITATION_ACCEPTED`, `INVITATION_REVOKED`.
+- Password imports: `password_hash_algorithm` also takes `scrypt_node` and `scrypt_django`, and scrypt `password_hash_params` take `salt_encoding` (free-form fields, no SDK change).
+- The earlier record constructors still work.
+
 ## 1.20.0 — 2026-11-01
 
 ### Added

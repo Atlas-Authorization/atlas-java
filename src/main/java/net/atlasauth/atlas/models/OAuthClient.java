@@ -41,7 +41,15 @@ public record OAuthClient(
         /** This client's token lifetime overrides (seconds); a null field is inherited. */ OAuthTokenLifetimes tokenLifetimes,
         /** Provisioning tags (strings, numbers and booleans). */ Map<String, Object> metadata,
         /** Your idempotent-create key. */ String externalRef,
-        /** True on a create that sent an {@code external_ref} and got the existing object back (200, no secret). */ Boolean idempotentReplay) {
+        /** True on a create that sent an {@code external_ref} and got the existing object back (200, no secret). */ Boolean idempotentReplay,
+        /** First-party only: each refresh keeps the Atlas session alive, and fails ({@code invalid_grant}) once it has ended. */ boolean refreshTouchesSession,
+        /** Create and update responses only: the origins the write added to the instance's {@code allowed_origins}. */ List<String> addedOrigins,
+        /** No authorization code is issued for a user whose primary email is not verified. */ boolean requireVerifiedEmail) {
+    /** The 1.20 shape, before {@code refreshTouchesSession} and {@code addedOrigins}. */
+    public OAuthClient(String object, String id, String clientId, String name, String logoUrl, List<String> redirectUris, List<String> allowedScopes, List<String> grantTypes, String tokenEndpointAuthMethod, String secretPrefix, boolean isPublic, boolean firstParty, long createdAt, long updatedAt, boolean skipLogoutConfirmation, Long previousSecretExpiresAt, boolean disabled, boolean requirePkce, String subjectType, String sectorIdentifierUri, Long clientSecretExpiresAt, String accessTokenFormat, OAuthTokenLifetimes tokenLifetimes, Map<String, Object> metadata, String externalRef, Boolean idempotentReplay) {
+        this(object, id, clientId, name, logoUrl, redirectUris, allowedScopes, grantTypes, tokenEndpointAuthMethod, secretPrefix, isPublic, firstParty, createdAt, updatedAt, skipLogoutConfirmation, previousSecretExpiresAt, disabled, requirePkce, subjectType, sectorIdentifierUri, clientSecretExpiresAt, accessTokenFormat, tokenLifetimes, metadata, externalRef, idempotentReplay, false, null, false);
+    }
+
     /** The shape before the provisioning fields ({@code metadata}, {@code externalRef}, {@code idempotentReplay}). */
     public OAuthClient(String object, String id, String clientId, String name, String logoUrl, List<String> redirectUris, List<String> allowedScopes, List<String> grantTypes, String tokenEndpointAuthMethod, String secretPrefix, boolean isPublic, boolean firstParty, long createdAt, long updatedAt, boolean skipLogoutConfirmation, Long previousSecretExpiresAt, boolean disabled, boolean requirePkce, String subjectType, String sectorIdentifierUri, Long clientSecretExpiresAt, String accessTokenFormat, OAuthTokenLifetimes tokenLifetimes) {
         this(object, id, clientId, name, logoUrl, redirectUris, allowedScopes, grantTypes, tokenEndpointAuthMethod, secretPrefix, isPublic, firstParty, createdAt, updatedAt, skipLogoutConfirmation, previousSecretExpiresAt, disabled, requirePkce, subjectType, sectorIdentifierUri, clientSecretExpiresAt, accessTokenFormat, tokenLifetimes, null, null, null);

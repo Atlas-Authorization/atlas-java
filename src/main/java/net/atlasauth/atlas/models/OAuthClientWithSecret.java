@@ -40,7 +40,22 @@ public record OAuthClientWithSecret(
         /** With an `X-Secret-Recipient`: the secret sealed to it (then the plaintext field is absent). */ String sealedSecret,
         /** With an `X-Secret-Recipient`: the client secret sealed to it. */ String sealedClientSecret,
         /** With an `X-Secret-Recipient`: the webhook secret sealed to it. */ String sealedWebhookSecret,
-        /** Names the fields that arrived sealed. */ SecretsSealed secretsSealed) {
+        /** Names the fields that arrived sealed. */ SecretsSealed secretsSealed,
+        /** See {@link OAuthClient#refreshTouchesSession()}. */ boolean refreshTouchesSession,
+        /** The origins this create added to the instance's {@code allowed_origins} ({@code add_redirect_origins}, or automatically for an integration's sign-in client). */ List<String> addedOrigins,
+        /** See {@link OAuthClient#requireVerifiedEmail()}. */ boolean requireVerifiedEmail,
+        /** Where and until when a generated secret can be fetched once more ({@code oauthClients().revealSecret(id)}); null for a chosen secret. */ SecretReveal clientSecretReveal) {
+
+    /** {@code client_secret_reveal}: POST {@code path} within 10 minutes (until {@code expiresAt}, epoch ms) to see the secret once more. */
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record SecretReveal(String path, long expiresAt) {
+    }
+
+    /** The 1.20 shape, before {@code refreshTouchesSession} and {@code addedOrigins}. */
+    public OAuthClientWithSecret(String object, String id, String clientId, String name, String logoUrl, List<String> redirectUris, List<String> allowedScopes, List<String> grantTypes, String tokenEndpointAuthMethod, String secretPrefix, boolean isPublic, boolean firstParty, long createdAt, long updatedAt, String clientSecret, String note, boolean skipLogoutConfirmation, Long previousSecretExpiresAt, Integer overlapSeconds, Map<String, Object> metadata, String externalRef, Boolean idempotentReplay, String sealedSecret, String sealedClientSecret, String sealedWebhookSecret, SecretsSealed secretsSealed) {
+        this(object, id, clientId, name, logoUrl, redirectUris, allowedScopes, grantTypes, tokenEndpointAuthMethod, secretPrefix, isPublic, firstParty, createdAt, updatedAt, clientSecret, note, skipLogoutConfirmation, previousSecretExpiresAt, overlapSeconds, metadata, externalRef, idempotentReplay, sealedSecret, sealedClientSecret, sealedWebhookSecret, secretsSealed, false, null, false, null);
+    }
+
     /** The shape before sealedSecret, sealedClientSecret, sealedWebhookSecret, secretsSealed. */
     public OAuthClientWithSecret(String object, String id, String clientId, String name, String logoUrl, List<String> redirectUris, List<String> allowedScopes, List<String> grantTypes, String tokenEndpointAuthMethod, String secretPrefix, boolean isPublic, boolean firstParty, long createdAt, long updatedAt, String clientSecret, String note, boolean skipLogoutConfirmation, Long previousSecretExpiresAt, Integer overlapSeconds, Map<String, Object> metadata, String externalRef, Boolean idempotentReplay) {
         this(object, id, clientId, name, logoUrl, redirectUris, allowedScopes, grantTypes, tokenEndpointAuthMethod, secretPrefix, isPublic, firstParty, createdAt, updatedAt, clientSecret, note, skipLogoutConfirmation, previousSecretExpiresAt, overlapSeconds, metadata, externalRef, idempotentReplay, null, null, null, null);

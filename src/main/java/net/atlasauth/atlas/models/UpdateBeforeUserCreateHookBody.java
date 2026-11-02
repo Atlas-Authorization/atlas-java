@@ -19,6 +19,8 @@ public final class UpdateBeforeUserCreateHookBody {
     public String signingSecret;
     /** 500-5000. */
     public Integer timeoutMs;
+    /** Refuse the sign-up (403 {@code SIGN_UP_DENIED}) when the hook times out, errors or answers badly. Default false: the sign-up goes on. */
+    public Boolean failClosed;
 
     @JsonIgnore
     private final Map<String, Object> additionalFields = new LinkedHashMap<>();
@@ -30,6 +32,7 @@ public final class UpdateBeforeUserCreateHookBody {
     public UpdateBeforeUserCreateHookBody url(String v) { this.url = v; return this; }
     public UpdateBeforeUserCreateHookBody signingSecret(String v) { this.signingSecret = v; return this; }
     public UpdateBeforeUserCreateHookBody timeoutMs(Integer v) { this.timeoutMs = v; return this; }
+    public UpdateBeforeUserCreateHookBody failClosed(Boolean v) { this.failClosed = v; return this; }
 
     /** Clear a field by its wire name: it is sent as {@code null}. */
     public UpdateBeforeUserCreateHookBody clear(String key) { this.additionalFields.put(key, null); return this; }

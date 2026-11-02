@@ -50,7 +50,17 @@ public final class InstanceSecurity {
      * without a site key and secret is refused with 422 {@code CAPTCHA_KEYS_REQUIRED}.
      */
     public JsonNode setCaptchaSecret(String secret, String provider) {
-        Map<String, Object> body = Params.of("secret", secret).set("provider", provider).map();
+        return setCaptchaSecret(secret, provider, null);
+    }
+
+    /**
+     * Store a captcha provider secret and, with {@code siteKey} (the provider's public site key),
+     * switch {@code auth_config.captcha} to {@code provider} in the same atomic write (e.g. from
+     * the built-in {@code atlas} captcha to Turnstile). The answer then has {@code switched: true}
+     * and the resulting {@code captcha} config. A null {@code siteKey} stores the secret only.
+     */
+    public JsonNode setCaptchaSecret(String secret, String provider, String siteKey) {
+        Map<String, Object> body = Params.of("secret", secret).set("provider", provider).set("site_key", siteKey).map();
         return t.put("/v1/instance/captcha_secret", body, new TypeReference<>() {
         });
     }

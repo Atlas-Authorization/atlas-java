@@ -14,6 +14,12 @@ public record BeforeUserCreateHookTest(
 
     /** What the hook answered. */
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record Answer(String externalId, Map<String, Object> publicMetadata, boolean privateMetadataSet, Map<String, Object> unsafeMetadata) {
+    public record Answer(String externalId, Map<String, Object> publicMetadata, boolean privateMetadataSet, Map<String, Object> unsafeMetadata,
+                         /** True when the hook denied the sample sign-up. */ Boolean deny,
+                         /** The hook's reason for a denial. */ String reason) {
+        /** The 1.20 shape, without {@code deny} and {@code reason}. */
+        public Answer(String externalId, Map<String, Object> publicMetadata, boolean privateMetadataSet, Map<String, Object> unsafeMetadata) {
+            this(externalId, publicMetadata, privateMetadataSet, unsafeMetadata, null, null);
+        }
     }
 }

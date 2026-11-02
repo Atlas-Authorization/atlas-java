@@ -11,7 +11,13 @@ public record BeforeUserCreateHook(
         boolean signingSecretSet,
         /** 500-5000, default 3000. */ int timeoutMs,
         /** The last call Atlas made to the hook. */ LastCall lastCall,
-        Long updatedAt) {
+        Long updatedAt,
+        /** Refuse the sign-up when the hook times out, errors or answers badly. Default false. */ boolean failClosed) {
+
+    /** The 1.20 shape, without {@code failClosed}. */
+    public BeforeUserCreateHook(String object, boolean enabled, String url, boolean signingSecretSet, int timeoutMs, LastCall lastCall, Long updatedAt) {
+        this(object, enabled, url, signingSecretSet, timeoutMs, lastCall, updatedAt, false);
+    }
 
     /** The last call Atlas made to the hook. */
     @JsonIgnoreProperties(ignoreUnknown = true)
