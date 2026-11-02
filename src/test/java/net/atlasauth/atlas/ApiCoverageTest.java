@@ -138,6 +138,9 @@ class ApiCoverageTest {
     }
 
     private static Object placeholder(Class<?> type, String name) {
+        if (type == Object.class) {
+            return null; // an open value (e.g. epoch ms or ISO string): absent is valid
+        }
         if (type == String.class) {
             return name.toLowerCase().contains("contenttype") ? "image/png" : "x1";
         }
