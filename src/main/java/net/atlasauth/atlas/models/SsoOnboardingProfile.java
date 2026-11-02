@@ -20,5 +20,12 @@ public record SsoOnboardingProfile(
         String companyName,
         boolean allowScim,
         long createdAt,
-        long updatedAt) {
+        long updatedAt,
+        /** Where "Finish" on the hosted setup page sends the admin. */
+        String returnUrl) {
+
+    /** The 1.19 shape, without returnUrl. */
+    public SsoOnboardingProfile(String object, String id, String name, List<String> allowedConnectionTypes, String organizationId, String companyName, boolean allowScim, long createdAt, long updatedAt) {
+        this(object, id, name, allowedConnectionTypes, organizationId, companyName, allowScim, createdAt, updatedAt, null);
+    }
 }

@@ -43,6 +43,7 @@ public final class SessionVerifier {
     public static final long CLOCK_SKEW_SECONDS = 5;
 
     private final String issuer;
+    private final List<String> previousIssuers;
     private final List<String> authorizedParties;
     private final JwksCache jwks;
     private final LongSupplier now;
@@ -60,6 +61,7 @@ public final class SessionVerifier {
             throw new IllegalArgumentException("SessionVerifier requires an issuer — an unchecked issuer accepts any Atlas instance.");
         }
         this.issuer = b.issuer;
+        this.previousIssuers = b.previousIssuers != null ? b.previousIssuers : List.of();
         this.authorizedParties = b.authorizedParties;
         this.now = b.now != null ? b.now : System::currentTimeMillis;
         this.http = b.http != null ? b.http : HttpClient.newHttpClient();
@@ -137,7 +139,8 @@ public final class SessionVerifier {
             JWTClaimsSet claims = jwt.getJWTClaimsSet();
             long nowSec = now.getAsLong() / 1000L;
 
-            if (!issuer.equals(claims.getIssuer())) {
+            String iss = claims.getIssuer();
+            if (iss == null || (!issuer.equals(iss) && !previousIssuers.contains(iss))) {
                 return VerifyResult.failed(VerifyResult.Reason.INVALID);
             }
             Date exp = claims.getExpirationTime();
@@ -271,6 +274,7 @@ public final class SessionVerifier {
     public static final class Builder {
         private String jwksUrl;
         private String issuer;
+        private List<String> previousIssuers;
         private List<String> authorizedParties;
         private LongSupplier now;
         private HttpClient http;
@@ -285,6 +289,17 @@ public final class SessionVerifier {
 
         public Builder issuer(String issuer) {
             this.issuer = issuer;
+            return this;
+        }
+
+        /**
+         * Earlier issuers of THIS instance, also accepted: its old sign-in host while the instance moves to a new
+         * one (a custom domain or a path mount going active). The keys are the instance's own, so nothing else
+         * changes. Discovery lists them in {@code atlas_previous_issuers} with an {@code accepted_until}; remove
+         * them after that.
+         */
+        public Builder previousIssuers(Collection<String> previousIssuers) {
+            this.previousIssuers = previousIssuers == null ? null : List.copyOf(previousIssuers);
             return this;
         }
 

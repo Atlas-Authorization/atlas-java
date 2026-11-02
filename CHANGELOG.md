@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.20.0 — 2026-11-01
+
+### Added
+
+- **Organizations.** `CreateOrganizationBody` gains `externalId`, `publicMetadata`, `privateMetadata`, `ownerEmail` and `roleMappings`, and `createdBy` is optional; `UpdateOrganizationBody` gains `externalId`, `roleMappings` and `clear(key)`. `Organization` gains `externalId`, `roleMappings`, `ownerInvitation` (create with `ownerEmail`), `sso` (`get`: connections and `scimBaseUrl`) and `domain` (by-domain lookup). `organizations().list(ListOrganizationsParams)` filters by `externalId` and `metadata[key]=value`; `getByDomain(domainOrEmail[, includeUnverified])`; `getPolicy(id)`.
+- **Organization domains.** `domains().verify(orgId, domainId, method, code)` (`dns_txt`, `well_known` or `email`) and `sendVerificationEmail(orgId, domainId, address)`; `OrgDomain` gains `verificationMethods`, `verificationMethod` and `sentTo`.
+- **SCIM tokens.** `ScimTokenWithSecret` gains `scimBaseUrl` and `warnings`.
+- **SSO.** `SsoConnection`, `CreateSsoConnectionBody` and `UpdateSsoConnectionBody` gain `samlAcsPath` and `githubAccess`; `OrgLdapConnection` and `OrgLdapConnectionBody` gain `groupRoleMappings`, the attribute map gains `groups`. SSO onboarding: `list(name)`, `returnUrl` on profiles and tickets (`CreateSsoOnboardingTicketBody.returnUrl`), `IssuedSsoOnboardingTicket.effectiveReturnUrl`.
+- **Trusted-JWT connections.** `atlas.jwtConnections()` (`list`, `get`, `create`, `update`, `delete`) with typed `JwtConnection` and `JwtConnectionBody`.
+- **Webhook endpoints.** `CreateWebhookEndpointBody.secret` and `RotateWebhookSecretBody.secret` (your own `whsec_` secret); `WebhookTestResult` gains `eventType` and `errorKind`. New `WebhookEvents` constants: `SSO_CONNECTION_ACTIVATED`, `SSO_ONBOARDING_TICKET_COMPLETED`, `SCIM_GROUP_CREATED`, `SCIM_GROUP_UPDATED`, `SCIM_GROUP_DELETED`, `SCIM_GROUP_MEMBER_ADDED`, `SCIM_GROUP_MEMBER_REMOVED`.
+- **Users.** `CreateUserBody` gains `passwordHash`, `passwordHashAlgorithm`, `passwordHashParams`, `passwordSalt` and `passwordHasher`; `ImportExportUserRow` gains `passwordHashAlgorithm`, `passwordHashParams` and `passwordSalt`.
+- **Platform.** `platform().apps().revealInitialSecret(id[, dryRun])` (typed `InitialSecret`); `PlatformAppProvisioned` gains `initialSecretReveal` and `secretRedacted`.
+- **Instance settings.** `ReferralSettings` and `UpdateReferralSettingsBody` gain `partnerPortalUrl` and `reportLinkedAtlasIdSignups`; `CookieConsent` and `CookieConsentBody` gain `hostAliases`; `BrandingSettings.accountPortal` (panels of the hosted account page).
+- **Custom domains.** `domains().createPathMount(hostname, basePath, idempotencyKey)`; `CustomDomain` gains `method`, `basePath`, `routing`, `frontendApiUrl`, `verification` and `issuer`.
+- **Token verification.** `SessionVerifier.Builder.previousIssuers(...)`: also accept the instance's earlier issuers while it moves to a new sign-in host; any other `iss` is still refused.
+- API coverage list: the 9 new operations.
+- Compatibility: records that gained components keep their previous constructors.
+
 ## 1.19.0 — 2026-10-30
 
 ### Added

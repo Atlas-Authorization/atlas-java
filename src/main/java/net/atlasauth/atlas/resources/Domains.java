@@ -47,6 +47,17 @@ public final class Domains {
         });
     }
 
+    /**
+     * {@code POST /v1/domains} with {@code method: "path"}: the Frontend API under {@code basePath} (null =
+     * {@code /__atlas}) on a host you already run, with no DNS record. Publish the returned
+     * {@code verification} file, then {@link #verify(String)}.
+     */
+    public CustomDomain createPathMount(String hostname, String basePath, String idempotencyKey) {
+        var body = Params.of().set("method", "path").set("hostname", hostname).set("base_path", basePath).map();
+        return t.post("/v1/domains", body, idempotencyKey, new TypeReference<>() {
+        });
+    }
+
     public CustomDomain verify(String id) {
         return t.post("/v1/domains/" + enc(id) + "/verify", null, new TypeReference<>() {
         });

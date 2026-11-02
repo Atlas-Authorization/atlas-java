@@ -44,6 +44,7 @@ import net.atlasauth.atlas.models.OriginMoveBody;
 import net.atlasauth.atlas.models.PlatformApp;
 import net.atlasauth.atlas.models.PlatformAppBulkDeleteResult;
 import net.atlasauth.atlas.models.PlatformAppDisabled;
+import net.atlasauth.atlas.models.InitialSecret;
 import net.atlasauth.atlas.models.PlatformAppProvisioned;
 import net.atlasauth.atlas.models.PlatformAppSecretRotation;
 import net.atlasauth.atlas.models.PlatformAppTransfer;
@@ -560,6 +561,21 @@ public final class Platform {
         public PlatformAppBulkDeleteResult bulkDelete(List<String> ids) {
             Map<String, Object> payload = Params.of().set("ids", ids).map();
             return t.post("/v1/platform/apps/bulk_delete", payload, new TypeReference<>() {
+            });
+        }
+
+        /**
+         * {@code POST /v1/platform/apps/{id}/initial_secret/reveal} — Show a newly created app's secret keys once
+         * more (within 10 minutes of the create, once); a second call is 410, so rotate instead.
+         */
+        public InitialSecret revealInitialSecret(String id) {
+            return revealInitialSecret(id, false);
+        }
+
+        /** As above; {@code dryRun} consumes nothing and says whether the reveal is still available and until when. */
+        public InitialSecret revealInitialSecret(String id, boolean dryRun) {
+            Map<String, Object> q = Params.of().set("dry_run", dryRun ? "true" : null).map();
+            return t.postWithQuery("/v1/platform/apps/" + enc(id) + "/initial_secret/reveal", q, null, new TypeReference<>() {
             });
         }
 

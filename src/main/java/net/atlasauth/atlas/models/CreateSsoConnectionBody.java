@@ -52,6 +52,10 @@ public final class CreateSsoConnectionBody {
     public Map<String, Object> logout;
     /** OIDC: {@code enabled}, {@code allowed_targets}, {@code default_target}. */
     public Map<String, Object> idpInitiatedLogin;
+    /** A custom ACS path on your own frontend API domain (SAML migration), e.g. {@code /saml/acs/acme}; {@code set("saml_acs_path", null)} clears. */
+    public String samlAcsPath;
+    /** GitHub as the identity provider (oidc type; oidc_issuer may be left out); {@code set("github_access", null)} removes it. */
+    public SsoConnection.GithubAccess githubAccess;
 
     @JsonIgnore
     private final Map<String, Object> additionalFields = new LinkedHashMap<>();
@@ -89,6 +93,8 @@ public final class CreateSsoConnectionBody {
     public CreateSsoConnectionBody clientAssertionAudience(String v) { this.clientAssertionAudience = v; return this; }
     public CreateSsoConnectionBody logout(Map<String, Object> v) { this.logout = v; return this; }
     public CreateSsoConnectionBody idpInitiatedLogin(Map<String, Object> v) { this.idpInitiatedLogin = v; return this; }
+    public CreateSsoConnectionBody samlAcsPath(String v) { this.samlAcsPath = v; return this; }
+    public CreateSsoConnectionBody githubAccess(SsoConnection.GithubAccess v) { this.githubAccess = v; return this; }
 
     /**
      * Set any field by its wire name, including an explicit {@code null} (which

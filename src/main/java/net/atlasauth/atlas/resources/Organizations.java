@@ -11,6 +11,7 @@ import net.atlasauth.atlas.models.CursorPage;
 import net.atlasauth.atlas.models.DataList;
 import net.atlasauth.atlas.models.DeletedObject;
 import net.atlasauth.atlas.models.ListEndUsersOrganizationsParams;
+import net.atlasauth.atlas.models.ListOrganizationsParams;
 import net.atlasauth.atlas.models.ListPage;
 import net.atlasauth.atlas.models.OrgDomain;
 import net.atlasauth.atlas.models.Organization;
@@ -69,8 +70,36 @@ public final class Organizations {
         });
     }
 
+    /** {@code GET /v1/organizations} filtered by {@code external_id} and {@code metadata[key]=value} (AND). */
+    public CursorPage<Organization> list(ListOrganizationsParams params) {
+        return t.get("/v1/organizations", params == null ? null : params.toQuery(), new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/organizations/{id}}: the organization plus its SSO setup ({@code sso}). */
     public Organization get(String id) {
         return t.get("/v1/organizations/" + enc(id), new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code GET /v1/organizations/by_domain/{domain}}: the organization owning a domain (or an email
+     * address's domain), with the matched {@code domain}. Verified domains only; 404 when none.
+     */
+    public Organization getByDomain(String domain) {
+        return getByDomain(domain, false);
+    }
+
+    /** As above; {@code includeUnverified} also matches a domain that is not verified yet. */
+    public Organization getByDomain(String domain, boolean includeUnverified) {
+        Map<String, Object> q = Params.of().set("include_unverified", includeUnverified ? "true" : null).map();
+        return t.get("/v1/organizations/by_domain/" + enc(domain), q, new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/organizations/{id}/policy}: the same object {@link #updatePolicy} returns. */
+    public OrganizationPolicy getPolicy(String id) {
+        return t.get("/v1/organizations/" + enc(id) + "/policy", new TypeReference<>() {
         });
     }
 
@@ -372,6 +401,29 @@ public final class Organizations {
         public OrgDomain verify(String orgId, String domainId) {
             return t.post("/v1/organizations/" + enc(orgId) + "/domains/" + enc(domainId) + "/verify", null,
                     new TypeReference<>() {
+                    });
+        }
+
+        /**
+         * Check now by {@code method}: {@code dns_txt} (the TXT record), {@code well_known} (fetches the
+         * file) or {@code email} (with the emailed {@code code}). Null method = the DNS check.
+         */
+        public OrgDomain verify(String orgId, String domainId, String method, String code) {
+            Map<String, Object> body = Params.of().set("method", method).set("code", code).map();
+            return t.post("/v1/organizations/" + enc(orgId) + "/domains/" + enc(domainId) + "/verify",
+                    body.isEmpty() ? null : body, new TypeReference<>() {
+                    });
+        }
+
+        /**
+         * {@code POST .../domains/{domainId}/verification_email} (202): email a 6-digit code to an
+         * administrative mailbox at the domain ({@code admin}, {@code administrator}, {@code hostmaster},
+         * {@code postmaster} or {@code webmaster}; null = admin) through your own email provider.
+         */
+        public OrgDomain sendVerificationEmail(String orgId, String domainId, String address) {
+            Map<String, Object> body = Params.of().set("address", address).map();
+            return t.post("/v1/organizations/" + enc(orgId) + "/domains/" + enc(domainId) + "/verification_email",
+                    body, new TypeReference<>() {
                     });
         }
 

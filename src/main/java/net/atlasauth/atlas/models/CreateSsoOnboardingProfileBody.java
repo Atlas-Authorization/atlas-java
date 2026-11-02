@@ -11,6 +11,8 @@ public final class CreateSsoOnboardingProfileBody {
     public String organizationId;
     public String companyName;
     public Boolean allowScim;
+    /** Where "Finish" on the hosted setup page sends the admin: https, on one of your allowed origins. */
+    public String returnUrl;
 
     public CreateSsoOnboardingProfileBody() {
     }
@@ -24,4 +26,5 @@ public final class CreateSsoOnboardingProfileBody {
     public CreateSsoOnboardingProfileBody organizationId(String v) { this.organizationId = v; return this; }
     public CreateSsoOnboardingProfileBody companyName(String v) { this.companyName = v; return this; }
     public CreateSsoOnboardingProfileBody allowScim(Boolean v) { this.allowScim = v; return this; }
+    public CreateSsoOnboardingProfileBody returnUrl(String v) { this.returnUrl = v; return this; }
 }

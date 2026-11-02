@@ -17,5 +17,12 @@ public record SsoOnboardingTicket(
         String status,
         long expiresAt,
         long createdAt,
-        Long completedAt) {
+        Long completedAt,
+        /** This ticket's return_url (null = the profile's applies). */
+        String returnUrl) {
+
+    /** The 1.19 shape, without returnUrl. */
+    public SsoOnboardingTicket(String object, String id, String profileId, String organizationId, String ssoConnectionId, String status, long expiresAt, long createdAt, Long completedAt) {
+        this(object, id, profileId, organizationId, ssoConnectionId, status, expiresAt, createdAt, completedAt, null);
+    }
 }

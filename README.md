@@ -22,14 +22,14 @@ Maven:
 <dependency>
   <groupId>net.atlasauth</groupId>
   <artifactId>atlas-java</artifactId>
-  <version>1.7.0</version>
+  <version>1.20.0</version>
 </dependency>
 ```
 
 Gradle:
 
 ```kotlin
-implementation("net.atlasauth:atlas-java:1.7.0")
+implementation("net.atlasauth:atlas-java:1.20.0")
 ```
 
 ## The management client
@@ -273,6 +273,21 @@ WebhookVerification v = WebhookVerifier.verifyStandard("whsec_...", rawBody, hea
 A one-time browser sign-in (support handoffs, end-to-end tests) replaces the deprecated sign-in tokens:
 `atlas.sessions().createBrowserTicket(userId, "https://app.example.com/", 60L).url()`. On development
 instances, `atlas.testing().createSignInUrl(userId, redirectUrl)` does the same for tests.
+
+### Organizations from your backend, trusted-JWT sign-in (1.20)
+
+Create an organization keyed by your own customer id, invite its owner, and find it again by id or domain:
+
+```java
+atlas.organizations().create(new CreateOrganizationBody().name("Acme").slug("acme")
+        .externalId("cus_123").ownerEmail("owner@acme.example.com"));
+atlas.organizations().list(new ListOrganizationsParams().externalId("cus_123"));
+Organization org = atlas.organizations().getByDomain("someone@acme.example.com");
+```
+
+`atlas.jwtConnections()` lets your own system sign people in with a short-lived JWT it signs
+(`list`, `get`, `create`, `update`, `delete`). While an instance moves to a new sign-in host, keep accepting
+the old issuer with `SessionVerifier.builder().previousIssuers(List.of(oldIssuer))`.
 
 ### Test and review accounts (1.18)
 

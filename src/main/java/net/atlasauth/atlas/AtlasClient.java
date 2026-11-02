@@ -76,6 +76,7 @@ import net.atlasauth.atlas.resources.ImportExport;
 import net.atlasauth.atlas.resources.Instance;
 import net.atlasauth.atlas.resources.InstanceSecurity;
 import net.atlasauth.atlas.resources.Invitations;
+import net.atlasauth.atlas.resources.JwtConnections;
 import net.atlasauth.atlas.resources.JwtTemplates;
 import net.atlasauth.atlas.resources.LegacyAuthConnection;
 import net.atlasauth.atlas.resources.BetterAuthBridge;
@@ -238,6 +239,7 @@ public final class AtlasClient {
     private final SignInTokens signInTokens;
     private final AuditLogs auditLogs;
     private final JwtTemplates jwtTemplates;
+    private final JwtConnections jwtConnections;
     private final ApiKeys apiKeys;
     private final OAuthProviders oauthProviders;
     private final SsoOnboarding ssoOnboarding;
@@ -402,6 +404,7 @@ public final class AtlasClient {
         this.signInTokens = new SignInTokens(transport);
         this.auditLogs = new AuditLogs(transport);
         this.jwtTemplates = new JwtTemplates(transport);
+        this.jwtConnections = new JwtConnections(transport);
         this.apiKeys = new ApiKeys(transport);
         this.oauthProviders = new OAuthProviders(transport);
         this.ssoOnboarding = new SsoOnboarding(transport);
@@ -800,6 +803,11 @@ public final class AtlasClient {
 
     public JwtTemplates jwtTemplates() {
         return jwtTemplates;
+    }
+
+    /** Trusted-JWT connections ({@code /v1/jwt_connections}). */
+    public JwtConnections jwtConnections() {
+        return jwtConnections;
     }
 
     public ApiKeys apiKeys() {

@@ -9,6 +9,16 @@ import java.util.Map;
 public final class CreateUserBody {
     public String emailAddress;
     public String password;
+    /** An existing hash instead of {@code password}; a self-describing one (Argon2id, bcrypt, ...) is stored as given. */
+    public String passwordHash;
+    /** Names a hash that does not describe itself: scrypt, pbkdf2, md5, sha1, sha256, sha512, hmac_sha256, ... */
+    public String passwordHashAlgorithm;
+    /** The algorithm's parameters, e.g. scrypt {@code {n, r, p, key_length, salt_encoding}}. */
+    public Map<String, Object> passwordHashParams;
+    /** The salt, when it is not part of {@code passwordHash}. */
+    public String passwordSalt;
+    /** The Clerk hasher name, used only when the hash does not describe itself. */
+    public String passwordHasher;
     public String firstName;
     public String lastName;
     public Boolean emailVerified;
@@ -38,6 +48,11 @@ public final class CreateUserBody {
 
     public CreateUserBody emailAddress(String v) { this.emailAddress = v; return this; }
     public CreateUserBody password(String v) { this.password = v; return this; }
+    public CreateUserBody passwordHash(String v) { this.passwordHash = v; return this; }
+    public CreateUserBody passwordHashAlgorithm(String v) { this.passwordHashAlgorithm = v; return this; }
+    public CreateUserBody passwordHashParams(Map<String, Object> v) { this.passwordHashParams = v; return this; }
+    public CreateUserBody passwordSalt(String v) { this.passwordSalt = v; return this; }
+    public CreateUserBody passwordHasher(String v) { this.passwordHasher = v; return this; }
     public CreateUserBody firstName(String v) { this.firstName = v; return this; }
     public CreateUserBody lastName(String v) { this.lastName = v; return this; }
     public CreateUserBody emailVerified(Boolean v) { this.emailVerified = v; return this; }

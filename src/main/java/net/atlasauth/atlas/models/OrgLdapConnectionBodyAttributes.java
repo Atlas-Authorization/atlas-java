@@ -15,6 +15,8 @@ public final class OrgLdapConnectionBodyAttributes {
     @JsonProperty("firstName") public String firstName;
     @JsonProperty("lastName") public String lastName;
     public String username;
+    /** The groups attribute (default memberOf), read for {@code group_role_mappings}. */
+    public String groups;
 
     @JsonIgnore
     private final Map<String, Object> additionalFields = new LinkedHashMap<>();
@@ -26,6 +28,7 @@ public final class OrgLdapConnectionBodyAttributes {
     public OrgLdapConnectionBodyAttributes firstName(String v) { this.firstName = v; return this; }
     public OrgLdapConnectionBodyAttributes lastName(String v) { this.lastName = v; return this; }
     public OrgLdapConnectionBodyAttributes username(String v) { this.username = v; return this; }
+    public OrgLdapConnectionBodyAttributes groups(String v) { this.groups = v; return this; }
 
     /**
      * Set any field by its wire name, including an explicit {@code null} (which

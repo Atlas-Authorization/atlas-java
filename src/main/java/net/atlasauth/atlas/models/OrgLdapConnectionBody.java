@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -26,6 +27,8 @@ public final class OrgLdapConnectionBody {
     /** Service-account password. Write-only; never returned. */
     public String bindPassword;
     public String defaultRoleId;
+    /** The first mapping whose group the person is in picks their role when seated; {@code set("group_role_mappings", null)} clears. */
+    public List<OrgLdapConnection.GroupRoleMapping> groupRoleMappings;
 
     @JsonIgnore
     private final Map<String, Object> additionalFields = new LinkedHashMap<>();
@@ -43,6 +46,7 @@ public final class OrgLdapConnectionBody {
     public OrgLdapConnectionBody attributes(OrgLdapConnectionBodyAttributes v) { this.attributes = v; return this; }
     public OrgLdapConnectionBody bindPassword(String v) { this.bindPassword = v; return this; }
     public OrgLdapConnectionBody defaultRoleId(String v) { this.defaultRoleId = v; return this; }
+    public OrgLdapConnectionBody groupRoleMappings(List<OrgLdapConnection.GroupRoleMapping> v) { this.groupRoleMappings = v; return this; }
 
     /**
      * Set any field by its wire name, including an explicit {@code null} (which

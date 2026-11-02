@@ -20,7 +20,13 @@ public record CookieConsent(
         List<String> extraOrigins,
         CookieConsentSettingsLink settingsLink,
         /** page (the script tag carries the page language) or browser. */ String culture,
-        /** Every cookie and browser-storage key Atlas writes for this instance. */ List<DeclaredCookie> declaredCookies) {
+        /** Every cookie and browser-storage key Atlas writes for this instance. */ List<DeclaredCookie> declaredCookies,
+        /** The declared host aliases. */ List<String> hostAliases) {
+
+    /** The 1.19 shape, without {@code hostAliases}. */
+    public CookieConsent(String object, boolean enabled, String scriptUrl, String scriptId, String siteId, String blockingMode, List<String> extraOrigins, CookieConsentSettingsLink settingsLink, String culture, List<DeclaredCookie> declaredCookies) {
+        this(object, enabled, scriptUrl, scriptId, siteId, blockingMode, extraOrigins, settingsLink, culture, declaredCookies, null);
+    }
 
     /** The previous shape, without {@code culture}, {@code declaredCookies}. */
     public CookieConsent(String object, boolean enabled, String scriptUrl, String scriptId, String siteId, String blockingMode, List<String> extraOrigins, CookieConsentSettingsLink settingsLink) {

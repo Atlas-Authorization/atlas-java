@@ -43,10 +43,22 @@ public record SsoConnection(
         /** OIDC: the private_key_jwt assertion audience override. */ String clientAssertionAudience,
         /** OIDC: RP-initiated, back- and front-channel logout settings. */ JsonNode logout,
         /** OIDC: third-party initiated login settings. */ JsonNode idpInitiatedLogin,
-        /** OIDC: the URLs to register at the IdP. */ UpstreamUrls upstreamUrls) {
+        /** OIDC: the URLs to register at the IdP. */ UpstreamUrls upstreamUrls,
+        /** A custom ACS path on your own frontend API domain (SAML migration); null = the standard ACS. */ String samlAcsPath,
+        /** GitHub as the identity provider: only members of these GitHub orgs / teams sign in; null otherwise. */ GithubAccess githubAccess) {
+
+    /** The 1.19 shape, without samlAcsPath and githubAccess. */
+    public SsoConnection(String object, String id, String organizationId, String type, String status, String oidcIssuer, String oidcClientId, boolean hasSecret, String samlIdpEntityId, String samlIdpSsoUrl, String samlSpEntityId, boolean hasSamlCertificate, boolean samlAllowIdpInitiated, boolean samlSignAuthnRequests, boolean samlWantResponseSigned, boolean hasDiscourseSecret, String discourseProviderUrl, List<String> allowedDomains, List<SsoConnectionClaimRoleMapping> claimRoleMappings, String defaultRoleId, long createdAt, long updatedAt, boolean samlSingleLogout, String samlIdpSloUrl, String samlIdpSloResponseUrl, String samlIdpSloBinding, String samlIdpSloSoapUrl, boolean samlRequireEncryptedAssertions, boolean hasSamlEncryptionKey, boolean hasPreviousSamlEncryptionKey, Long samlEncryptionRotatedAt, JsonNode profileMapping, String tokenEndpointAuthMethod, String clientAssertionAudience, JsonNode logout, JsonNode idpInitiatedLogin, UpstreamUrls upstreamUrls) {
+        this(object, id, organizationId, type, status, oidcIssuer, oidcClientId, hasSecret, samlIdpEntityId, samlIdpSsoUrl, samlSpEntityId, hasSamlCertificate, samlAllowIdpInitiated, samlSignAuthnRequests, samlWantResponseSigned, hasDiscourseSecret, discourseProviderUrl, allowedDomains, claimRoleMappings, defaultRoleId, createdAt, updatedAt, samlSingleLogout, samlIdpSloUrl, samlIdpSloResponseUrl, samlIdpSloBinding, samlIdpSloSoapUrl, samlRequireEncryptedAssertions, hasSamlEncryptionKey, hasPreviousSamlEncryptionKey, samlEncryptionRotatedAt, profileMapping, tokenEndpointAuthMethod, clientAssertionAudience, logout, idpInitiatedLogin, upstreamUrls, null, null);
+    }
+
+    /** The GitHub organization / team ({@code org/team-slug}) allowlist. */
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record GithubAccess(List<String> allowedOrganizations, List<String> allowedTeams) {
+    }
 
     /** The 1.11 shape, before the custom-data, add-on, enterprise and token-format fields. */
     public SsoConnection(String object, String id, String organizationId, String type, String status, String oidcIssuer, String oidcClientId, boolean hasSecret, String samlIdpEntityId, String samlIdpSsoUrl, String samlSpEntityId, boolean hasSamlCertificate, boolean samlAllowIdpInitiated, boolean samlSignAuthnRequests, boolean samlWantResponseSigned, boolean hasDiscourseSecret, String discourseProviderUrl, List<String> allowedDomains, List<SsoConnectionClaimRoleMapping> claimRoleMappings, String defaultRoleId, long createdAt, long updatedAt) {
-        this(object, id, organizationId, type, status, oidcIssuer, oidcClientId, hasSecret, samlIdpEntityId, samlIdpSsoUrl, samlSpEntityId, hasSamlCertificate, samlAllowIdpInitiated, samlSignAuthnRequests, samlWantResponseSigned, hasDiscourseSecret, discourseProviderUrl, allowedDomains, claimRoleMappings, defaultRoleId, createdAt, updatedAt, false, null, null, null, null, false, false, false, null, null, null, null, null, null, null);
+        this(object, id, organizationId, type, status, oidcIssuer, oidcClientId, hasSecret, samlIdpEntityId, samlIdpSsoUrl, samlSpEntityId, hasSamlCertificate, samlAllowIdpInitiated, samlSignAuthnRequests, samlWantResponseSigned, hasDiscourseSecret, discourseProviderUrl, allowedDomains, claimRoleMappings, defaultRoleId, createdAt, updatedAt, false, null, null, null, null, false, false, false, null, null, null, null, null, null, null, null, null);
     }
 }

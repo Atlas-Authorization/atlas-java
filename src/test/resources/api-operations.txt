@@ -98,6 +98,7 @@ POST /v1/platform/apps/{id}/archive
 POST /v1/platform/apps/{id}/unarchive
 POST /v1/platform/apps/bulk_delete
 POST /v1/platform/apps/{id}/rotate_secret
+POST /v1/platform/apps/{id}/initial_secret/reveal
 GET /v1/platform/apps/{id}/secret_keys
 POST /v1/platform/apps/{id}/instances
 GET /v1/platform/apps/{id}/instances
@@ -124,6 +125,8 @@ GET /v1/organizations/{id}
 PATCH /v1/organizations/{id}
 DELETE /v1/organizations/{id}
 PATCH /v1/organizations/{id}/policy
+GET /v1/organizations/{id}/policy
+GET /v1/organizations/by_domain/{domain}
 PUT /v1/organizations/{id}/metadata
 GET /v1/organizations/{id}/memberships
 POST /v1/organizations/{id}/memberships
@@ -140,6 +143,7 @@ DELETE /v1/organizations/{orgId}/groups/{groupId}/roles/{roleId}
 GET /v1/organizations/{id}/domains
 POST /v1/organizations/{id}/domains
 POST /v1/organizations/{id}/domains/{domainId}/verify
+POST /v1/organizations/{id}/domains/{domainId}/verification_email
 DELETE /v1/organizations/{id}/domains/{domainId}
 GET /v1/organizations/{id}/branding
 PUT /v1/organizations/{id}/branding
@@ -150,6 +154,11 @@ GET /v1/jwt_templates
 GET /v1/jwt_templates/{id}
 PATCH /v1/jwt_templates/{id}
 DELETE /v1/jwt_templates/{id}
+GET /v1/jwt_connections
+POST /v1/jwt_connections
+GET /v1/jwt_connections/{id}
+PATCH /v1/jwt_connections/{id}
+DELETE /v1/jwt_connections/{id}
 POST /v1/sessions
 GET /v1/sessions
 GET /v1/sessions/{id}

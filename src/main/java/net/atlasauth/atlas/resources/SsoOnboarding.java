@@ -2,6 +2,7 @@ package net.atlasauth.atlas.resources;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import net.atlasauth.atlas.Params;
 import net.atlasauth.atlas.http.Transport;
 import net.atlasauth.atlas.models.CreateSsoOnboardingProfileBody;
 import net.atlasauth.atlas.models.CreateSsoOnboardingTicketBody;
@@ -23,6 +24,12 @@ public final class SsoOnboarding {
 
     public ListPage<SsoOnboardingProfile> list() {
         return t.get("/v1/sso_onboarding_profiles", new TypeReference<>() {
+        });
+    }
+
+    /** Only the profiles named exactly {@code name} ("find or create"); null lists all. */
+    public ListPage<SsoOnboardingProfile> list(String name) {
+        return t.get("/v1/sso_onboarding_profiles", Params.of().set("name", name).map(), new TypeReference<>() {
         });
     }
 

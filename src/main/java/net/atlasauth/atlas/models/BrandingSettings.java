@@ -95,6 +95,9 @@ public class BrandingSettings {
     /** Sanitized HTML slot below the card. */
     @JsonProperty("customHtmlFooter")
     public String customHtmlFooter;
+    /** The hosted account page ({@code /hosted/user}): which panels it draws. */
+    @JsonProperty("accountPortal")
+    public AccountPortal accountPortal;
 
     public BrandingSettings() {
     }
@@ -134,8 +137,24 @@ public class BrandingSettings {
     public BrandingSettings customCss(String v) { this.customCss = v; return this; }
     public BrandingSettings customHtmlHeader(String v) { this.customHtmlHeader = v; return this; }
     public BrandingSettings customHtmlFooter(String v) { this.customHtmlFooter = v; return this; }
+    public BrandingSettings accountPortal(AccountPortal v) { this.accountPortal = v; return this; }
 
     // ---- nested inline shapes ---------------------------------------------
+
+    /**
+     * Panel (profile, email_addresses, password, passkeys, mfa, sessions, linked_accounts, connected_apps,
+     * shared_resources, ciba, referrals, delete_account) to {@code false} to hide it; absent = shown. Merged per
+     * panel on update; a null value removes that key.
+     */
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static final class AccountPortal {
+        public Map<String, Boolean> panels;
+
+        public AccountPortal() {
+        }
+
+        public AccountPortal panels(Map<String, Boolean> v) { this.panels = v; return this; }
+    }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Providers {

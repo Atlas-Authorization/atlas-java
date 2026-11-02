@@ -8,9 +8,12 @@ public final class RotateWebhookSecretBody {
      * it only once every receiver verifies with a verifier that accepts several signatures (1.5.0+).
      */
     public Integer overlapSeconds;
+    /** Rotate to a secret you chose ({@code whsec_} + at least 32 characters, different from the current one). */
+    public String secret;
 
     public RotateWebhookSecretBody() {
     }
 
     public RotateWebhookSecretBody overlapSeconds(Integer v) { this.overlapSeconds = v; return this; }
+    public RotateWebhookSecretBody secret(String v) { this.secret = v; return this; }
 }

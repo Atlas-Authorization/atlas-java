@@ -24,6 +24,11 @@ public final class CookieConsentBody {
     public CookieConsentSettingsLinkInput settingsLink;
     /** {@code page} (default: the script tag carries the page language) or {@code browser}. */
     public String culture;
+    /**
+     * Bare hostnames the hosted pages are served on that your consent manager's site is knowingly not
+     * registered for (at most 10). Sent alone it sets only the aliases; {@code set("host_aliases", null)} clears.
+     */
+    public List<String> hostAliases;
 
     @JsonIgnore
     private final Map<String, Object> additionalFields = new LinkedHashMap<>();
@@ -38,6 +43,7 @@ public final class CookieConsentBody {
     public CookieConsentBody extraOrigins(List<String> v) { this.extraOrigins = v; return this; }
     public CookieConsentBody settingsLink(CookieConsentSettingsLinkInput v) { this.settingsLink = v; return this; }
     public CookieConsentBody culture(String v) { this.culture = v; return this; }
+    public CookieConsentBody hostAliases(List<String> v) { this.hostAliases = v; return this; }
 
     /**
      * Set any field by its wire name, including an explicit {@code null} (which

@@ -150,6 +150,25 @@ class SessionVerifierTest {
     }
 
     @Test
+    void previousIssuersAcceptsTheOldHostAndNothingElse() throws Exception {
+        String old = "https://acme-fapi.example.com";
+        SessionVerifier v = SessionVerifier.builder()
+                .jwksUrl(jwksUrl)
+                .issuer(ISSUER)
+                .previousIssuers(List.of(old))
+                .now(() -> NOW_MILLIS)
+                .build();
+
+        assertTrue(v.verify(signSession(ISSUER, NOW_MILLIS + 60_000, Map.of())).ok());
+        assertTrue(v.verify(signSession(old, NOW_MILLIS + 60_000, Map.of())).ok());
+        VerifyResult other = v.verify(signSession("https://evil.example.com", NOW_MILLIS + 60_000, Map.of()));
+        assertFalse(other.ok());
+        assertEquals(VerifyResult.Reason.INVALID, other.reason());
+        // Without the option the old host is refused.
+        assertFalse(verifier(ISSUER).verify(signSession(old, NOW_MILLIS + 60_000, Map.of())).ok());
+    }
+
+    @Test
     void rejectsExpiredToken() throws Exception {
         // Expired a full minute ago — beyond the 5s skew.
         String token = signSession(ISSUER, NOW_MILLIS - 60_000, Map.of());

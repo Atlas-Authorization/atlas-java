@@ -10,6 +10,8 @@ public final class CreateWebhookEndpointBody extends WebhookEndpointSettingsBody
     public List<String> enabledEvents;
     /** False creates the endpoint switched off. Default true. */
     public Boolean active;
+    /** Your own signing secret ({@code whsec_} + at least 32 characters, from a CSPRNG) instead of a generated one. */
+    public String secret;
 
     public CreateWebhookEndpointBody() {
     }
@@ -24,4 +26,5 @@ public final class CreateWebhookEndpointBody extends WebhookEndpointSettingsBody
     public CreateWebhookEndpointBody url(String v) { this.url = v; return this; }
     public CreateWebhookEndpointBody enabledEvents(List<String> v) { this.enabledEvents = v; return this; }
     public CreateWebhookEndpointBody active(Boolean v) { this.active = v; return this; }
+    public CreateWebhookEndpointBody secret(String v) { this.secret = v; return this; }
 }

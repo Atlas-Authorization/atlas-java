@@ -56,6 +56,10 @@ public final class UpdateReferralSettingsBody {
     public Boolean forwardLifecycle;
     public Boolean mirrorToPublicMetadata;
     public Boolean includeReferralClaims;
+    /** https URL of the partner portal, linked from the hosted account page's "Refer a friend" panel; {@code clear("partner_portal_url")} removes it. */
+    public String partnerPortalUrl;
+    /** Report the first sign-in of an Atlas ID account to a Sign in with Atlas app this instance manages as a sign-up (default false). */
+    public Boolean reportLinkedAtlasIdSignups;
 
     @JsonIgnore
     private final Map<String, Object> additionalFields = new LinkedHashMap<>();
@@ -88,6 +92,8 @@ public final class UpdateReferralSettingsBody {
     public UpdateReferralSettingsBody forwardLifecycle(Boolean v) { this.forwardLifecycle = v; return this; }
     public UpdateReferralSettingsBody mirrorToPublicMetadata(Boolean v) { this.mirrorToPublicMetadata = v; return this; }
     public UpdateReferralSettingsBody includeReferralClaims(Boolean v) { this.includeReferralClaims = v; return this; }
+    public UpdateReferralSettingsBody partnerPortalUrl(String v) { this.partnerPortalUrl = v; return this; }
+    public UpdateReferralSettingsBody reportLinkedAtlasIdSignups(Boolean v) { this.reportLinkedAtlasIdSignups = v; return this; }
 
     /**
      * Clear a nullable field by its wire name ({@code endpoint_url}, {@code program_id},

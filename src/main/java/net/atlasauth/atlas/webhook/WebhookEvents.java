@@ -123,6 +123,17 @@ public final class WebhookEvents {
     public static final String STATUS_INCIDENT_CREATED = "status.incident.created";
     public static final String STATUS_INCIDENT_UPDATED = "status.incident.updated";
     public static final String STATUS_INCIDENT_RESOLVED = "status.incident.resolved";
+    /** An SSO connection went active ({@code data} is the connection). */
+    public static final String SSO_CONNECTION_ACTIVATED = "sso_connection.activated";
+    /** A customer finished a hosted SSO setup ticket ({@code data} carries {@code return_url}). */
+    public static final String SSO_ONBOARDING_TICKET_COMPLETED = "sso_onboarding_ticket.completed";
+    /** A SCIM group of an organization's directory was created / updated / deleted. */
+    public static final String SCIM_GROUP_CREATED = "scim_group.created";
+    public static final String SCIM_GROUP_UPDATED = "scim_group.updated";
+    public static final String SCIM_GROUP_DELETED = "scim_group.deleted";
+    /** A user joined / left a SCIM group ({@code data}: group_id, user_id, organization_id). */
+    public static final String SCIM_GROUP_MEMBER_ADDED = "scim_group.member_added";
+    public static final String SCIM_GROUP_MEMBER_REMOVED = "scim_group.member_removed";
 
     /** Scope that lets a key reveal webhook signing secrets. */
     public static final String SCOPE_WEBHOOKS_REVEAL = "webhooks:reveal";

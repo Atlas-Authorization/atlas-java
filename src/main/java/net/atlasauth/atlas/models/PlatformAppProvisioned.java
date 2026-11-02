@@ -29,14 +29,26 @@ public record PlatformAppProvisioned(
         /** The declared integration per allowed origin ({@code redirect} or {@code embedded}). */ Map<String, String> allowedOriginIntegrations,
         /** Provisioning tags (strings, numbers and booleans). */ Map<String, Object> metadata,
         /** Your idempotent-create key. */ String externalRef,
-        /** True on a create that sent an {@code external_ref} and got the existing object back (200, no secret). */ Boolean idempotentReplay) {
+        /** True on a create that sent an {@code external_ref} and got the existing object back (200, no secret). */ Boolean idempotentReplay,
+        /** The one extra look at this response's secrets: {@code POST path} once before {@code expiresAt}. */ InitialSecretReveal initialSecretReveal,
+        /** True on an {@code Idempotency-Key} replay: the secrets are null because they are never stored for replay. */ Boolean secretRedacted) {
+    /** The 1.19 shape, without {@code initialSecretReveal} and {@code secretRedacted}. */
+    public PlatformAppProvisioned(String object, String id, String name, String environment, String publishableKey, List<String> allowedOrigins, List<String> tags, boolean archived, Long archivedAt, boolean disabled, long createdAt, long updatedAt, String secret, String note, PlatformAppWithSecret siblingInstance, String frontendApiHost, String issuer, String discoveryUrl, String jwksUri, Map<String, String> allowedOriginIntegrations, Map<String, Object> metadata, String externalRef, Boolean idempotentReplay) {
+        this(object, id, name, environment, publishableKey, allowedOrigins, tags, archived, archivedAt, disabled, createdAt, updatedAt, secret, note, siblingInstance, frontendApiHost, issuer, discoveryUrl, jwksUri, allowedOriginIntegrations, metadata, externalRef, idempotentReplay, null, null);
+    }
+
     /** The shape before the provisioning fields ({@code metadata}, {@code externalRef}, {@code idempotentReplay}). */
     public PlatformAppProvisioned(String object, String id, String name, String environment, String publishableKey, List<String> allowedOrigins, List<String> tags, boolean archived, Long archivedAt, boolean disabled, long createdAt, long updatedAt, String secret, String note, PlatformAppWithSecret siblingInstance, String frontendApiHost, String issuer, String discoveryUrl, String jwksUri, Map<String, String> allowedOriginIntegrations) {
-        this(object, id, name, environment, publishableKey, allowedOrigins, tags, archived, archivedAt, disabled, createdAt, updatedAt, secret, note, siblingInstance, frontendApiHost, issuer, discoveryUrl, jwksUri, allowedOriginIntegrations, null, null, null);
+        this(object, id, name, environment, publishableKey, allowedOrigins, tags, archived, archivedAt, disabled, createdAt, updatedAt, secret, note, siblingInstance, frontendApiHost, issuer, discoveryUrl, jwksUri, allowedOriginIntegrations, null, null, null, null, null);
     }
 
     /** The 1.4 shape, without {@code frontendApiHost}, {@code issuer}, {@code discoveryUrl}, {@code jwksUri}, {@code allowedOriginIntegrations}. */
     public PlatformAppProvisioned(String object, String id, String name, String environment, String publishableKey, List<String> allowedOrigins, List<String> tags, boolean archived, Long archivedAt, boolean disabled, long createdAt, long updatedAt, String secret, String note, PlatformAppWithSecret siblingInstance) {
         this(object, id, name, environment, publishableKey, allowedOrigins, tags, archived, archivedAt, disabled, createdAt, updatedAt, secret, note, siblingInstance, null, null, null, null, null);
+    }
+
+    /** Where and until when (epoch ms) {@code POST /v1/platform/apps/{id}/initial_secret/reveal} works. */
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record InitialSecretReveal(String path, long expiresAt) {
     }
 }
