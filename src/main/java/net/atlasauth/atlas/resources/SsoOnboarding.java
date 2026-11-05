@@ -11,6 +11,8 @@ import net.atlasauth.atlas.models.IssuedSsoOnboardingTicket;
 import net.atlasauth.atlas.models.ListPage;
 import net.atlasauth.atlas.models.SsoOnboardingProfile;
 
+import java.util.Map;
+
 import static net.atlasauth.atlas.http.Transport.enc;
 
 /** The self-service SSO onboarding profiles and tickets resource. */
@@ -70,6 +72,21 @@ public final class SsoOnboarding {
     /** Kill a still-live ticket. 404 once it is used, expired, or already revoked. */
     public JsonNode revokeTicket(String ticketId) {
         return t.post("/v1/sso_onboarding_tickets/" + enc(ticketId) + "/revoke", null, new TypeReference<>() {
+        });
+    }
+
+    /** {@code PATCH /v1/sso_onboarding_profiles/{id}} — only the fields sent change. */
+    public SsoOnboardingProfile update(String id, Map<String, Object> body) {
+        return t.patch("/v1/sso_onboarding_profiles/" + enc(id), body, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * {@code PUT /v1/sso_onboarding_profiles/by_name/{name}} — create or update the profile with this exact name:
+     * 201 when created, else 200. 409 {@code IDENTIFIER_EXISTS} when two profiles already share the name.
+     */
+    public SsoOnboardingProfile upsertByName(String name, Map<String, Object> body) {
+        return t.put("/v1/sso_onboarding_profiles/by_name/" + enc(name), body, new TypeReference<>() {
         });
     }
 }

@@ -1,6 +1,7 @@
 package net.atlasauth.atlas.resources;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import net.atlasauth.atlas.Params;
 import net.atlasauth.atlas.http.Transport;
 import net.atlasauth.atlas.models.ListPage;
@@ -11,6 +12,9 @@ import net.atlasauth.atlas.models.PartnerPlatformList;
 import net.atlasauth.atlas.models.PartnerPlatformRegistration;
 import net.atlasauth.atlas.models.SetPartnerPlatformBody;
 import net.atlasauth.atlas.models.StorePartnerPlatformTokenBody;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import static net.atlasauth.atlas.http.Transport.enc;
 
@@ -72,5 +76,23 @@ public final class PartnerPlatforms {
     public ListPage<PartnerDelivery> deliveries(String partner, Integer limit) {
         return t.get("/v1/partner_platforms/" + enc(partner) + "/deliveries", Params.of("limit", limit).map(), new TypeReference<>() {
         });
+    }
+
+    /**
+     * {@code POST /v1/partner_executor_keys/{partner}/{instanceId}} — for the partner: mint its data-rights
+     * key for one instance. {@code rawBody} is sent byte for byte because {@code signature} (in
+     * {@code signatureHeader}) signs those bytes. Answers {@code secret} and {@code executorUrl}.
+     */
+    public JsonNode mintExecutorKey(String partner, String instanceId, String rawBody, String signatureHeader, String signature) {
+        return t.requestSigned("POST", "/v1/partner_executor_keys/" + enc(partner) + "/" + enc(instanceId),
+                rawBody.getBytes(StandardCharsets.UTF_8), Map.of(signatureHeader, signature), new TypeReference<>() {
+                });
+    }
+
+    /** {@code DELETE /v1/partner_executor_keys/{partner}/{instanceId}} — for the partner: the link is gone, revoke the keys minted for that site. */
+    public JsonNode revokeExecutorKey(String partner, String instanceId, String rawBody, String signatureHeader, String signature) {
+        return t.requestSigned("DELETE", "/v1/partner_executor_keys/" + enc(partner) + "/" + enc(instanceId),
+                rawBody.getBytes(StandardCharsets.UTF_8), Map.of(signatureHeader, signature), new TypeReference<>() {
+                });
     }
 }

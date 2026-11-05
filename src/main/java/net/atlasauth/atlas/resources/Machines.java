@@ -15,6 +15,8 @@ import net.atlasauth.atlas.models.M2mTokenVerification;
 import net.atlasauth.atlas.models.Machine;
 import net.atlasauth.atlas.models.MachineEnrolmentToken;
 import net.atlasauth.atlas.models.MachineEnrolmentTokenWithSecret;
+import net.atlasauth.atlas.models.MachineGrant;
+import net.atlasauth.atlas.models.MachineMembership;
 import net.atlasauth.atlas.models.MachineWithSecret;
 import net.atlasauth.atlas.models.UpdateMachineMetadataBody;
 import net.atlasauth.atlas.models.UserOrganizationMembership;
@@ -118,10 +120,60 @@ public final class Machines {
         });
     }
 
-    /** {@code POST /v1/m2m_tokens/verify} — Verify a presented machine secret → { valid, machine_id? */
+    /** {@code POST /v1/m2m_tokens/verify} — Verify a presented machine secret or machine JWT. */
     public M2mTokenVerification verifyToken(String token) {
         Map<String, Object> payload = Params.of().set("token", token).map();
         return t.post("/v1/m2m_tokens/verify", payload, new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/machines/{id}/grants} — The resource servers this machine may obtain tokens for. */
+    public ListPage<MachineGrant> listGrants(String id) {
+        return t.get("/v1/machines/" + enc(id) + "/grants", new TypeReference<>() {
+        });
+    }
+
+    /** {@code POST /v1/machines/{id}/grants} — Authorize the machine for a resource server. {@code scopePresets} names the server's presets, unioned with {@code scopes}; either may be null. A second grant on the same server is a 409. */
+    public MachineGrant createGrant(String id, String resourceServerId, List<String> scopes, List<String> scopePresets) {
+        Map<String, Object> payload = Params.of()
+                .set("resource_server_id", resourceServerId)
+                .set("scopes", scopes)
+                .set("scope_presets", scopePresets)
+                .map();
+        return t.post("/v1/machines/" + enc(id) + "/grants", payload, new TypeReference<>() {
+        });
+    }
+
+    /** {@code DELETE /v1/machines/{id}/grants/{grantId}} — Revoke a grant. A token already issued lasts until it expires. */
+    public DeletedObject deleteGrant(String id, String grantId) {
+        return t.delete("/v1/machines/" + enc(id) + "/grants/" + enc(grantId), new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/organizations/{id}/machine_memberships} — The machines that are members of an organization. */
+    public CursorPage<MachineMembership> listOrganizationMembers(String organizationId, Long limit, String startingAfter) {
+        Map<String, Object> query = Params.of().set("limit", limit).set("starting_after", startingAfter).map();
+        return t.get("/v1/organizations/" + enc(organizationId) + "/machine_memberships", query, new TypeReference<>() {
+        });
+    }
+
+    /** {@code POST /v1/organizations/{id}/machine_memberships} — Make a machine a member. A null {@code role} means {@code org:member}. */
+    public MachineMembership addToOrganization(String organizationId, String machineId, String role, String idempotencyKey) {
+        Map<String, Object> payload = Params.of().set("machine_id", machineId).set("role", role).map();
+        return t.post("/v1/organizations/" + enc(organizationId) + "/machine_memberships", payload, idempotencyKey, new TypeReference<>() {
+        });
+    }
+
+    /** {@code PATCH /v1/organizations/{id}/machine_memberships/{machineId}} — Change a machine's role. New tokens carry it. */
+    public MachineMembership updateOrganizationRole(String organizationId, String machineId, String role) {
+        Map<String, Object> payload = Params.of().set("role", role).map();
+        return t.patch("/v1/organizations/" + enc(organizationId) + "/machine_memberships/" + enc(machineId), payload, new TypeReference<>() {
+        });
+    }
+
+    /** {@code DELETE /v1/organizations/{id}/machine_memberships/{machineId}} — Remove a machine from an organization. */
+    public DeletedObject removeFromOrganization(String organizationId, String machineId) {
+        return t.delete("/v1/organizations/" + enc(organizationId) + "/machine_memberships/" + enc(machineId), new TypeReference<>() {
         });
     }
 

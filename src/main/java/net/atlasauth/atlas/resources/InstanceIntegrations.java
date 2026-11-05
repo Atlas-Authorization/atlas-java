@@ -21,6 +21,13 @@ public final class InstanceIntegrations {
         this.t = t;
     }
 
+    /** {@code POST /v1/instance/integrations/{product}/deliveries/redeliver} - Re-send the events the integration's receiver never got, and switch a disabled receiver back on. Delivered events are not sent again. {@code since} is an ISO 8601 time, epoch milliseconds or {@code failing_since}; while {@code has_more} is true, call again with {@code since} set to {@code next_since}. Scope: {@code instance:write}. */
+    public JsonNode redeliverEvents(String product, String since, String idempotencyKey) {
+        Map<String, Object> payload = Params.of().set("since", since).map();
+        return t.post("/v1/instance/integrations/" + enc(product) + "/deliveries/redeliver", payload, idempotencyKey, new TypeReference<>() {
+        });
+    }
+
     /** {@code POST /v1/instance/integrations/{product}/events_secret/rotate} - Rotate the signing secret of the integration's event receiver. The new secret is revealed exactly once. By default (`overlap_seconds` 0) the old secret stops signing at once. With `overlap_seconds` (at most 604800 = 7 days) every delivery carries two signatures in `Atlas-Signature` (`v1,&lt;new&gt; v1,&lt;old&gt;`, the new one first), so the service verifies with either secret while it deploys the new one; after that only the new secret signs. `previous_secret_expires_at` says when the old secret stops signing (epoch ms), or null when it already has. Audited as integration.&lt;id&gt;.events_secret_rotated. 404 when the integration has no event receiver. Scope: {@code instance:write}. */
     public InstanceIntegrationsRotateEventsSecretResponse rotateEventsSecret(String product, InstanceIntegrationsRotateEventsSecretBody body) {
         return rotateEventsSecret(product, body, null);

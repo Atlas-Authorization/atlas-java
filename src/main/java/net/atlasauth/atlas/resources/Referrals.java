@@ -188,4 +188,14 @@ public final class Referrals {
         return t.post("/v1/instance/referrals/" + enc(provider) + "/install", Params.of("return_to", returnTo).map(), new TypeReference<>() {
         });
     }
+
+    /**
+     * {@code POST /v1/instance/referrals/accounts/resync} — send every organization's owner to the referral platform
+     * once, up to 10,000 per call. When {@code truncated}, continue with {@code next_starting_after}; null starts over.
+     */
+    public JsonNode resyncAccounts(String startingAfter) {
+        Map<String, Object> body = Params.of().set("starting_after", startingAfter).map();
+        return t.post("/v1/instance/referrals/accounts/resync", body, new TypeReference<>() {
+        });
+    }
 }

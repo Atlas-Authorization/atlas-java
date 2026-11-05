@@ -60,4 +60,10 @@ public final class UserHooks {
         return t.get("/v1/instance/hooks/before_user_create/calls", q, new TypeReference<>() {
         });
     }
+
+    /** {@code DELETE /v1/instance/hooks/before_user_create} — turn the hook off and clear its url and signing secret. Idempotent. */
+    public BeforeUserCreateHook clearBeforeUserCreate() {
+        return t.delete(PATH, new TypeReference<>() {
+        });
+    }
 }

@@ -156,4 +156,10 @@ public final class Sessions {
         return t.post("/v1/sessions", body.map(), new TypeReference<>() {
         });
     }
+
+    /** {@code GET /v1/sessions/{id}/status} — cheap freshness check: id, status (active, expired, revoked or ended), user_id, expires_at, last_active_at. */
+    public JsonNode status(String id) {
+        return t.get("/v1/sessions/" + enc(id) + "/status", new TypeReference<>() {
+        });
+    }
 }

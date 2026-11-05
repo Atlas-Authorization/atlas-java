@@ -48,4 +48,13 @@ public final class JwtConnections {
         return t.delete("/v1/jwt_connections/" + enc(id), new TypeReference<>() {
         });
     }
+
+    /**
+     * Where to send the person's browser to sign in with a trusted JWT ({@code GET /v1/sso/jwt/{connectionId}}).
+     * {@code loginUrl} is the connection's {@code login_url}. A URL, not an API call: the token works once,
+     * and the 302 carries a one-time ticket that has to reach the browser.
+     */
+    public static String signInUrl(String loginUrl, String token, String redirectUrl) {
+        return loginUrl + (loginUrl.contains("?") ? "&" : "?") + "token=" + enc(token) + "&redirect_url=" + enc(redirectUrl);
+    }
 }

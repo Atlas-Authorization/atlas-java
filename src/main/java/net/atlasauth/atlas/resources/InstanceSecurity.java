@@ -205,4 +205,22 @@ public final class InstanceSecurity {
         return t.put("/v1/instance/wallet_rpc_secret", body, new TypeReference<>() {
         });
     }
+
+    /** {@code DELETE /v1/instance/signing_keys/next} — cancel a staged rotation; 404 when none is staged. */
+    public JsonNode cancelStagedSigningKey() {
+        return t.delete("/v1/instance/signing_keys/next", new TypeReference<>() {
+        });
+    }
+
+    /** {@code GET /v1/instance/signing_key_policy} — {@code prepublish_days} (null = off). */
+    public JsonNode getSigningKeyPolicy() {
+        return t.get("/v1/instance/signing_key_policy", new TypeReference<>() {
+        });
+    }
+
+    /** {@code PATCH /v1/instance/signing_key_policy} — stage every ordinary rotation this many days ahead (1..90); 0 is off. */
+    public JsonNode setSigningKeyPolicy(int prepublishDays) {
+        return t.patch("/v1/instance/signing_key_policy", Map.of("prepublish_days", prepublishDays), new TypeReference<>() {
+        });
+    }
 }

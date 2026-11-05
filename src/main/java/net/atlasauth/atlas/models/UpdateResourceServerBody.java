@@ -28,6 +28,8 @@ public final class UpdateResourceServerBody {
     public Long refreshTokenIdleTtlSeconds;
     /** client_ids of confidential clients that may introspect this API's tokens. */
     public List<String> introspectionClientIds;
+    /** Named bundles over the scopes: name to scope values. On an update it replaces them all. */
+    public Map<String, List<String>> scopePresets;
 
     @JsonIgnore
     private final Map<String, Object> additionalFields = new LinkedHashMap<>();
@@ -47,6 +49,7 @@ public final class UpdateResourceServerBody {
     public UpdateResourceServerBody refreshTokenAbsoluteTtlSeconds(Long v) { this.refreshTokenAbsoluteTtlSeconds = v; return this; }
     public UpdateResourceServerBody refreshTokenIdleTtlSeconds(Long v) { this.refreshTokenIdleTtlSeconds = v; return this; }
     public UpdateResourceServerBody introspectionClientIds(List<String> v) { this.introspectionClientIds = v; return this; }
+    public UpdateResourceServerBody scopePresets(Map<String, List<String>> v) { this.scopePresets = v; return this; }
 
     /**
      * Set any field by its wire name, including an explicit {@code null} (which

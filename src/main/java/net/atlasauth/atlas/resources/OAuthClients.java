@@ -156,6 +156,17 @@ public final class OAuthClients {
             });
         }
 
+        /** As {@link #create(String, String, List)}, with names from the resource server's {@code scope_presets}, unioned with {@code scopes}. */
+        public OAuthClientGrant create(String clientId, String resourceServerId, List<String> scopes, List<String> scopePresets) {
+            Map<String, Object> body = Params.of()
+                    .set("resource_server_id", resourceServerId)
+                    .set("scopes", scopes)
+                    .set("scope_presets", scopePresets)
+                    .map();
+            return t.post("/v1/oauth_clients/" + enc(clientId) + "/grants", body, new TypeReference<>() {
+            });
+        }
+
         public OAuthClientGrant create(String clientId, String resourceServerId, List<String> scopes) {
             Map<String, Object> body = Params.of()
                     .set("resource_server_id", resourceServerId)

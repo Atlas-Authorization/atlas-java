@@ -200,6 +200,14 @@ public final class Transport {
     }
 
     /**
+     * Send these exact bytes as a JSON body with extra per-call headers, for a request signed
+     * over its raw body. An {@code authorization} entry is ignored.
+     */
+    public <T> T requestSigned(String method, String path, byte[] data, Map<String, String> headers, TypeReference<T> type) {
+        return send(method, path, null, HttpRequest.BodyPublishers.ofByteArray(data), "application/json", null, false, headers, type);
+    }
+
+    /**
      * A JSON request with extra per-call headers (for example the end user's forwarded IP on the
      * Better Auth exchange). An {@code authorization} entry is ignored: the Bearer secret is never replaced.
      */

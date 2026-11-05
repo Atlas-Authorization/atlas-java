@@ -144,6 +144,13 @@ public final class Users {
         });
     }
 
+    /** {@code POST /v1/users/{id}/account_claim} — Protect one existing unverified user, so a proof of its address reaches it instead of making a second account. A 409 {@code ACCOUNT_NOT_CLAIMABLE} names what else on the user signs in. */
+    public com.fasterxml.jackson.databind.JsonNode protectAccountClaim(String id, String idempotencyKey) {
+        Map<String, Object> body = Params.of().set("password_policy", "until_email_verified").map();
+        return t.post("/v1/users/" + enc(id) + "/account_claim", body, idempotencyKey, new TypeReference<>() {
+        });
+    }
+
     public User lock(String id) {
         return lock(id, null);
     }
@@ -581,5 +588,15 @@ public final class Users {
     /** The {@code search} sub-resource. */
     public UsersSearch search() {
         return new UsersSearch(t);
+    }
+
+    /**
+     * {@code DELETE /v1/users/{id}/password} — remove the password, even when it is the only sign-in method.
+     * Idempotent. Signs the user out unless {@code signOutOfOtherSessions} is false; null leaves the default.
+     */
+    public User removePassword(String id, Boolean signOutOfOtherSessions) {
+        return t.delete("/v1/users/" + enc(id) + "/password",
+                Params.of().set("sign_out_of_other_sessions", signOutOfOtherSessions).map(), new TypeReference<>() {
+                });
     }
 }

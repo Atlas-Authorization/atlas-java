@@ -599,4 +599,13 @@ public final class Organizations {
     public OrganizationsWebhookEndpoints webhookEndpoints() {
         return new OrganizationsWebhookEndpoints(t);
     }
+
+    /**
+     * {@code PUT /v1/organizations/by_external_id/{external_id}} — create or update the organization keyed by your
+     * own id: 201 when created, else 200 with only the fields sent changed. {@code name} is required when it creates.
+     */
+    public Organization upsertByExternalId(String externalId, Map<String, Object> body) {
+        return t.put("/v1/organizations/by_external_id/" + enc(externalId), body, new TypeReference<>() {
+        });
+    }
 }

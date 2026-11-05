@@ -748,7 +748,56 @@ class ParityOperationsTest {
     @Test
     void operations18() throws IOException {
         expect("POST", "/v1/instance/integrations/a%20b%2Fc/events_secret/rotate", null, "{\"overlap_seconds\":1}", "idem-1", c -> c.instance().integrations().rotateEventsSecret("a b/c", new InstanceIntegrationsRotateEventsSecretBody().overlapSeconds(1L), "idem-1"));
+        expect("POST", "/v1/instance/integrations/a%20b%2Fc/deliveries/redeliver", null, "{\"since\":\"failing_since\"}", "idem-1", c -> c.instance().integrations().redeliverEvents("a b/c", "failing_since", "idem-1"));
+        expect("POST", "/v1/users/a%20b%2Fc/account_claim", null, "{\"password_policy\":\"until_email_verified\"}", "idem-1", c -> c.users().protectAccountClaim("a b/c", "idem-1"));
+        expect("GET", "/v1/machines/a%20b%2Fc/grants", null, null, null, c -> c.machines().listGrants("a b/c"));
+        expect("POST", "/v1/machines/a%20b%2Fc/grants", null, "{\"resource_server_id\":\"s\",\"scope_presets\":[\"readonly\"]}", null, c -> c.machines().createGrant("a b/c", "s", null, java.util.List.of("readonly")));
+        expect("DELETE", "/v1/machines/a%20b%2Fc/grants/p1", null, null, null, c -> c.machines().deleteGrant("a b/c", "p1"));
+        expect("GET", "/v1/organizations/a%20b%2Fc/machine_memberships", "limit=1", null, null, c -> c.machines().listOrganizationMembers("a b/c", 1L, null));
+        expect("POST", "/v1/organizations/a%20b%2Fc/machine_memberships", null, "{\"machine_id\":\"s\",\"role\":\"org:admin\"}", "idem-1", c -> c.machines().addToOrganization("a b/c", "s", "org:admin", "idem-1"));
+        expect("PATCH", "/v1/organizations/a%20b%2Fc/machine_memberships/p1", null, "{\"role\":\"org:admin\"}", null, c -> c.machines().updateOrganizationRole("a b/c", "p1", "org:admin"));
+        expect("DELETE", "/v1/organizations/a%20b%2Fc/machine_memberships/p1", null, null, null, c -> c.machines().removeFromOrganization("a b/c", "p1"));
         expect("POST", "/v1/integrations/a%20b%2Fc/card/actions/p1", null, "{\"sub\":\"s\"}", "idem-1", c -> c.integrations().runCardAction("a b/c", "p1", new IntegrationsRunCardActionBody().sub("s"), "idem-1"));
     }
 
+    @Test
+    void operations19() throws IOException {
+        expect("DELETE", "/v1/instance/hooks/before_user_create", null, null, null, c -> c.userHooks().clearBeforeUserCreate());
+        expect("DELETE", "/v1/instance/signing_keys/next", null, null, null, c -> c.instanceSecurity().cancelStagedSigningKey());
+        expect("GET", "/v1/instance/signing_key_policy", null, null, null, c -> c.instanceSecurity().getSigningKeyPolicy());
+        expect("PATCH", "/v1/instance/signing_key_policy", null, "{\"prepublish_days\":7}", null, c -> c.instanceSecurity().setSigningKeyPolicy(7));
+        expect("POST", "/v1/partner_executor_keys/a%20b%2Fc/p1", null, "{\"x\":1}", null, c -> c.partnerPlatforms().mintExecutorKey("a b/c", "p1", "{\"x\":1}", "x-signature", "t=1"));
+        expect("DELETE", "/v1/partner_executor_keys/a%20b%2Fc/p1", null, "{\"x\":1}", null, c -> c.partnerPlatforms().revokeExecutorKey("a b/c", "p1", "{\"x\":1}", "x-signature", "t=1"));
+        expect("DELETE", "/v1/users/a%20b%2Fc/password", "sign_out_of_other_sessions=false", null, null, c -> c.users().removePassword("a b/c", false));
+        expect("GET", "/v1/instance/storage_declaration", null, null, null, c -> c.instance().storageDeclaration());
+        expect("GET", "/v1/storage_declaration", "publishable_key=pk_1", null, null, c -> c.instance().publicStorageDeclaration("pk_1"));
+        expect("GET", "/v1/sessions/a%20b%2Fc/status", null, null, null, c -> c.sessions().status("a b/c"));
+        expect("PATCH", "/v1/sso_onboarding_profiles/a%20b%2Fc", null, "{\"x\":1}", null, c -> c.ssoOnboarding().update("a b/c", Map.of("x", 1)));
+        expect("POST", "/v1/instance/referrals/accounts/resync", null, "{\"starting_after\":\"org_1\"}", null, c -> c.referrals().resyncAccounts("org_1"));
+        expect("PUT", "/v1/organizations/by_external_id/a%20b%2Fc", null, "{\"x\":1}", null, c -> c.organizations().upsertByExternalId("a b/c", Map.of("x", 1)));
+        expect("PUT", "/v1/sso_onboarding_profiles/by_name/a%20b%2Fc", null, "{\"x\":1}", null, c -> c.ssoOnboarding().upsertByName("a b/c", Map.of("x", 1)));
+    }
+
+    @Test
+    void partnerExecutorKeySendsTheSignedBytesAndTheSignature() {
+        String raw = "{ \"nonce\":\"n\",  \"iat\":1 }";
+        atlas.partnerPlatforms().mintExecutorKey("p", "i", raw, "x-signature", "t=1");
+        assertEquals(raw, mock.requestBody);
+        assertEquals("t=1", mock.requestHeaders.getFirst("x-signature"));
+        assertEquals("application/json", mock.requestHeaders.getFirst("content-type"));
+    }
+
+    @Test
+    void storageDeclarationCsvAsksForCsv() {
+        atlas.instance().storageDeclarationCsv();
+        assertEquals("format=csv", mock.rawQuery);
+    }
+
+    @Test
+    void jwtSignInUrlEncodesBothValues() {
+        assertEquals("https://a.test/j?token=t%20k&redirect_url=https%3A%2F%2Fb.test%2F%3Fx%3D1",
+                net.atlasauth.atlas.resources.JwtConnections.signInUrl("https://a.test/j", "t k", "https://b.test/?x=1"));
+        assertEquals("https://a.test/j?z=1&token=t&redirect_url=u",
+                net.atlasauth.atlas.resources.JwtConnections.signInUrl("https://a.test/j?z=1", "t", "u"));
+    }
 }

@@ -322,4 +322,26 @@ public final class Instance {
             });
         }
     }
+
+    /** {@code GET /v1/instance/storage_declaration} — every cookie and browser-storage key of the hosted pages, for a consent manager to import. */
+    public JsonNode storageDeclaration() {
+        return t.get("/v1/instance/storage_declaration", new TypeReference<>() {
+        });
+    }
+
+    /** {@link #storageDeclaration()} as CSV text. */
+    public String storageDeclarationCsv() {
+        return t.getRaw("/v1/instance/storage_declaration", Params.of("format", "csv").map());
+    }
+
+    /** {@code GET /v1/storage_declaration} — the same declaration read by publishable key. Nothing in it is secret. */
+    public JsonNode publicStorageDeclaration(String publishableKey) {
+        return t.get("/v1/storage_declaration", Params.of("publishable_key", publishableKey).map(), new TypeReference<>() {
+        });
+    }
+
+    /** {@link #publicStorageDeclaration(String)} as CSV text. */
+    public String publicStorageDeclarationCsv(String publishableKey) {
+        return t.getRaw("/v1/storage_declaration", Params.of("publishable_key", publishableKey).set("format", "csv").map());
+    }
 }
