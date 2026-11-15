@@ -127,7 +127,7 @@ public final class LogoutTokenVerifier {
         }
 
         if (!SigningAlgs.allowed(jwt)) {
-            throw new LogoutTokenException(LogoutTokenException.Reason.BAD_ALGORITHM, "logout_token must be signed with RS256 or ES256");
+            throw new LogoutTokenException(LogoutTokenException.Reason.BAD_ALGORITHM, "logout_token must be signed with RS256, ES256, ES384, PS256 or EdDSA");
         }
         JOSEObjectType typ = jwt.getHeader().getType();
         if (typ != null) {

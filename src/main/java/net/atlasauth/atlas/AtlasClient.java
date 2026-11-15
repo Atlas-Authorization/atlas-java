@@ -1,7 +1,10 @@
 package net.atlasauth.atlas;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.atlasauth.atlas.catalog.Catalog;
 import net.atlasauth.atlas.http.Json;
+import net.atlasauth.atlas.http.Resilience;
+import net.atlasauth.atlas.http.Telemetry;
 import net.atlasauth.atlas.http.Transport;
 import net.atlasauth.atlas.resources.AppCatalog;
 import net.atlasauth.atlas.resources.LdapServerClients;
@@ -313,6 +316,8 @@ public final class AtlasClient {
     private final AuditExports auditExports;
     private final Status status;
     private final Delivery delivery;
+    private final Catalog catalog;
+    private final Doctor doctor;
 
     private final Builder config;
 
@@ -335,11 +340,11 @@ public final class AtlasClient {
 
         this.transport = new Transport(b.secretKey, apiUrl, http, mapper, timeout, b.strict, b.onUnknownFields,
                 "This call needs an instance secret key: set AtlasClient.builder().secretKey(\"sk_...\").",
-                b.dryRun, b.traceparent, b.secretRecipient);
+                b.dryRun, b.traceparent, b.secretRecipient, b.resilience, b.telemetry);
         Transport platformTransport = new Transport(b.platformKey, apiUrl, http, mapper, timeout, b.strict,
                 b.onUnknownFields,
                 "Platform calls need a platform key: set AtlasClient.builder().platformKey(\"psk_...\").",
-                b.dryRun, b.traceparent, b.secretRecipient);
+                b.dryRun, b.traceparent, b.secretRecipient, b.resilience, b.telemetry);
 
         this.users = new Users(transport);
         this.appCatalog = new AppCatalog(transport);
@@ -478,6 +483,8 @@ public final class AtlasClient {
         this.auditExports = new AuditExports(transport);
         this.status = new Status(transport);
         this.delivery = new Delivery(transport);
+        this.catalog = new Catalog(transport, platformTransport);
+        this.doctor = new Doctor(b.secretKey, b.platformKey, apiUrl, http, mapper, timeout, transport);
     }
 
     /**
@@ -1123,6 +1130,20 @@ public final class AtlasClient {
         return status;
     }
 
+    /**
+     * Every Backend API and Platform API operation that has no hand-written method, generated from the OpenAPI
+     * document: typed request builders, typed responses, cursor {@code Iterable}s and idempotency keys.
+     * {@code atlas.catalog().<namespace>().<operation>(...)}.
+     */
+    public Catalog catalog() {
+        return catalog;
+    }
+
+    /** Check this client's setup: keys, clock skew, reachability, instance status, config. See {@link Doctor}. */
+    public Doctor doctor() {
+        return doctor;
+    }
+
     /** Outbound delivery health and the egress IPs. */
     public Delivery delivery() {
         return delivery;
@@ -1197,6 +1218,8 @@ public final class AtlasClient {
         private boolean dryRun;
         private String traceparent;
         private String secretRecipient;
+        private Resilience resilience = Resilience.none();
+        private Telemetry telemetry;
 
         private Builder copy() {
             Builder b = new Builder();
@@ -1211,6 +1234,8 @@ public final class AtlasClient {
             b.dryRun = dryRun;
             b.traceparent = traceparent;
             b.secretRecipient = secretRecipient;
+            b.resilience = resilience;
+            b.telemetry = telemetry;
             return b;
         }
 
@@ -1259,6 +1284,18 @@ public final class AtlasClient {
         /** Send a W3C {@code traceparent} on every call (see {@link AtlasClient#withTraceparent(String)}). */
         public Builder traceparent(String traceparent) {
             this.traceparent = traceparent;
+            return this;
+        }
+
+        /** Retry policy for 429/503 and (when safe) 502/504/network errors; honours {@code Retry-After}. Off by default; see {@link Resilience}. */
+        public Builder resilience(Resilience resilience) {
+            this.resilience = resilience == null ? Resilience.none() : resilience;
+            return this;
+        }
+
+        /** Report every request to this hook (the {@code atlas-java-otel} module provides an OpenTelemetry one). */
+        public Builder telemetry(Telemetry telemetry) {
+            this.telemetry = telemetry;
             return this;
         }
 

@@ -228,7 +228,7 @@ class BxSurfaceTest {
         assertTrue(v.verify(sign(session().build(), JWSAlgorithm.RS256, "rs-1")).ok());
         assertFalse(v.verify(sign(session().build(), JWSAlgorithm.ES256, "rs-1")).ok());
         assertFalse(v.verify(sign(session().build(), JWSAlgorithm.HS256, "ec-1")).ok());
-        assertEquals(List.of(JWSAlgorithm.RS256, JWSAlgorithm.ES256), SigningAlgs.ALGS);
+        assertEquals(List.of(JWSAlgorithm.RS256, JWSAlgorithm.ES256, JWSAlgorithm.ES384, JWSAlgorithm.PS256, JWSAlgorithm.EdDSA), SigningAlgs.ALGS);
     }
 
     private JWTClaimsSet.Builder access() {

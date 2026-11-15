@@ -44,6 +44,12 @@ public final class JwtTemplates {
         });
     }
 
+    /** Change a template's claims and/or its mint settings (lifetime, audience, algorithm, HS256 secret). */
+    public JwtTemplate update(String name, net.atlasauth.atlas.models.UpdateJwtTemplateBody body) {
+        return t.patch("/v1/jwt_templates/" + enc(name), body, new TypeReference<>() {
+        });
+    }
+
     /** Returns {@code {object, name, deleted}}. */
     public JsonNode delete(String name) {
         return t.delete("/v1/jwt_templates/" + enc(name), new TypeReference<>() {

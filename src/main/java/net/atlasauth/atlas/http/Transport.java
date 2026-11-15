@@ -51,6 +51,8 @@ public final class Transport {
     private final boolean dryRun;
     private final String traceparent;
     private final String secretRecipient;
+    private final Resilience resilience;
+    private final Telemetry telemetry;
 
     public Transport(String secretKey, String baseUrl, HttpClient http, ObjectMapper mapper, Duration timeout) {
         this(secretKey, baseUrl, http, mapper, timeout, null, null, null);
@@ -87,6 +89,19 @@ public final class Transport {
     public Transport(String secretKey, String baseUrl, HttpClient http, ObjectMapper mapper, Duration timeout,
                      Boolean strict, Consumer<UnknownFieldsWarning> onUnknownFields, String missingKeyMessage,
                      boolean dryRun, String traceparent, String secretRecipient) {
+        this(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage, dryRun, traceparent,
+                secretRecipient, Resilience.none(), null);
+    }
+
+    /**
+     * @param resilience status-aware retry policy ({@link Resilience#none()} = never retry)
+     * @param telemetry  a span/metrics hook around every request ({@code null} = none)
+     */
+    public Transport(String secretKey, String baseUrl, HttpClient http, ObjectMapper mapper, Duration timeout,
+                     Boolean strict, Consumer<UnknownFieldsWarning> onUnknownFields, String missingKeyMessage,
+                     boolean dryRun, String traceparent, String secretRecipient, Resilience resilience, Telemetry telemetry) {
+        this.resilience = resilience == null ? Resilience.none() : resilience;
+        this.telemetry = telemetry;
         this.secretRecipient = secretRecipient;
         this.dryRun = dryRun;
         this.traceparent = traceparent;
@@ -111,22 +126,42 @@ public final class Transport {
 
     /** A copy of this transport that sends {@code Atlas-Strict: <strict>} on writes ({@code null} = never). */
     public Transport withStrict(Boolean strict) {
-        return new Transport(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage, dryRun, traceparent, secretRecipient);
+        return new Transport(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage, dryRun, traceparent, secretRecipient, resilience, telemetry);
     }
 
     /** A copy of this transport that sends every write as a dry run ({@code ?dry_run=true}). */
     public Transport withDryRun(boolean dryRun) {
-        return new Transport(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage, dryRun, traceparent, secretRecipient);
+        return new Transport(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage, dryRun, traceparent, secretRecipient, resilience, telemetry);
     }
 
     /** A copy of this transport that sends a W3C {@code traceparent} on every call ({@code null} = none). */
     public Transport withTraceparent(String traceparent) {
-        return new Transport(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage, dryRun, traceparent, secretRecipient);
+        return new Transport(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage, dryRun, traceparent, secretRecipient, resilience, telemetry);
     }
 
     /** A copy of this transport that sends {@code X-Secret-Recipient} on every call ({@code null} = none). */
     public Transport withSecretRecipient(String secretRecipient) {
-        return new Transport(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage, dryRun, traceparent, secretRecipient);
+        return new Transport(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage, dryRun, traceparent, secretRecipient, resilience, telemetry);
+    }
+
+    /** A copy of this transport with this retry policy. */
+    public Transport withResilience(Resilience resilience) {
+        return new Transport(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage, dryRun, traceparent, secretRecipient, resilience, telemetry);
+    }
+
+    /** A copy of this transport that reports every request to this hook ({@code null} = none). */
+    public Transport withTelemetry(Telemetry telemetry) {
+        return new Transport(secretKey, baseUrl, http, mapper, timeout, strict, onUnknownFields, missingKeyMessage, dryRun, traceparent, secretRecipient, resilience, telemetry);
+    }
+
+    /** The base URL requests go to (no trailing slash). */
+    public String baseUrl() {
+        return baseUrl;
+    }
+
+    /** The HTTP client in use (shared with the client that built this transport). */
+    public HttpClient httpClient() {
+        return http;
     }
 
     // ---- Convenience verbs -------------------------------------------------
@@ -252,6 +287,109 @@ public final class Transport {
                        boolean raw,
                        Map<String, String> extraHeaders,
                        TypeReference<T> type) {
+        Telemetry.Span span = null;
+        if (telemetry != null) {
+            try {
+                span = telemetry.start(method, path);
+            } catch (RuntimeException ignored) {
+                // telemetry never breaks a call
+            }
+        }
+        boolean hasKey = idempotencyKey != null && !idempotencyKey.isEmpty();
+        int attempt = 0;
+        while (true) {
+            int status = 0;
+            RuntimeException failure;
+            Duration retryAfter = null;
+            try {
+                T result = sendOnce(method, path, query, publisher, contentType, idempotencyKey, raw, extraHeaders, type);
+                endSpan(span, 200, null);
+                return result;
+            } catch (AtlasApiException e) {
+                status = e.status();
+                retryAfter = e.retryAfter();
+                failure = e;
+            } catch (AtlasConnectionException e) {
+                failure = e;
+            }
+            Duration wait = null;
+            if (attempt < resilience.maxRetries() && resilience.retryable(status, method.toUpperCase(), hasKey)
+                    && !(resilience.statusAware() && (status == 503 || status == 0) && confirmedOutage())) {
+                wait = resilience.delay(attempt + 1, retryAfter);
+            }
+            if (wait == null || !replayable(publisher)) {
+                endSpan(span, status, failure);
+                throw failure;
+            }
+            attempt++;
+            if (span != null) {
+                try {
+                    span.retry(attempt, status, wait);
+                } catch (RuntimeException ignored) {
+                    // telemetry never breaks a call
+                }
+            }
+            try {
+                resilience.sleep(wait);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+                endSpan(span, status, failure);
+                throw failure;
+            }
+        }
+    }
+
+    /** A body publisher built from bytes or a string can be sent again; a streaming one cannot. */
+    private static boolean replayable(HttpRequest.BodyPublisher publisher) {
+        return publisher.contentLength() >= 0;
+    }
+
+    private static void endSpan(Telemetry.Span span, int status, Throwable error) {
+        if (span != null) {
+            try {
+                span.end(status, error);
+            } catch (RuntimeException ignored) {
+                // telemetry never breaks a call
+            }
+        }
+    }
+
+    /** True when the public status endpoint reports a major outage (overall or the backend_api component): waiting cannot help, so stop retrying. */
+    private boolean confirmedOutage() {
+        try {
+            HttpRequest req = HttpRequest.newBuilder(URI.create(baseUrl + "/v1/status"))
+                    .timeout(Duration.ofSeconds(3)).header("accept", "application/json").GET().build();
+            HttpResponse<String> res = http.send(req, HttpResponse.BodyHandlers.ofString());
+            if (res.statusCode() != 200) {
+                return false;
+            }
+            com.fasterxml.jackson.databind.JsonNode doc = mapper.readTree(res.body());
+            if ("major_outage".equals(doc.path("status").asText())) {
+                return true;
+            }
+            for (com.fasterxml.jackson.databind.JsonNode comp : doc.path("components")) {
+                if ("backend_api".equals(comp.path("id").asText()) && "major_outage".equals(comp.path("status").asText())) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (IOException | RuntimeException e) {
+            return false;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
+        }
+    }
+
+    private <T> T sendOnce(String method,
+                       String path,
+                       Map<String, Object> query,
+                       HttpRequest.BodyPublisher publisher,
+                       String contentType,
+                       String idempotencyKey,
+                       boolean raw,
+                       Map<String, String> extraHeaders,
+                       TypeReference<T> type) {
         if (secretKey == null || secretKey.isEmpty()) {
             throw new IllegalStateException(missingKeyMessage != null ? missingKeyMessage
                     : "No API key is configured for this call.");
@@ -314,7 +452,10 @@ public final class Transport {
         response.headers().firstValue(UNKNOWN_FIELDS_HEADER).ifPresent(v -> reportUnknown(method, path, v));
 
         if (status < 200 || status >= 300) {
-            throw toApiError(status, text);
+            AtlasApiException error = toApiError(status, text);
+            error.setRetryAfter(Resilience.parseRetryAfter(response.headers().firstValue("retry-after").orElse(null),
+                    java.time.Instant.now()));
+            throw error;
         }
         if (status == 204 || text == null || text.isEmpty()) {
             return null;

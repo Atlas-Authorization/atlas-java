@@ -1,0 +1,16 @@
+{
+ "generate_despite_handwritten": [],
+ "method_names": {},
+ "no_idempotency": [],
+ "skip": {
+  "GET /v1/organizations/{id}/app_webhook_endpoints": "hand-written in AppEvents / Organizations / Platform (its path is built by a helper the scan cannot follow)",
+  "GET /v1/organizations/{id}/memberships/{userId}": "hand-written in AppEvents / Organizations / Platform (its path is built by a helper the scan cannot follow)",
+  "GET /v1/organizations/{id}/roles": "hand-written in AppEvents / Organizations / Platform (its path is built by a helper the scan cannot follow)",
+  "GET /v1/organizations/{id}/teams": "hand-written in AppEvents / Organizations / Platform (its path is built by a helper the scan cannot follow)",
+  "GET /v1/platform/atlas_id_apps/{id}/provisioned_accounts": "hand-written in AppEvents / Organizations / Platform (its path is built by a helper the scan cannot follow)",
+  "POST /v1/organizations/{id}/app_webhook_endpoints": "hand-written in AppEvents / Organizations / Platform (its path is built by a helper the scan cannot follow)",
+  "POST /v1/organizations/{id}/roles": "hand-written in AppEvents / Organizations / Platform (its path is built by a helper the scan cannot follow)",
+  "POST /v1/organizations/{id}/teams": "hand-written in AppEvents / Organizations / Platform (its path is built by a helper the scan cannot follow)",
+  "POST /v1/platform/atlas_id_apps/{id}/provisioned_accounts": "hand-written in AppEvents / Organizations / Platform (its path is built by a helper the scan cannot follow)"
+ }
+}

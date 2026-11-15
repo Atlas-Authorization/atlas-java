@@ -20,6 +20,7 @@ public class AtlasApiException extends AtlasException {
 
     private final int status;
     private final List<ErrorItem> errors;
+    private java.time.Duration retryAfter;
 
     public AtlasApiException(int status, List<ErrorItem> errors) {
         super(firstMessage(status, errors));
@@ -32,6 +33,16 @@ public class AtlasApiException extends AtlasException {
             return errors.get(0).message();
         }
         return "Atlas API request failed with status " + status;
+    }
+
+    /** The server's {@code Retry-After} as a duration, or null when the response carried none (set by the transport). */
+    public java.time.Duration retryAfter() {
+        return retryAfter;
+    }
+
+    /** Called by the transport; not part of the public contract. */
+    public void setRetryAfter(java.time.Duration retryAfter) {
+        this.retryAfter = retryAfter;
     }
 
     /** HTTP status of the failed response. */
