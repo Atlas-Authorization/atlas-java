@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 
 /**
  * Verifies Atlas-issued OAuth access tokens for your own API (an OAuth 2.0 resource server),
- * locally against the instance JWKS — RS256 or ES256, nothing else: the issuer, expiry, that it IS
+ * locally against the instance JWKS — RS256, ES256, ES384, PS256 or EdDSA, nothing else: the issuer, expiry, that it IS
  * an access token, that its {@code aud} names your API (RFC 8707), and the scopes a route needs. A
  * refusal carries the RFC 6750 / RFC 9728 {@code WWW-Authenticate} challenge, so an OAuth or MCP
  * client can discover Atlas from the 401 ({@code resource_metadata}) or ask for the missing scope.

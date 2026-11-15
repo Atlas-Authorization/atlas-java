@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.22.0 - 2026-11-14
+
+### Added
+
+- **Every operation, typed.** `atlas.catalog()` exposes all Backend API and Platform API operations without a hand-written method (1,028 operations in 146 namespaces): fluent request models, record responses, query option classes, lazy `Iterable` cursor lists (`listAll`) and `Idempotency-Key` overloads. `clearX()` on a request model sends an explicit JSON `null` to clear a field; unset fields are omitted.
+- **Resilience.** Opt-in `Resilience` retries 429/503 (and 502/504/network errors when a repeat is safe), honours `Retry-After`, backs off with jitter, and with `statusAware` stops at once when `GET /v1/status` reports a major outage. `AtlasApiException.retryAfter()`.
+- **Doctor.** `atlas.doctor().run()` checks keys, clock skew, JWKS reachability, service status, credentials and config.
+- **OpenTelemetry.** The `telemetry` hook on the client; the optional `atlas-java-otel` module records a client span per request and request, retry and duration metrics.
+- **Relying party.** `RelyingParty` (start, callback, `touchIfDue`, `requireRecentAuth`, sign-out; PKCE, state, nonce, ID-token verification) and the Jakarta Servlet `RelyingPartyFilter` with a sealed session cookie.
+- **Verification primitives.** `KeyMirror`, `SidRevocationList`, `ResourceRoleMirror`, `MachineClient` with `DpopKey`, `WebBotAuth` (verify and sign), `WebhookDedupe` (memory and JDBC stores) and `TransactionTokenVerifier`.
+- **Session helpers.** `SessionClaims.authenticatedWithin`, `usedMultiFactor`, `mfaSatisfied`, `mfaOrgSatisfied`; JWT template settings (`JwtTemplateSettings`, `UpdateJwtTemplateBody`, `JwtTemplate.settings`).
+- **Spring Boot starter** `net.atlasauth:atlas-spring-boot-starter`: auto-configuration, a networkless Spring Security filter, `AtlasPrincipal` / `AtlasAuthentication`, `atlas.security.*` and `atlas.login.*` properties.
+- **Signed status list** for `SidRevocationList` (`.statusList(jwksUrl, issuer)`): the signed `GET /v1/sessions/revocations/status-list` is verified (RS256, PS256, ES256, ES384, EdDSA) and used in place of the feed; when it cannot answer (bad signature, expired, truncated) the feed answers.
+- **All five signing algorithms.** Session, access, logout, ID, transaction and status-list tokens verify under RS256, PS256, ES256, ES384 and EdDSA; a key only ever verifies its own family and curve, and `none` / HMAC are refused.
+- The Spring Boot starter and the OpenTelemetry module are published to Maven Central with the SDK (`atlas-spring-boot-starter`, `atlas-java-otel`).
+- `AtlasClient.transport()` for an operation the SDK has no method for.
+
+### Changed
+
+- Dependencies updated to patched releases: Jackson 2.21.4, Nimbus JOSE+JWT 10.10, Spring Boot 3.5.16 (Spring Framework 6.2.19, Spring Security 6.5.11). The Java baseline stays 17.
+
 ## 1.21.0 — 2026-11-02
 
 ### Added

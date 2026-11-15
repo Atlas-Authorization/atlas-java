@@ -142,6 +142,71 @@ public final class SessionClaims {
         return version != null && version.equals(pol().get(key));
     }
 
+    /** {@code auth_time}: epoch seconds of the first-factor sign-in or the last step-up, or null. */
+    public Long authTime() {
+        return num("auth_time");
+    }
+
+    /** {@code acr}: the authentication context ({@code urn:atlas:acr:basic}, {@code :mfa}, {@code :step_up}), or null. */
+    public String acr() {
+        return str("acr");
+    }
+
+    /** {@code amr}: the authentication methods used. */
+    @SuppressWarnings("unchecked")
+    public List<String> amr() {
+        Object v = claims.get("amr");
+        return v instanceof List<?> list ? (List<String>) list : List.of();
+    }
+
+    /**
+     * Whether {@code auth_time} is within {@code maxAgeSeconds} of now: the "recent sign-in" gate for a
+     * sensitive action. A token without {@code auth_time} never is.
+     */
+    public boolean authenticatedWithin(long maxAgeSeconds) {
+        return authenticatedWithin(maxAgeSeconds, System.currentTimeMillis());
+    }
+
+    /** As {@link #authenticatedWithin(long)}, against an explicit clock (epoch milliseconds). */
+    public boolean authenticatedWithin(long maxAgeSeconds, long nowMs) {
+        Long at = authTime();
+        return at != null && nowMs / 1000.0 - at <= maxAgeSeconds;
+    }
+
+    /** Whether the session proved a second factor: {@code acr} is the mfa level, or {@code amr} includes {@code mfa}. */
+    public boolean usedMultiFactor() {
+        return "urn:atlas:acr:mfa".equals(acr()) || amr().contains("mfa");
+    }
+
+    /**
+     * Whether the session satisfies a "requires MFA" rule: the server's own {@code mfa_satisfied} verdict when
+     * the token carries it, else {@code mfa}, {@link #usedMultiFactor()}, or an enterprise SSO sign-in (the
+     * identity provider owns the second factor).
+     */
+    public boolean mfaSatisfied() {
+        if (claims.get("mfa_satisfied") instanceof Boolean b) {
+            return b;
+        }
+        return mfa() || usedMultiFactor() || claims.get("sso_connection_id") instanceof String;
+    }
+
+    /**
+     * Whether the session meets the active organization's MFA policy: true when the organization does not
+     * require MFA or the token says {@code org_mfa_ok}. Pass the organization you are authorizing for (its
+     * Atlas id or external id): a token whose active organization is another one answers false.
+     */
+    public boolean mfaOrgSatisfied(String orgIdOrExternalId) {
+        boolean required = Boolean.TRUE.equals(claims.get("org_mfa_required"));
+        if (orgIdOrExternalId == null) {
+            return !required || Boolean.TRUE.equals(claims.get("org_mfa_ok"));
+        }
+        boolean matches = orgIdOrExternalId.equals(claims.get("org_id")) || orgIdOrExternalId.equals(claims.get("org_external_id"));
+        if (required) {
+            return Boolean.TRUE.equals(claims.get("org_mfa_ok")) && (matches || claims.get("org_id") == null);
+        }
+        return matches;
+    }
+
     private String str(String key) {
         Object v = claims.get(key);
         return v == null ? null : String.valueOf(v);

@@ -16,6 +16,10 @@ jobs:
           distribution: temurin
           java-version: "17"
           cache: maven
+      - name: Catalog is up to date with the OpenAPI snapshot
+        run: |
+          python3 scripts/gen_catalog.py
+          git diff --exit-code -- src scripts
       - run: mvn -B -q test
       # Framework integrations (Ktor, Quarkus, Micronaut) build against the SDK just compiled above.
       - run: mvn -B -q install -DskipTests

@@ -22,14 +22,14 @@ Maven:
 <dependency>
   <groupId>net.atlasauth</groupId>
   <artifactId>atlas-java</artifactId>
-  <version>1.21.0</version>
+  <version>1.22.0</version>
 </dependency>
 ```
 
 Gradle:
 
 ```kotlin
-implementation("net.atlasauth:atlas-java:1.21.0")
+implementation("net.atlasauth:atlas-java:1.22.0")
 ```
 
 ## The management client
@@ -711,6 +711,82 @@ public class AtlasConfig {
 
 Both are thread-safe singletons; inject `AtlasClient` into services and
 `SessionVerifier` into a filter/interceptor that authenticates incoming requests.
+
+## Every operation, typed (`atlas.catalog()`)
+
+`atlas.catalog()` exposes every Backend API and Platform API operation that has no hand-written method, generated from the
+OpenAPI document: request models are mutable builders with fluent setters, responses are records, list operations have a
+lazy `Iterable` (`listAll`), and writes that accept an `Idempotency-Key` have an overload for it.
+
+```java
+var query = new AdministrativeUnitsListQuery().limit(100L);
+for (var unit : atlas.catalog().administrativeUnits().listAll(query)) { ... }
+
+atlas.catalog().administrativeUnits().update("au_1",
+    new AdministrativeUnitsUpdateBody().name("EMEA").clearDescription());   // clearX() sends an explicit null; unset fields are omitted
+```
+
+Hand-written methods keep their signatures; the catalog also carries typed models for fields the older models lack.
+
+## Resilience, telemetry and doctor
+
+```java
+AtlasClient atlas = AtlasClient.builder().secretKey(key)
+    .resilience(Resilience.standard())                   // 429/503 honour Retry-After; 502/504/network only when a repeat is safe; reads GET /v1/status
+    .telemetry(new AtlasOpenTelemetry(openTelemetry))    // module atlas-java-otel, optional
+    .build();
+System.out.println(atlas.doctor().run());                // keys, clock skew, JWKS, service status, credentials, config
+```
+
+Retries are off by default. `AtlasApiException.retryAfter()` exposes the server's wait.
+
+## Relying party (hosted-redirect sign-in)
+
+`RelyingParty` runs the OpenID Connect code flow (state, nonce, PKCE S256 in one sealed cookie; ID token checked for algorithm,
+`iss`, `aud`/`azp`, `exp`, `nonce`, `at_hash`) plus keep-alive (`touchIfDue`), step-up (`requireRecentAuth`) and sign-out.
+`RelyingPartyFilter` is the Jakarta Servlet filter around it: sign-in, callback and sign-out routes, a sealed session cookie,
+and `RelyingPartyFilter.user(request)`.
+
+```java
+RelyingParty rp = new RelyingParty(RpConfig.builder(issuer, clientId, "https://app.example.com/auth/callback", secret)
+    .clientSecret(clientSecret).secretKey(atlasSecretKey).build());
+RelyingPartyFilter filter = RelyingPartyFilter.builder(rp).requireSignIn("/app").build();
+```
+
+## Verification primitives
+
+| Class | What it does |
+|---|---|
+| `mirror.KeyMirror` | Local mirror of end-user API keys: verify with no network call, mint/import/rotate/revoke, revocation feed `sync()`, webhooks |
+| `mirror.SidRevocationList` | Polled list of revoked session ids, optional fail-closed when stale |
+| `mirror.ResourceRoleMirror` | `can(user, permission, resource)` answered locally with the server's inheritance rules |
+| `machine.MachineClient` | Enrol a machine, mint machine tokens, DPoP proofs (`DpopKey`) |
+| `webbotauth.WebBotAuth` | Verify (and sign) Web Bot Auth HTTP message signatures, allow/block policy |
+| `webhook.WebhookDedupe` | Verify a webhook and drop a repeated `atlas-id` (memory or JDBC store) |
+| `verify.TransactionTokenVerifier` | Transaction tokens for a trust domain |
+
+`SessionClaims` gained `authenticatedWithin(seconds)`, `usedMultiFactor()`, `mfaSatisfied()` and `mfaOrgSatisfied(org)`;
+`JwtTemplateSettings` sets a JWT template's lifetime, audience and algorithm.
+
+## Spring Boot starter
+
+`net.atlasauth:atlas-spring-boot-starter` auto-configures: an `AtlasClient`, a networkless Spring Security filter that turns a
+valid session token into an `AtlasAuthentication` whose principal (`@AuthenticationPrincipal AtlasPrincipal`) carries
+claims, organization, role and permissions, a default stateless chain (`atlas.security.public-paths`), and the sign-in flow when
+`atlas.login.client-id` is set.
+
+```yaml
+atlas:
+  issuer: https://clerk.example.com
+  jwks-url: https://api.atlasauth.net/v1/jwks
+  secret-key: ${ATLAS_SECRET_KEY}
+  security:
+    public-paths: [/, /health]
+  login:
+    client-id: oc_...
+    redirect-uri: https://app.example.com/auth/callback
+    secret: ${ATLAS_LOGIN_SECRET}
+```
 
 ## License
 
