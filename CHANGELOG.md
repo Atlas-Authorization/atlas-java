@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.23.1 - 2026-11-23
+
+### Fixed
+
+- A request that fails with a connection error (a reset or a closed idle connection) before any response is retried once, after a short jittered delay, when it is a GET, HEAD, OPTIONS, PUT or DELETE or carries an idempotency key. Timeouts and other writes are never retried.
+
 ## 1.23.0 - 2026-11-22
 
 ### Added
