@@ -192,4 +192,10 @@ public final class DataSubjectRequestsApi {
         return t.request("PATCH", "/v1/data_subject_requests/" + enc(id) + "/triage", null, body, null, false, new TypeReference<Map<String, Object>>() {
         });
     }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Map<String, Object> updateTriage(String id, DataSubjectRequestsUpdateTriageBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/data_subject_requests/" + enc(id) + "/triage", null, body, idempotencyKey, false, new TypeReference<Map<String, Object>>() {
+        });
+    }
 }

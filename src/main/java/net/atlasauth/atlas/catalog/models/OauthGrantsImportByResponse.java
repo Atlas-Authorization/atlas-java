@@ -15,6 +15,7 @@ public record OauthGrantsImportByResponse(
         @JsonProperty("failed") Long failed,
         @JsonProperty("refresh_tokens") Long refreshTokens,
         @JsonProperty("results") List<OauthGrantsImportByResponseResultsItem> results,
+        @JsonProperty("data") List<OauthGrantsImportByResponseDataItem> data,
         @JsonProperty("errors") List<OauthGrantsImportByResponseErrorsItem> errors,
         @JsonProperty("note") String note) {
 }

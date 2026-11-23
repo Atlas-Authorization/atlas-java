@@ -21,6 +21,78 @@ public final class SsfApi {
         this.t = t;
     }
 
+    /** {@code POST /v1/ssf/add_subject} - Add a subject to a stream (8.1.3.2). 200, empty body. Scope: {@code pca:write}. */
+    public Map<String, Object> addSubject(SsfAddSubjectBody body) {
+        return t.request("POST", "/v1/ssf/add_subject", null, body, null, false, new TypeReference<Map<String, Object>>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Map<String, Object> addSubject(SsfAddSubjectBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/ssf/add_subject", null, body, idempotencyKey, false, new TypeReference<Map<String, Object>>() {
+        });
+    }
+
+    /** {@code DELETE /v1/ssf/configuration} - Delete a stream (?stream_id, 8.1.1.5): 204. Scope: {@code pca:write}. */
+    public Map<String, Object> deleteConfiguration(Map<String, Object> body, SsfDeleteConfigurationQuery query) {
+        return t.request("DELETE", "/v1/ssf/configuration", query == null ? null : query.toMap(), body, null, false, new TypeReference<Map<String, Object>>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Map<String, Object> deleteConfiguration(Map<String, Object> body, SsfDeleteConfigurationQuery query, String idempotencyKey) {
+        return t.request("DELETE", "/v1/ssf/configuration", query == null ? null : query.toMap(), body, idempotencyKey, false, new TypeReference<Map<String, Object>>() {
+        });
+    }
+
+    /** {@code GET /v1/ssf/configuration} - Read one stream (?stream_id) or all of the receiver's streams (8.1.1.2). Another receiver's stream is 404. Scope: {@code pca:read}. */
+    public Map<String, Object> getConfiguration() {
+        return t.request("GET", "/v1/ssf/configuration", null, null, null, false, new TypeReference<Map<String, Object>>() {
+        });
+    }
+
+    /** As above, with every optional parameter. */
+    public Map<String, Object> getConfiguration(SsfGetConfigurationQuery query) {
+        return t.request("GET", "/v1/ssf/configuration", query == null ? null : query.toMap(), null, null, false, new TypeReference<Map<String, Object>>() {
+        });
+    }
+
+    /** {@code PATCH /v1/ssf/configuration} - Update a stream (8.1.1.3): only the members present change; transmitter-supplied members must match; the delivery method cannot change. Scope: {@code pca:write}. */
+    public Map<String, Object> updateConfiguration(SsfUpdateConfigurationBody body) {
+        return t.request("PATCH", "/v1/ssf/configuration", null, body, null, false, new TypeReference<Map<String, Object>>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Map<String, Object> updateConfiguration(SsfUpdateConfigurationBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/ssf/configuration", null, body, idempotencyKey, false, new TypeReference<Map<String, Object>>() {
+        });
+    }
+
+    /** {@code POST /v1/ssf/configuration} - Create an event stream (OpenID SSF 1.0 8.1.1.1). Receiver-supplied members: events_requested, delivery, description. Poll delivery by default (the transmitter assigns the endpoint); push needs an https endpoint_url. One stream per receiver (a second is 409). The stream belongs to the creating API key. Scope: {@code pca:write}. */
+    public SsfConfigurationResponse configuration(SsfConfigurationBody body) {
+        return t.request("POST", "/v1/ssf/configuration", null, body, null, false, new TypeReference<SsfConfigurationResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public SsfConfigurationResponse configuration(SsfConfigurationBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/ssf/configuration", null, body, idempotencyKey, false, new TypeReference<SsfConfigurationResponse>() {
+        });
+    }
+
+    /** {@code PUT /v1/ssf/configuration} - Replace a stream (8.1.1.4): a missing receiver-supplied member is deleted. Scope: {@code pca:write}. */
+    public Map<String, Object> setConfiguration(SsfSetConfigurationBody body) {
+        return t.request("PUT", "/v1/ssf/configuration", null, body, null, false, new TypeReference<Map<String, Object>>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Map<String, Object> setConfiguration(SsfSetConfigurationBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/ssf/configuration", null, body, idempotencyKey, false, new TypeReference<Map<String, Object>>() {
+        });
+    }
+
     /** {@code POST /v1/ssf/events} - Raise a Shared Signals event for one of your users: the CAEP and RISC events Atlas has no flow for (opt-in, opt-out-initiated, opt-out-cancelled, opt-out-effective, identifier-recycled, recovery-activated ...). It reaches every stream that asked for the event and whose subject rules allow the user. 202. Scope: {@code ssf:write}. */
     public void createEvent(SsfCreateEventBody body) {
         t.request("POST", "/v1/ssf/events", null, body, null, false, new TypeReference<Object>() {
@@ -30,6 +102,24 @@ public final class SsfApi {
     /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
     public void createEvent(SsfCreateEventBody body, String idempotencyKey) {
         t.request("POST", "/v1/ssf/events", null, body, idempotencyKey, false, new TypeReference<Object>() {
+        });
+    }
+
+    /** {@code GET /v1/ssf/metadata} - SSF transmitter configuration metadata (issuer, delivery methods, the five management endpoints). Scope: {@code pca:read}. */
+    public SsfGetMetadataResponse getMetadata() {
+        return t.request("GET", "/v1/ssf/metadata", null, null, null, false, new TypeReference<SsfGetMetadataResponse>() {
+        });
+    }
+
+    /** {@code POST /v1/ssf/remove_subject} - Remove a subject from a stream (8.1.3.3). 204; an unknown subject is ignored. Scope: {@code pca:write}. */
+    public Map<String, Object> removeSubject(SsfRemoveSubjectBody body) {
+        return t.request("POST", "/v1/ssf/remove_subject", null, body, null, false, new TypeReference<Map<String, Object>>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Map<String, Object> removeSubject(SsfRemoveSubjectBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/ssf/remove_subject", null, body, idempotencyKey, false, new TypeReference<Map<String, Object>>() {
         });
     }
 
@@ -81,6 +171,18 @@ public final class SsfApi {
         });
     }
 
+    /** {@code POST /v1/ssf/streams/{streamId}/poll} - Poll a stream (RFC 8936): acknowledge with ack, report invalid SETs with setErrs, receive up to maxEvents unacknowledged SETs. Scope: {@code pca:write}. */
+    public SsfPollResponse poll(String streamId, SsfPollBody body) {
+        return t.request("POST", "/v1/ssf/streams/" + enc(streamId) + "/poll", null, body, null, false, new TypeReference<SsfPollResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public SsfPollResponse poll(String streamId, SsfPollBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/ssf/streams/" + enc(streamId) + "/poll", null, body, idempotencyKey, false, new TypeReference<SsfPollResponse>() {
+        });
+    }
+
     /** {@code POST /v1/ssf/subjects/add} - SSF 1.0 add subject: start (or, on an ALL stream, resume) events for one subject on a stream. Subject formats: iss_sub (this issuer), email, phone_number, opaque, account, did, uri. 200 with an empty body. Scope: {@code ssf:write}. */
     public void add(SsfAddBody body) {
         t.request("POST", "/v1/ssf/subjects/add", null, body, null, false, new TypeReference<Object>() {
@@ -102,6 +204,18 @@ public final class SsfApi {
     /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
     public void remove(SsfRemoveBody body, String idempotencyKey) {
         t.request("POST", "/v1/ssf/subjects/remove", null, body, idempotencyKey, false, new TypeReference<Object>() {
+        });
+    }
+
+    /** {@code POST /v1/ssf/verification} - Request a verification event (8.1.4.2): 204, and a signed SET carrying the optional state is delivered on the stream (pushed, or retained for polling). Scope: {@code pca:write}. */
+    public Map<String, Object> verification(SsfVerificationBody body) {
+        return t.request("POST", "/v1/ssf/verification", null, body, null, false, new TypeReference<Map<String, Object>>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Map<String, Object> verification(SsfVerificationBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/ssf/verification", null, body, idempotencyKey, false, new TypeReference<Map<String, Object>>() {
         });
     }
 

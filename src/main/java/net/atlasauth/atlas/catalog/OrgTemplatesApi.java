@@ -65,6 +65,12 @@ public final class OrgTemplatesApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OrgTemplatesDeleteResponse delete(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/org_templates/" + enc(id), null, null, idempotencyKey, false, new TypeReference<OrgTemplatesDeleteResponse>() {
+        });
+    }
+
     /** {@code GET /v1/org_templates/{id}} - One template, by id or key. Scope: {@code organizations:read}. */
     public OrgTemplatesGetResponse get(String id) {
         return t.request("GET", "/v1/org_templates/" + enc(id), null, null, null, false, new TypeReference<OrgTemplatesGetResponse>() {
@@ -74,6 +80,12 @@ public final class OrgTemplatesApi {
     /** {@code PATCH /v1/org_templates/{id}} - Change a template. Organizations already made from it are not touched. Scope: {@code organizations:write}. */
     public OrgTemplatesUpdateResponse update(String id, OrgTemplatesUpdateBody body) {
         return t.request("PATCH", "/v1/org_templates/" + enc(id), null, body, null, false, new TypeReference<OrgTemplatesUpdateResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OrgTemplatesUpdateResponse update(String id, OrgTemplatesUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/org_templates/" + enc(id), null, body, idempotencyKey, false, new TypeReference<OrgTemplatesUpdateResponse>() {
         });
     }
 

@@ -15,6 +15,8 @@ public record UsersIdentityVerificationsImportResponse(
         @JsonProperty("provider") String provider,
         @JsonProperty("status") String status,
         @JsonProperty("reason") String reason,
+        @JsonProperty("last_error") UsersIdentityVerificationsImportResponseLastError lastError,
+        @JsonProperty("attempts") Long attempts,
         @JsonProperty("imported") Boolean imported,
         @JsonProperty("verified_at") Long verifiedAt,
         @JsonProperty("verified_attributes_status") String verifiedAttributesStatus,

@@ -65,6 +65,12 @@ public final class MfaCampaignsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public MfaCampaignsDeleteResponse delete(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/mfa_campaigns/" + enc(id), null, null, idempotencyKey, false, new TypeReference<MfaCampaignsDeleteResponse>() {
+        });
+    }
+
     /** {@code GET /v1/mfa_campaigns/{id}} - Read one MFA campaign with its completion numbers. Scope: {@code mfa_campaigns:read}. */
     public MfaCampaignsGetResponse get(String id) {
         return t.request("GET", "/v1/mfa_campaigns/" + enc(id), null, null, null, false, new TypeReference<MfaCampaignsGetResponse>() {
@@ -74,6 +80,12 @@ public final class MfaCampaignsApi {
     /** {@code PATCH /v1/mfa_campaigns/{id}} - Change a running campaign: name, required factors, deadline (null removes it), nag interval or enforcement. The target is fixed; end the campaign and start another to change who it reaches. Scope: {@code mfa_campaigns:write}. */
     public MfaCampaignsUpdateResponse update(String id, MfaCampaignsUpdateBody body) {
         return t.request("PATCH", "/v1/mfa_campaigns/" + enc(id), null, body, null, false, new TypeReference<MfaCampaignsUpdateResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public MfaCampaignsUpdateResponse update(String id, MfaCampaignsUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/mfa_campaigns/" + enc(id), null, body, idempotencyKey, false, new TypeReference<MfaCampaignsUpdateResponse>() {
         });
     }
 
@@ -112,6 +124,12 @@ public final class MfaCampaignsApi {
     /** {@code PUT /v1/mfa_campaigns/{id}/users/{user_id}} - Set one user's own required factors and/or an exemption until a date. Send null to clear either. The user's own factors replace the campaign's for them. Scope: {@code mfa_campaigns:write}. */
     public MfaCampaignsSetUserResponse setUser(String id, String userId, MfaCampaignsSetUserBody body) {
         return t.request("PUT", "/v1/mfa_campaigns/" + enc(id) + "/users/" + enc(userId), null, body, null, false, new TypeReference<MfaCampaignsSetUserResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public MfaCampaignsSetUserResponse setUser(String id, String userId, MfaCampaignsSetUserBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/mfa_campaigns/" + enc(id) + "/users/" + enc(userId), null, body, idempotencyKey, false, new TypeReference<MfaCampaignsSetUserResponse>() {
         });
     }
 }

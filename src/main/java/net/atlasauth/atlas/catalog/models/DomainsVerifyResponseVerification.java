@@ -13,5 +13,8 @@ public record DomainsVerifyResponseVerification(
         @JsonProperty("url") String url,
         @JsonProperty("token") String token,
         @JsonProperty("content") String content,
-        @JsonProperty("instructions") String instructions) {
+        @JsonProperty("instructions") String instructions,
+        @JsonProperty("previous_url") String previousUrl,
+        @JsonProperty("previous_valid_until") Long previousValidUntil,
+        @JsonProperty("last_observation") DomainsVerifyResponseVerificationLastObservation lastObservation) {
 }

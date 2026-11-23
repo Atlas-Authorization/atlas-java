@@ -47,7 +47,7 @@ public final class SecretKeysApi {
         return listAll(null);
     }
 
-    /** {@code POST /v1/secret_keys} - Create a scoped secret key: `name`, `scopes[]` (refused when unknown, or when the calling key does not hold them; presets `read_only`, `privacy:execute`, `privacy:grants:revoke`; or `preset: "app-runtime"` for an app server runtime key), `expires_at` (at most a year; default one year; "never" is refused), `allowed_ips` (CIDRs), `allowed_origins` (browser origins; a request with another Origin gets 403 ORIGIN_NOT_ALLOWED), `owner` (default: the creating person or key), `external_ref` (idempotent create: a repeat returns the existing key, 200, idempotent_replay, no secret), `metadata` (tags; filter the list with ?metadata[key]=value) and `key_format` (`atlas`, the default `atlas_&lt;env&gt;_sk_…`, or `legacy` `sk_&lt;env&gt;_…`). The secret is returned once. Minting with an operator token needs multi-factor sign-in within 5 minutes (403 STEP_UP_REQUIRED). Send `X-Secret-Recipient: x25519:&lt;public key&gt;` to receive the secret sealed (libsodium sealed box) as `sealed_secret` instead of in plaintext. Scope: {@code secret_keys:write}. */
+    /** {@code POST /v1/secret_keys} - Create a scoped secret key: `name`, `scopes[]` (refused when unknown, or when the calling key does not hold them; presets `read_only`, `privacy:execute`, `privacy:grants:revoke`; or `preset: "app-runtime"` for an app server runtime key, or `preset: "integrations"` for the key a connected platform (consent manager, referral or support platform) connects with, or `preset: "provisioning"` for a deploy-script key that configures the instance: instance settings, domains, messaging providers, integrations, webhooks, OAuth clients and providers, redirect URLs, branding and keys, with no user, session or organization-member access), `expires_at` (at most a year; default one year; "never" is refused), `allowed_ips` (CIDRs), `allowed_origins` (browser origins; a request with another Origin gets 403 ORIGIN_NOT_ALLOWED), `owner` (default: the creating person or key), `external_ref` (idempotent create: a repeat returns the existing key, 200, idempotent_replay, no secret), `metadata` (tags; filter the list with ?metadata[key]=value) and `key_format` (`atlas`, the default `atlas_&lt;env&gt;_sk_…`, or `legacy` `sk_&lt;env&gt;_…`). The secret is returned once. Minting with an operator token needs multi-factor sign-in within 5 minutes (403 STEP_UP_REQUIRED). Send `X-Secret-Recipient: x25519:&lt;public key&gt;` to receive the secret sealed (libsodium sealed box) as `sealed_secret` instead of in plaintext. Scope: {@code secret_keys:write}. */
     public SecretKeysCreateResponse create(SecretKeysCreateBody body) {
         return t.request("POST", "/v1/secret_keys", null, body, null, false, new TypeReference<SecretKeysCreateResponse>() {
         });
@@ -71,6 +71,12 @@ public final class SecretKeysApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public SecretKeysUpdateResponse update(String id, SecretKeysUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/secret_keys/" + enc(id), null, body, idempotencyKey, false, new TypeReference<SecretKeysUpdateResponse>() {
+        });
+    }
+
     /** {@code POST /v1/secret_keys/{id}/revoke} - Revoke a secret key now. A second revoke is a 409. Scope: {@code secret_keys:write}. */
     public SecretKeysRevokeResponse revoke(String id) {
         return t.request("POST", "/v1/secret_keys/" + enc(id) + "/revoke", null, null, null, false, new TypeReference<SecretKeysRevokeResponse>() {
@@ -83,7 +89,7 @@ public final class SecretKeysApi {
         });
     }
 
-    /** {@code POST /v1/secret_keys/{id}/rotate} - Mint a replacement with the same scopes (or, with `preset: "app-runtime"`, the preset scopes: one-click move off an all-scope key), owner, IP list and expiry. The old key keeps working for `overlap_seconds` (default 259200 = 72 h, max 7 days; 0 revokes it now). Returns the new secret once and `previous_key_expires_at`. Send `X-Secret-Recipient: x25519:&lt;public key&gt;` to receive the secret sealed (libsodium sealed box) as `sealed_secret` instead of in plaintext. Scope: {@code secret_keys:write}. */
+    /** {@code POST /v1/secret_keys/{id}/rotate} - Mint a replacement with the same scopes (or, with `preset: "app-runtime"`, the preset scopes: one-click move off an all-scope key), owner, IP list and expiry. The old key keeps working for `overlap_seconds` (default 259200 = 72 h, max 7 days; 0 revokes it now). Returns the new secret once and `previous_key_expires_at` (epoch ms: now plus the overlap, or the old key's own earlier expiry; `null` only when the old key was revoked at once; also sent as `old_key_valid_until`). Send `X-Secret-Recipient: x25519:&lt;public key&gt;` to receive the secret sealed (libsodium sealed box) as `sealed_secret` instead of in plaintext. Scope: {@code secret_keys:write}. */
     public SecretKeysRotateResponse rotate(String id, SecretKeysRotateBody body) {
         return t.request("POST", "/v1/secret_keys/" + enc(id) + "/rotate", null, body, null, false, new TypeReference<SecretKeysRotateResponse>() {
         });

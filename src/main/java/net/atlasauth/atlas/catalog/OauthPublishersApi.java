@@ -65,6 +65,12 @@ public final class OauthPublishersApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OauthPublishersDeleteResponse delete(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/oauth_publishers/" + enc(id), null, null, idempotencyKey, false, new TypeReference<OauthPublishersDeleteResponse>() {
+        });
+    }
+
     /** {@code GET /v1/oauth_publishers/{id}} - Get one OAuth publisher, with its domain verification status. Scope: {@code oauth_clients:read}. */
     public OauthPublishersGetResponse get(String id) {
         return t.request("GET", "/v1/oauth_publishers/" + enc(id), null, null, null, false, new TypeReference<OauthPublishersGetResponse>() {
@@ -77,15 +83,33 @@ public final class OauthPublishersApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OauthPublishersUpdateResponse update(String id, OauthPublishersUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/oauth_publishers/" + enc(id), null, body, idempotencyKey, false, new TypeReference<OauthPublishersUpdateResponse>() {
+        });
+    }
+
     /** {@code DELETE /v1/oauth_publishers/{id}/clients/{client_id}} - Detach an app from a publisher. The consent screen stops naming the publisher for it and its repeat consent is no longer shared; a shared sector it already took stays. Scope: {@code oauth_clients:write}. */
     public OauthPublishersDeleteClientResponse deleteClient(String id, String clientId) {
         return t.request("DELETE", "/v1/oauth_publishers/" + enc(id) + "/clients/" + enc(clientId), null, null, null, false, new TypeReference<OauthPublishersDeleteClientResponse>() {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OauthPublishersDeleteClientResponse deleteClient(String id, String clientId, String idempotencyKey) {
+        return t.request("DELETE", "/v1/oauth_publishers/" + enc(id) + "/clients/" + enc(clientId), null, null, idempotencyKey, false, new TypeReference<OauthPublishersDeleteClientResponse>() {
+        });
+    }
+
     /** {@code PUT /v1/oauth_publishers/{id}/clients/{client_id}} - Attach an app (its public client_id) to a verified publisher. The app's homepage_url must be an https URL on the publisher's domain, and an app belongs to one publisher. With a shared sector the app must be pairwise and takes the publisher's sector; if it already has another sector, send allow_subject_change: true to confirm that users' subject identifiers in it change. Attaching an app already attached returns the publisher unchanged. Scope: {@code oauth_clients:write}. */
     public OauthPublishersSetClientResponse setClient(String id, String clientId, OauthPublishersSetClientBody body) {
         return t.request("PUT", "/v1/oauth_publishers/" + enc(id) + "/clients/" + enc(clientId), null, body, null, false, new TypeReference<OauthPublishersSetClientResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OauthPublishersSetClientResponse setClient(String id, String clientId, OauthPublishersSetClientBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/oauth_publishers/" + enc(id) + "/clients/" + enc(clientId), null, body, idempotencyKey, false, new TypeReference<OauthPublishersSetClientResponse>() {
         });
     }
 

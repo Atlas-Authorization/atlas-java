@@ -65,6 +65,12 @@ public final class DeviceIntegrationsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public DeviceIntegrationsDeleteResponse delete(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/device_integrations/" + enc(id), null, null, idempotencyKey, false, new TypeReference<DeviceIntegrationsDeleteResponse>() {
+        });
+    }
+
     /** {@code GET /v1/device_integrations/{id}} - Read one device integration and its last sync result. Scope: {@code device_assurance:read}. */
     public DeviceIntegrationsGetResponse get(String id) {
         return t.request("GET", "/v1/device_integrations/" + enc(id), null, null, null, false, new TypeReference<DeviceIntegrationsGetResponse>() {
@@ -74,6 +80,12 @@ public final class DeviceIntegrationsApi {
     /** {@code PATCH /v1/device_integrations/{id}} - Change a device integration (name, config, credentials, interval, paused or active). Scope: {@code device_assurance:write}. */
     public DeviceIntegrationsUpdateResponse update(String id, DeviceIntegrationsUpdateBody body) {
         return t.request("PATCH", "/v1/device_integrations/" + enc(id), null, body, null, false, new TypeReference<DeviceIntegrationsUpdateResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public DeviceIntegrationsUpdateResponse update(String id, DeviceIntegrationsUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/device_integrations/" + enc(id), null, body, idempotencyKey, false, new TypeReference<DeviceIntegrationsUpdateResponse>() {
         });
     }
 

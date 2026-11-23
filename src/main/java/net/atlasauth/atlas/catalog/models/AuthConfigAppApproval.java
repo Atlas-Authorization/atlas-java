@@ -10,6 +10,7 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record AuthConfigAppApproval(
         @JsonProperty("firstFactor") Boolean firstFactor,
+        @JsonProperty("revealNoAccount") Boolean revealNoAccount,
         @JsonProperty("stepUp") Boolean stepUp,
         @JsonProperty("ttlSeconds") Double ttlSeconds) {
 }

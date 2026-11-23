@@ -30,6 +30,11 @@ public record PlatformAppProvisionedSiblingInstance(
         @JsonProperty("secret_key_scopes") List<String> secretKeyScopes,
         @JsonProperty("onboarding_secret") String onboardingSecret,
         @JsonProperty("onboarding_key_id") String onboardingKeyId,
+        @JsonProperty("runtime_secret") String runtimeSecret,
+        @JsonProperty("runtime_key_id") String runtimeKeyId,
+        @JsonProperty("runtime_secret_scopes") List<String> runtimeSecretScopes,
+        @JsonProperty("secret_key_label") String secretKeyLabel,
+        @JsonProperty("secret_expires_at") Long secretExpiresAt,
         @JsonProperty("onboarding_secret_expires_at") Long onboardingSecretExpiresAt,
         @JsonProperty("warnings") List<PlatformAppProvisionedSiblingInstanceWarningsItem> warnings,
         @JsonProperty("note") String note) {

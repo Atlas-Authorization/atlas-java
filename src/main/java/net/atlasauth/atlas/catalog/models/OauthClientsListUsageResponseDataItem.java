@@ -14,5 +14,6 @@ public record OauthClientsListUsageResponseDataItem(
         @JsonProperty("token_issuances") Long tokenIssuances,
         @JsonProperty("active_users") Long activeUsers,
         @JsonProperty("errors") Long errors,
+        @JsonProperty("errors_by_code") Map<String, Long> errorsByCode,
         @JsonProperty("rate_limited") Long rateLimited) {
 }

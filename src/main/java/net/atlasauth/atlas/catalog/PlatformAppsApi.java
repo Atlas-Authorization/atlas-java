@@ -101,9 +101,27 @@ public final class PlatformAppsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public PlatformAppsDeleteCloneResponse deleteClone(String id, String instanceId, String cloneId, String idempotencyKey) {
+        return t.request("DELETE", "/v1/platform/apps/" + enc(id) + "/instances/" + enc(instanceId) + "/clones/" + enc(cloneId), null, null, idempotencyKey, false, new TypeReference<PlatformAppsDeleteCloneResponse>() {
+        });
+    }
+
     /** {@code GET /v1/platform/apps/{id}/instances/{instanceId}/clones/{cloneId}} - One clone or preview: status, what was copied, what could not be placed, and when a preview expires. Scope: {@code platform:apps:read}. */
     public PlatformAppsGetCloneResponse getClone(String id, String instanceId, String cloneId) {
         return t.request("GET", "/v1/platform/apps/" + enc(id) + "/instances/" + enc(instanceId) + "/clones/" + enc(cloneId), null, null, null, false, new TypeReference<PlatformAppsGetCloneResponse>() {
+        });
+    }
+
+    /** {@code POST /v1/platform/apps/{id}/instances/{instanceId}/clones/{cloneId}/refresh} - Bring a completed clone or preview up to date in place (same instance, keys and host); same body and rules as POST /v1/instance/staging_copies/&#123;id&#125;/refresh. Needs platform:apps:write. Scope: {@code platform:apps:write}. */
+    public PlatformAppsRefreshResponse refresh(String id, String instanceId, String cloneId, PlatformAppsRefreshBody body) {
+        return t.request("POST", "/v1/platform/apps/" + enc(id) + "/instances/" + enc(instanceId) + "/clones/" + enc(cloneId) + "/refresh", null, body, null, false, new TypeReference<PlatformAppsRefreshResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public PlatformAppsRefreshResponse refresh(String id, String instanceId, String cloneId, PlatformAppsRefreshBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/platform/apps/" + enc(id) + "/instances/" + enc(instanceId) + "/clones/" + enc(cloneId) + "/refresh", null, body, idempotencyKey, false, new TypeReference<PlatformAppsRefreshResponse>() {
         });
     }
 
@@ -116,6 +134,18 @@ public final class PlatformAppsApi {
     /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
     public PlatformAppsCreateNarrowSecretKeyResponse createNarrowSecretKey(String id, PlatformAppsCreateNarrowSecretKeyBody body, String idempotencyKey) {
         return t.request("POST", "/v1/platform/apps/" + enc(id) + "/narrow_secret_keys", null, body, idempotencyKey, false, new TypeReference<PlatformAppsCreateNarrowSecretKeyResponse>() {
+        });
+    }
+
+    /** {@code POST /v1/platform/apps/{id}/provisioning_key/renew} - Extend the `provisioning` key of an app created with `secret_key_profile: "web_app"` by another 24 hours. Scope: {@code platform:secrets:write}. */
+    public PlatformAppsRenewResponse renew(String id, PlatformAppsRenewBody body) {
+        return t.request("POST", "/v1/platform/apps/" + enc(id) + "/provisioning_key/renew", null, body, null, false, new TypeReference<PlatformAppsRenewResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public PlatformAppsRenewResponse renew(String id, PlatformAppsRenewBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/platform/apps/" + enc(id) + "/provisioning_key/renew", null, body, idempotencyKey, false, new TypeReference<PlatformAppsRenewResponse>() {
         });
     }
 

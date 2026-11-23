@@ -57,6 +57,12 @@ public final class ChangesApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ChangesSetAckResponse setAck(String name, ChangesSetAckBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/changes/consumers/" + enc(name) + "/ack", null, body, idempotencyKey, false, new TypeReference<ChangesSetAckResponse>() {
+        });
+    }
+
     /** {@code GET /v1/changes/snapshot/{resource_type}} - A paginated, full list of the live resources of one type, in id order, pinned to the feed position it was taken at. Walk every page, then follow `GET /v1/changes?after=&#123;snapshot_seq&#125;`: no change between the snapshot and the feed is missed, and an entry already reflected in a page is applied again harmlessly (apply by version). `next_cursor` carries the pin, so every page of one walk reports the same `snapshot_seq`. 410 `RESYNC_REQUIRED` when the pinned position has since been trimmed. Scope: {@code events:read}. */
     public ChangesGetSnapshotResponse getSnapshot(String resourceType) {
         return t.request("GET", "/v1/changes/snapshot/" + enc(resourceType), null, null, null, false, new TypeReference<ChangesGetSnapshotResponse>() {

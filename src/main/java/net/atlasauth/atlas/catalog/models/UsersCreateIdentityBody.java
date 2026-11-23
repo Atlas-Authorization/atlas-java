@@ -18,6 +18,8 @@ public final class UsersCreateIdentityBody {
     public String userId;
     @JsonProperty("link_with")
     public String linkWith;
+    @JsonProperty("external_id")
+    public String externalId;
     /** Wire names sent as an explicit JSON null (see the clear methods); unset fields are omitted. */
     @JsonIgnore
     private final java.util.Set<String> clearedFields = new java.util.LinkedHashSet<>();
@@ -34,6 +36,9 @@ public final class UsersCreateIdentityBody {
     public UsersCreateIdentityBody linkWith(String v) { this.linkWith = v; clearedFields.remove("link_with"); return this; }
     /** Send {@code "link_with": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public UsersCreateIdentityBody clearLinkWith() { this.linkWith = null; clearedFields.add("link_with"); return this; }
+    public UsersCreateIdentityBody externalId(String v) { this.externalId = v; clearedFields.remove("external_id"); return this; }
+    /** Send {@code "external_id": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public UsersCreateIdentityBody clearExternalId() { this.externalId = null; clearedFields.add("external_id"); return this; }
 
     @JsonAnyGetter
     Map<String, Object> clearedAsNull() {

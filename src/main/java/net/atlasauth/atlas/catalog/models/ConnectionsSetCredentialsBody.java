@@ -41,7 +41,7 @@ public final class ConnectionsSetCredentialsBody {
     public String tokenUrl;
     @JsonProperty("scopes")
     public List<String> scopes;
-    /** jwt_bearer / github_app_installation: a PEM private key (RSA or P-256). Held in the vault; never returned. */
+    /** jwt_bearer / github_app_installation: a PEM private key (RSA or P-256). oauth1 with config.signature_method RSA-SHA1 or RSA-SHA256: the consumer's RSA private key (2048 to 8192 bits) in place of consumer_secret. Held in the vault; never returned. */
     @JsonProperty("private_key")
     public String privateKey;
     /** jwt_bearer: have Atlas generate the key pair; the public JWK is returned in config.public_jwk for you to register at the provider. */
@@ -56,9 +56,12 @@ public final class ConnectionsSetCredentialsBody {
     /** oauth1. */
     @JsonProperty("consumer_key")
     public String consumerKey;
-    /** oauth1. */
+    /** oauth1 (not needed with an RSA signature method; send private_key instead). */
     @JsonProperty("consumer_secret")
     public String consumerSecret;
+    /** cookie_jar: the browser session (at most 200 cookies, 256 KiB). Write-only; your backend reads it with GET /v1/connections/&#123;id&#125;/secret. Atlas never sends requests with it. */
+    @JsonProperty("cookies")
+    public List<ConnectionsSetCredentialsBodyCookiesItem> cookies;
     /** oauth1. */
     @JsonProperty("token_secret")
     public String tokenSecret;
@@ -123,6 +126,9 @@ public final class ConnectionsSetCredentialsBody {
     public ConnectionsSetCredentialsBody consumerSecret(String v) { this.consumerSecret = v; clearedFields.remove("consumer_secret"); return this; }
     /** Send {@code "consumer_secret": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public ConnectionsSetCredentialsBody clearConsumerSecret() { this.consumerSecret = null; clearedFields.add("consumer_secret"); return this; }
+    public ConnectionsSetCredentialsBody cookies(List<ConnectionsSetCredentialsBodyCookiesItem> v) { this.cookies = v; clearedFields.remove("cookies"); return this; }
+    /** Send {@code "cookies": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public ConnectionsSetCredentialsBody clearCookies() { this.cookies = null; clearedFields.add("cookies"); return this; }
     public ConnectionsSetCredentialsBody tokenSecret(String v) { this.tokenSecret = v; clearedFields.remove("token_secret"); return this; }
     /** Send {@code "token_secret": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public ConnectionsSetCredentialsBody clearTokenSecret() { this.tokenSecret = null; clearedFields.add("token_secret"); return this; }

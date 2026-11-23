@@ -53,6 +53,12 @@ public final class DeviceSsoApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public DeviceSsoDeleteRegistrationResponse deleteRegistration(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/device_sso/registrations/" + enc(id), null, null, idempotencyKey, false, new TypeReference<DeviceSsoDeleteRegistrationResponse>() {
+        });
+    }
+
     /** {@code GET /v1/device_sso/registrations/{id}} - Read one device registration. Scope: {@code desktop_mfa:read}. */
     public DeviceSsoGetRegistrationResponse getRegistration(String id) {
         return t.request("GET", "/v1/device_sso/registrations/" + enc(id), null, null, null, false, new TypeReference<DeviceSsoGetRegistrationResponse>() {

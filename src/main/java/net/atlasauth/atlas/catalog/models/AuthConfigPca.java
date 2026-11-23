@@ -9,7 +9,13 @@ import java.util.Map;
 /** The AuthConfigPca object. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record AuthConfigPca(
+        @JsonProperty("allowedSuites") List<String> allowedSuites,
+        @JsonProperty("beacons") String beacons,
         @JsonProperty("enabled") Boolean enabled,
         @JsonProperty("maxPlanNodes") Double maxPlanNodes,
-        @JsonProperty("publicRateLimitPerMin") Double publicRateLimitPerMin) {
+        @JsonProperty("objectiveRisk") AuthConfigPcaObjectiveRisk objectiveRisk,
+        @JsonProperty("optimistic") Boolean optimistic,
+        @JsonProperty("publicRateLimitPerMin") Double publicRateLimitPerMin,
+        @JsonProperty("quotas") AuthConfigPcaQuotas quotas,
+        @JsonProperty("undoSigner") String undoSigner) {
 }

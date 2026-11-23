@@ -33,6 +33,12 @@ public final class RiskBasedMfaApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public RiskBasedMfa update(RiskBasedMfaUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/risk_based_mfa", null, body, idempotencyKey, false, new TypeReference<RiskBasedMfa>() {
+        });
+    }
+
     /** {@code POST /v1/risk_based_mfa/replay} - What-if replay: re-score the recorded sign-ins of the last `days` days (1 to 30) under the current risk policy and under the policy with `candidate` applied (any of step_up_threshold, on_high_risk_no_factor, weights, signals, level_actions, baseline, as in PATCH /v1/risk_based_mfa), and report how levels and actions move, how many sign-ins would see more or less friction, and up to 25 changed sign-ins. Reported risk signals are replayed over the time each was live; reputation feeds are not. Changes nothing. Scope: {@code risk_based_mfa:read}. */
     public RiskBasedMfaReplayResponse replay(RiskBasedMfaReplayBody body) {
         return t.request("POST", "/v1/risk_based_mfa/replay", null, body, null, false, new TypeReference<RiskBasedMfaReplayResponse>() {

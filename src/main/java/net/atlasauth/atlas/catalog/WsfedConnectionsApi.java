@@ -51,6 +51,12 @@ public final class WsfedConnectionsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public void delete(String id, String idempotencyKey) {
+        t.request("DELETE", "/v1/wsfed_connections/" + enc(id), null, null, idempotencyKey, false, new TypeReference<Object>() {
+        });
+    }
+
     /** {@code GET /v1/wsfed_connections/{id}} - Read one WS-Federation connection with the reply URL to enter at the provider. Scope: {@code sso_connections:read}. */
     public WsfedConnectionsGetResponse get(String id) {
         return t.request("GET", "/v1/wsfed_connections/" + enc(id), null, null, null, false, new TypeReference<WsfedConnectionsGetResponse>() {
@@ -60,6 +66,12 @@ public final class WsfedConnectionsApi {
     /** {@code PATCH /v1/wsfed_connections/{id}} - Change a WS-Federation connection; sending metadata refreshes the certificates after a provider rollover. Scope: {@code sso_connections:write}. */
     public WsfedConnectionsUpdateResponse update(String id, WsfedConnectionsUpdateBody body) {
         return t.request("PATCH", "/v1/wsfed_connections/" + enc(id), null, body, null, false, new TypeReference<WsfedConnectionsUpdateResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public WsfedConnectionsUpdateResponse update(String id, WsfedConnectionsUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/wsfed_connections/" + enc(id), null, body, idempotencyKey, false, new TypeReference<WsfedConnectionsUpdateResponse>() {
         });
     }
 }

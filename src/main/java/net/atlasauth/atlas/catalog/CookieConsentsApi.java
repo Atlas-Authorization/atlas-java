@@ -53,6 +53,12 @@ public final class CookieConsentsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public CookieConsentsDeleteSubjectResponse deleteSubject(String subject, String idempotencyKey) {
+        return t.request("DELETE", "/v1/cookie_consents/subjects/" + enc(subject), null, null, idempotencyKey, false, new TypeReference<CookieConsentsDeleteSubjectResponse>() {
+        });
+    }
+
     /** {@code GET /v1/cookie_consents/subjects/{subject}} - One visitor's current choice and history. 404 when nothing is recorded. Scope: {@code data_subject_requests:read}. */
     public CookieConsentsGetSubjectResponse getSubject(String subject) {
         return t.request("GET", "/v1/cookie_consents/subjects/" + enc(subject), null, null, null, false, new TypeReference<CookieConsentsGetSubjectResponse>() {

@@ -53,6 +53,12 @@ public final class DesktopMfaApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public DesktopMfaDeletePasskeyResponse deletePasskey(String id, String passkeyId, String idempotencyKey) {
+        return t.request("DELETE", "/v1/desktop_mfa/devices/" + enc(id) + "/passkeys/" + enc(passkeyId), null, null, idempotencyKey, false, new TypeReference<DesktopMfaDeletePasskeyResponse>() {
+        });
+    }
+
     /** {@code GET /v1/desktop_mfa/policy} - The desktop-login MFA policy: who must pass a second factor at OS login, the allowed factors and the offline grace window. Scope: {@code desktop_mfa:read}. */
     public DesktopMfaGetPolicyResponse getPolicy() {
         return t.request("GET", "/v1/desktop_mfa/policy", null, null, null, false, new TypeReference<DesktopMfaGetPolicyResponse>() {
@@ -62,6 +68,12 @@ public final class DesktopMfaApi {
     /** {@code PUT /v1/desktop_mfa/policy} - Change the desktop-login MFA policy. Send only the fields to change. `applies_to: "selected"` needs at least one user or organization while enabled. Scope: {@code desktop_mfa:write}. */
     public DesktopMfaSetPolicyResponse setPolicy(DesktopMfaSetPolicyBody body) {
         return t.request("PUT", "/v1/desktop_mfa/policy", null, body, null, false, new TypeReference<DesktopMfaSetPolicyResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public DesktopMfaSetPolicyResponse setPolicy(DesktopMfaSetPolicyBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/desktop_mfa/policy", null, body, idempotencyKey, false, new TypeReference<DesktopMfaSetPolicyResponse>() {
         });
     }
 }

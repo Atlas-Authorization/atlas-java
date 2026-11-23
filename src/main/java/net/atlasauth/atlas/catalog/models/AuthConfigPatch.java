@@ -46,6 +46,9 @@ public final class AuthConfigPatch {
     /** DANGEROUS. When true, addresses that skipped proof because requireEmailVerification was false are reported as verified again in users, tokens, webhooks and exports (the old behaviour). Anyone can then sign up as any address and present a verified claim. Atlas still treats those addresses as unproven when linking social sign-ins, auto-joining organizations and accepting invitations. Preflight reports email_verified_unproven while this is on. */
     @JsonProperty("dangerouslyReportSkippedEmailsAsVerified")
     public Boolean dangerouslyReportSkippedEmailsAsVerified;
+    /** Server-minted delegation tokens (POST /v1/users/&#123;id&#125;/delegation_tokens and the token-exchange grant). Off by default. */
+    @JsonProperty("delegationTokens")
+    public AuthConfigPatchDelegationTokens delegationTokens;
     /** One of: allow, block. */
     @JsonProperty("deletedUserReturn")
     public String deletedUserReturn;
@@ -58,6 +61,9 @@ public final class AuthConfigPatch {
     public AuthConfigPatchExternalJwt externalJwt;
     @JsonProperty("identityTraits")
     public AuthConfigPatchIdentityTraits identityTraits;
+    /** Previous issuers of this instance that verification should still accept, for a host or mount move made before Atlas recorded it. Listed in discovery as atlas_previous_issuers and accepted by &#64;atlasauth/backend with previousIssuers "discovery". At most 10; acceptedUntil at most a year ahead. */
+    @JsonProperty("issuerAliases")
+    public List<AuthConfigPatchIssuerAliasesItem> issuerAliases;
     @JsonProperty("jwtTemplates")
     public Map<String, Map<String, String>> jwtTemplates;
     @JsonProperty("jwtTemplateSettings")
@@ -89,6 +95,8 @@ public final class AuthConfigPatch {
     public AuthConfigPatchPca pca;
     @JsonProperty("phoneChannels")
     public AuthConfigPatchPhoneChannels phoneChannels;
+    @JsonProperty("previousIssuerOverlapDays")
+    public Double previousIssuerOverlapDays;
     @JsonProperty("qrSignIn")
     public AuthConfigPatchQrSignIn qrSignIn;
     @JsonProperty("rateLimit")
@@ -188,6 +196,9 @@ public final class AuthConfigPatch {
     public AuthConfigPatch dangerouslyReportSkippedEmailsAsVerified(Boolean v) { this.dangerouslyReportSkippedEmailsAsVerified = v; clearedFields.remove("dangerouslyReportSkippedEmailsAsVerified"); return this; }
     /** Send {@code "dangerouslyReportSkippedEmailsAsVerified": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatch clearDangerouslyReportSkippedEmailsAsVerified() { this.dangerouslyReportSkippedEmailsAsVerified = null; clearedFields.add("dangerouslyReportSkippedEmailsAsVerified"); return this; }
+    public AuthConfigPatch delegationTokens(AuthConfigPatchDelegationTokens v) { this.delegationTokens = v; clearedFields.remove("delegationTokens"); return this; }
+    /** Send {@code "delegationTokens": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatch clearDelegationTokens() { this.delegationTokens = null; clearedFields.add("delegationTokens"); return this; }
     public AuthConfigPatch deletedUserReturn(String v) { this.deletedUserReturn = v; clearedFields.remove("deletedUserReturn"); return this; }
     /** Send {@code "deletedUserReturn": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatch clearDeletedUserReturn() { this.deletedUserReturn = null; clearedFields.add("deletedUserReturn"); return this; }
@@ -203,6 +214,9 @@ public final class AuthConfigPatch {
     public AuthConfigPatch identityTraits(AuthConfigPatchIdentityTraits v) { this.identityTraits = v; clearedFields.remove("identityTraits"); return this; }
     /** Send {@code "identityTraits": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatch clearIdentityTraits() { this.identityTraits = null; clearedFields.add("identityTraits"); return this; }
+    public AuthConfigPatch issuerAliases(List<AuthConfigPatchIssuerAliasesItem> v) { this.issuerAliases = v; clearedFields.remove("issuerAliases"); return this; }
+    /** Send {@code "issuerAliases": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatch clearIssuerAliases() { this.issuerAliases = null; clearedFields.add("issuerAliases"); return this; }
     public AuthConfigPatch jwtTemplates(Map<String, Map<String, String>> v) { this.jwtTemplates = v; clearedFields.remove("jwtTemplates"); return this; }
     /** Send {@code "jwtTemplates": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatch clearJwtTemplates() { this.jwtTemplates = null; clearedFields.add("jwtTemplates"); return this; }
@@ -248,6 +262,9 @@ public final class AuthConfigPatch {
     public AuthConfigPatch phoneChannels(AuthConfigPatchPhoneChannels v) { this.phoneChannels = v; clearedFields.remove("phoneChannels"); return this; }
     /** Send {@code "phoneChannels": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatch clearPhoneChannels() { this.phoneChannels = null; clearedFields.add("phoneChannels"); return this; }
+    public AuthConfigPatch previousIssuerOverlapDays(Double v) { this.previousIssuerOverlapDays = v; clearedFields.remove("previousIssuerOverlapDays"); return this; }
+    /** Send {@code "previousIssuerOverlapDays": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatch clearPreviousIssuerOverlapDays() { this.previousIssuerOverlapDays = null; clearedFields.add("previousIssuerOverlapDays"); return this; }
     public AuthConfigPatch qrSignIn(AuthConfigPatchQrSignIn v) { this.qrSignIn = v; clearedFields.remove("qrSignIn"); return this; }
     /** Send {@code "qrSignIn": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatch clearQrSignIn() { this.qrSignIn = null; clearedFields.add("qrSignIn"); return this; }

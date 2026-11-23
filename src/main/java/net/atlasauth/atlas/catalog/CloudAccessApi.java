@@ -51,6 +51,12 @@ public final class CloudAccessApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public void deleteTarget(String id, String idempotencyKey) {
+        t.request("DELETE", "/v1/cloud_access/targets/" + enc(id), null, null, idempotencyKey, false, new TypeReference<Object>() {
+        });
+    }
+
     /** {@code GET /v1/cloud_access/targets/{id}} - Read one cloud access target with its launch URL and assignment. Scope: {@code app_catalog:read}. */
     public CloudAccessGetTargetResponse getTarget(String id) {
         return t.request("GET", "/v1/cloud_access/targets/" + enc(id), null, null, null, false, new TypeReference<CloudAccessGetTargetResponse>() {
@@ -60,6 +66,12 @@ public final class CloudAccessApi {
     /** {@code PATCH /v1/cloud_access/targets/{id}} - Change a target's name, config or assignment. The provider cannot change. Scope: {@code app_catalog:write}. */
     public CloudAccessUpdateTargetResponse updateTarget(String id, CloudAccessUpdateTargetBody body) {
         return t.request("PATCH", "/v1/cloud_access/targets/" + enc(id), null, body, null, false, new TypeReference<CloudAccessUpdateTargetResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public CloudAccessUpdateTargetResponse updateTarget(String id, CloudAccessUpdateTargetBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/cloud_access/targets/" + enc(id), null, body, idempotencyKey, false, new TypeReference<CloudAccessUpdateTargetResponse>() {
         });
     }
 

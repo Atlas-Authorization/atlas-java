@@ -16,6 +16,8 @@ public final class UsersMergeBody {
     public String sourceUserId;
     @JsonProperty("dry_run")
     public Boolean dryRun;
+    @JsonProperty("external_id")
+    public String externalId;
     /** Wire names sent as an explicit JSON null (see the clear methods); unset fields are omitted. */
     @JsonIgnore
     private final java.util.Set<String> clearedFields = new java.util.LinkedHashSet<>();
@@ -29,6 +31,9 @@ public final class UsersMergeBody {
     public UsersMergeBody dryRun(Boolean v) { this.dryRun = v; clearedFields.remove("dry_run"); return this; }
     /** Send {@code "dry_run": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public UsersMergeBody clearDryRun() { this.dryRun = null; clearedFields.add("dry_run"); return this; }
+    public UsersMergeBody externalId(String v) { this.externalId = v; clearedFields.remove("external_id"); return this; }
+    /** Send {@code "external_id": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public UsersMergeBody clearExternalId() { this.externalId = null; clearedFields.add("external_id"); return this; }
 
     @JsonAnyGetter
     Map<String, Object> clearedAsNull() {

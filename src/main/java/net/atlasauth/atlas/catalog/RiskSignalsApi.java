@@ -65,6 +65,12 @@ public final class RiskSignalsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public RiskSignalsDeleteResponse delete(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/risk_signals/" + enc(id), null, null, idempotencyKey, false, new TypeReference<RiskSignalsDeleteResponse>() {
+        });
+    }
+
     /** {@code GET /v1/risk_signals/{id}} - Read one risk signal. Scope: {@code risk_signals:read}. */
     public RiskSignalsGetResponse get(String id) {
         return t.request("GET", "/v1/risk_signals/" + enc(id), null, null, null, false, new TypeReference<RiskSignalsGetResponse>() {

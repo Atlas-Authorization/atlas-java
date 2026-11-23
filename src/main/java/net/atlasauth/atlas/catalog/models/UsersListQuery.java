@@ -24,6 +24,10 @@ public final class UsersListQuery {
     public String phoneNumber;
     /** Exact external_id match. */
     public String externalId;
+    /** With provider_user_id: the user who holds that identity at that provider (for example discord). Both are required together. */
+    public String provider;
+    /** The provider's own id for the person (for example a Discord user id). Needs provider. */
+    public String providerUserId;
     /** true: only users under an active ban; false: only users who are not (a timed ban that has expired counts as not banned). */
     public Boolean banned;
     /** true: users with at least one verified email address; false: users with none. */
@@ -56,6 +60,8 @@ public final class UsersListQuery {
     public UsersListQuery username(String v) { this.username = v; return this; }
     public UsersListQuery phoneNumber(String v) { this.phoneNumber = v; return this; }
     public UsersListQuery externalId(String v) { this.externalId = v; return this; }
+    public UsersListQuery provider(String v) { this.provider = v; return this; }
+    public UsersListQuery providerUserId(String v) { this.providerUserId = v; return this; }
     public UsersListQuery banned(Boolean v) { this.banned = v; return this; }
     public UsersListQuery emailVerified(Boolean v) { this.emailVerified = v; return this; }
     public UsersListQuery organizationId(String v) { this.organizationId = v; return this; }
@@ -78,6 +84,8 @@ public final class UsersListQuery {
         c.username = this.username;
         c.phoneNumber = this.phoneNumber;
         c.externalId = this.externalId;
+        c.provider = this.provider;
+        c.providerUserId = this.providerUserId;
         c.banned = this.banned;
         c.emailVerified = this.emailVerified;
         c.organizationId = this.organizationId;
@@ -102,6 +110,8 @@ public final class UsersListQuery {
         p.set("username", username);
         p.set("phone_number", phoneNumber);
         p.set("external_id", externalId);
+        p.set("provider", provider);
+        p.set("provider_user_id", providerUserId);
         p.set("banned", banned);
         p.set("email_verified", emailVerified);
         p.set("organization_id", organizationId);

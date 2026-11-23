@@ -24,6 +24,8 @@ public final class AuthConfigPatchComplianceRetention {
     public Double dsrDueDays;
     @JsonProperty("erasureGraceDays")
     public Double erasureGraceDays;
+    @JsonProperty("maxPauses")
+    public Double maxPauses;
     /** One of: block, off, require_action. */
     @JsonProperty("ownershipTransfer")
     public String ownershipTransfer;
@@ -54,6 +56,9 @@ public final class AuthConfigPatchComplianceRetention {
     public AuthConfigPatchComplianceRetention erasureGraceDays(Double v) { this.erasureGraceDays = v; clearedFields.remove("erasureGraceDays"); return this; }
     /** Send {@code "erasureGraceDays": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchComplianceRetention clearErasureGraceDays() { this.erasureGraceDays = null; clearedFields.add("erasureGraceDays"); return this; }
+    public AuthConfigPatchComplianceRetention maxPauses(Double v) { this.maxPauses = v; clearedFields.remove("maxPauses"); return this; }
+    /** Send {@code "maxPauses": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchComplianceRetention clearMaxPauses() { this.maxPauses = null; clearedFields.add("maxPauses"); return this; }
     public AuthConfigPatchComplianceRetention ownershipTransfer(String v) { this.ownershipTransfer = v; clearedFields.remove("ownershipTransfer"); return this; }
     /** Send {@code "ownershipTransfer": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchComplianceRetention clearOwnershipTransfer() { this.ownershipTransfer = null; clearedFields.add("ownershipTransfer"); return this; }

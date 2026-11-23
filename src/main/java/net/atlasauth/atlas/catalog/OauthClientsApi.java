@@ -89,9 +89,65 @@ public final class OauthClientsApi {
         });
     }
 
+    /** {@code GET /v1/oauth_clients/{id}/consents} - The users who authorized one OAuth client, one cursor page at a time: user id, granted scopes, when they first authorized it and when it was last used. status is active (default), revoked or all. The path takes the oac_ id or the public client_id. The developer can read the same list at GET /oauth2/register/&#123;client_id&#125;/consents with the client's registration_access_token. Scope: {@code grants:read}. */
+    public OauthClientsListConsentsResponse listConsents(String id) {
+        return t.request("GET", "/v1/oauth_clients/" + enc(id) + "/consents", null, null, null, false, new TypeReference<OauthClientsListConsentsResponse>() {
+        });
+    }
+
+    /** As above, with every optional parameter. */
+    public OauthClientsListConsentsResponse listConsents(String id, OauthClientsListConsentsQuery query) {
+        return t.request("GET", "/v1/oauth_clients/" + enc(id) + "/consents", query == null ? null : query.toMap(), null, null, false, new TypeReference<OauthClientsListConsentsResponse>() {
+        });
+    }
+
+    /** Every item across every page of {@code GET /v1/oauth_clients/{id}/consents}, fetched lazily (the cursor is followed for you). */
+    public Iterable<OauthClientsListConsentsResponseDataItem> listConsentsAll(String id, OauthClientsListConsentsQuery query) {
+        final OauthClientsListConsentsQuery base = query == null ? new OauthClientsListConsentsQuery() : query.copy();
+        return Pagination.iterate(cursor -> {
+            OauthClientsListConsentsResponse r = listConsents(id, base.copy().startingAfter(cursor));
+            return new CursorPage<>(r.data(), Boolean.TRUE.equals(r.hasMore()), r.nextCursor());
+        });
+    }
+
+    /** As above, with no query options. */
+    public Iterable<OauthClientsListConsentsResponseDataItem> listConsentsAll(String id) {
+        return listConsentsAll(id, null);
+    }
+
+    /** {@code POST /v1/oauth_clients/{id}/consents/revoke} - Revoke the consents users gave one OAuth client, and their refresh and access tokens, the same way revoking a single grant does: every active consent, or only the users in user_ids. The app receives grant.revoked per user and the instance gets the usual token revocation events. Audited. Idempotent. Scope: {@code grants:write}. */
+    public OauthClientsRevokeResponse revoke(String id, OauthClientsRevokeBody body) {
+        return t.request("POST", "/v1/oauth_clients/" + enc(id) + "/consents/revoke", null, body, null, false, new TypeReference<OauthClientsRevokeResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OauthClientsRevokeResponse revoke(String id, OauthClientsRevokeBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/oauth_clients/" + enc(id) + "/consents/revoke", null, body, idempotencyKey, false, new TypeReference<OauthClientsRevokeResponse>() {
+        });
+    }
+
+    /** {@code PUT /v1/oauth_clients/{id}/delegated_ui} - Set (or clear, with null) the URLs of your own sign-in and consent pages for an OAuth client. /oauth2/authorize then sends the browser there with a login_challenge / consent_challenge instead of Atlas’s pages. A client URL overrides the instance-wide oauthProvider.loginUrl / consentUrl. Scope: {@code oauth_clients:write}. */
+    public OauthClientsSetDelegatedUiResponse setDelegatedUi(String id, OauthClientsSetDelegatedUiBody body) {
+        return t.request("PUT", "/v1/oauth_clients/" + enc(id) + "/delegated_ui", null, body, null, false, new TypeReference<OauthClientsSetDelegatedUiResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OauthClientsSetDelegatedUiResponse setDelegatedUi(String id, OauthClientsSetDelegatedUiBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/oauth_clients/" + enc(id) + "/delegated_ui", null, body, idempotencyKey, false, new TypeReference<OauthClientsSetDelegatedUiResponse>() {
+        });
+    }
+
     /** {@code PUT /v1/oauth_clients/{id}/organization_access} - Set who may use an application. `open` (default): any organization. `restricted`: only organizations granted access (and, when a grant lists roles, members holding them); a sign-in outside an entitled organization is refused with `access_denied` at the authorize endpoint. Scope: {@code oauth_clients:write}. */
     public OauthClientsSetOrganizationAccessResponse setOrganizationAccess(String id, OauthClientsSetOrganizationAccessBody body) {
         return t.request("PUT", "/v1/oauth_clients/" + enc(id) + "/organization_access", null, body, null, false, new TypeReference<OauthClientsSetOrganizationAccessResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OauthClientsSetOrganizationAccessResponse setOrganizationAccess(String id, OauthClientsSetOrganizationAccessBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/oauth_clients/" + enc(id) + "/organization_access", null, body, idempotencyKey, false, new TypeReference<OauthClientsSetOrganizationAccessResponse>() {
         });
     }
 
@@ -177,13 +233,25 @@ public final class OauthClientsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public void deleteTokenExchangeProfile(String id, String profileId, String idempotencyKey) {
+        t.request("DELETE", "/v1/oauth_clients/" + enc(id) + "/token_exchange_profiles/" + enc(profileId), null, null, idempotencyKey, false, new TypeReference<Object>() {
+        });
+    }
+
     /** {@code PATCH /v1/oauth_clients/{id}/token_exchange_profiles/{profileId}} - Rename or enable / disable a token exchange profile. Scope: {@code oauth_clients:write}. */
     public void updateTokenExchangeProfile(String id, String profileId, OauthClientsUpdateTokenExchangeProfileBody body) {
         t.request("PATCH", "/v1/oauth_clients/" + enc(id) + "/token_exchange_profiles/" + enc(profileId), null, body, null, false, new TypeReference<Object>() {
         });
     }
 
-    /** {@code GET /v1/oauth_clients/{id}/usage} - Per-day usage of one OAuth client for the last `days` days (1 to 90, default 30): token endpoint calls, access tokens issued, distinct active users, errors and rate-limited calls, with totals. The path takes the oac_ id or the public client_id. The developer can read the same report at GET /oauth2/register/&#123;client_id&#125;/usage with the client's registration_access_token. Scope: {@code oauth_clients:read}. */
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public void updateTokenExchangeProfile(String id, String profileId, OauthClientsUpdateTokenExchangeProfileBody body, String idempotencyKey) {
+        t.request("PATCH", "/v1/oauth_clients/" + enc(id) + "/token_exchange_profiles/" + enc(profileId), null, body, idempotencyKey, false, new TypeReference<Object>() {
+        });
+    }
+
+    /** {@code GET /v1/oauth_clients/{id}/usage} - Per-day usage of one OAuth client for the last `days` days (1 to 90, default 30): token endpoint calls, access tokens issued, distinct active users, errors and rate-limited calls, with totals, a per-day errors_by_code breakdown and the latest error (code, endpoint, time). The path takes the oac_ id or the public client_id. The developer can read the same report at GET /oauth2/register/&#123;client_id&#125;/usage with the client's registration_access_token. Scope: {@code oauth_clients:read}. */
     public OauthClientsListUsageResponse listUsage(String id) {
         return t.request("GET", "/v1/oauth_clients/" + enc(id) + "/usage", null, null, null, false, new TypeReference<OauthClientsListUsageResponse>() {
         });
@@ -201,6 +269,12 @@ public final class OauthClientsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public void deleteWebhook(String id, String idempotencyKey) {
+        t.request("DELETE", "/v1/oauth_clients/" + enc(id) + "/webhook", null, null, idempotencyKey, false, new TypeReference<Object>() {
+        });
+    }
+
     /** {@code GET /v1/oauth_clients/{id}/webhook} - The webhook this client receives user events on (404 when it has none). Scope: {@code oauth_clients:read}. */
     public OauthClientsGetWebhookResponse getWebhook(String id) {
         return t.request("GET", "/v1/oauth_clients/" + enc(id) + "/webhook", null, null, null, false, new TypeReference<OauthClientsGetWebhookResponse>() {
@@ -210,6 +284,12 @@ public final class OauthClientsApi {
     /** {@code PUT /v1/oauth_clients/{id}/webhook} - Create or update the client's event webhook: a signed, retried endpoint that receives events about users who granted the client access, never the instance's own stream. user.updated carries only what the user's granted scopes allow (email with the email scope, name and picture with profile). enabled_events may also name your own types declared with PUT /v1/instance/app_event_types; those reach the client only for users who granted the type's required scope. The signing secret is returned once, on create (201). Audited. Scope: {@code oauth_clients:write}. */
     public OauthClientsSetWebhookResponse setWebhook(String id, OauthClientsSetWebhookBody body) {
         return t.request("PUT", "/v1/oauth_clients/" + enc(id) + "/webhook", null, body, null, false, new TypeReference<OauthClientsSetWebhookResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OauthClientsSetWebhookResponse setWebhook(String id, OauthClientsSetWebhookBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/oauth_clients/" + enc(id) + "/webhook", null, body, idempotencyKey, false, new TypeReference<OauthClientsSetWebhookResponse>() {
         });
     }
 }

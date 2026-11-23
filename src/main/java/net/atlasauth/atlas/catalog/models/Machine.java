@@ -23,6 +23,10 @@ public record Machine(
         @JsonProperty("metadata") Map<String, Object> metadata,
         @JsonProperty("enrolled_at") Long enrolledAt,
         @JsonProperty("last_token_at") Long lastTokenAt,
+        @JsonProperty("revoked_reason") String revokedReason,
+        @JsonProperty("revoked_by") MachineRevokedBy revokedBy,
+        @JsonProperty("ended_at") Long endedAt,
+        @JsonProperty("dies_with") String diesWith,
         @JsonProperty("created_at") Long createdAt,
         @JsonProperty("updated_at") Long updatedAt) {
 }

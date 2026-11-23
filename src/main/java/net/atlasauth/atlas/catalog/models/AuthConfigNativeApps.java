@@ -10,5 +10,9 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record AuthConfigNativeApps(
         @JsonProperty("androidApps") List<AuthConfigNativeAppsAndroidAppsItem> androidApps,
-        @JsonProperty("appleAppIds") List<String> appleAppIds) {
+        @JsonProperty("appleAppIds") List<String> appleAppIds,
+        @JsonProperty("apps") List<AuthConfigNativeAppsAppsItem> apps,
+        @JsonProperty("publishableKeyAppIds") List<String> publishableKeyAppIds,
+        @JsonProperty("unregistered") String unregistered,
+        @JsonProperty("unregisteredSession") AuthConfigNativeAppsUnregisteredSession unregisteredSession) {
 }

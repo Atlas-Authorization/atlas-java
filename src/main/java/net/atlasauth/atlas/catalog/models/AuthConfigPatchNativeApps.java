@@ -16,6 +16,15 @@ public final class AuthConfigPatchNativeApps {
     public List<AuthConfigPatchNativeAppsAndroidAppsItem> androidApps;
     @JsonProperty("appleAppIds")
     public List<String> appleAppIds;
+    @JsonProperty("apps")
+    public List<AuthConfigPatchNativeAppsAppsItem> apps;
+    @JsonProperty("publishableKeyAppIds")
+    public List<String> publishableKeyAppIds;
+    /** One of: allow, device_bound, refuse. */
+    @JsonProperty("unregistered")
+    public String unregistered;
+    @JsonProperty("unregisteredSession")
+    public AuthConfigPatchNativeAppsUnregisteredSession unregisteredSession;
     /** Wire names sent as an explicit JSON null (see the clear methods); unset fields are omitted. */
     @JsonIgnore
     private final java.util.Set<String> clearedFields = new java.util.LinkedHashSet<>();
@@ -29,6 +38,18 @@ public final class AuthConfigPatchNativeApps {
     public AuthConfigPatchNativeApps appleAppIds(List<String> v) { this.appleAppIds = v; clearedFields.remove("appleAppIds"); return this; }
     /** Send {@code "appleAppIds": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchNativeApps clearAppleAppIds() { this.appleAppIds = null; clearedFields.add("appleAppIds"); return this; }
+    public AuthConfigPatchNativeApps apps(List<AuthConfigPatchNativeAppsAppsItem> v) { this.apps = v; clearedFields.remove("apps"); return this; }
+    /** Send {@code "apps": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchNativeApps clearApps() { this.apps = null; clearedFields.add("apps"); return this; }
+    public AuthConfigPatchNativeApps publishableKeyAppIds(List<String> v) { this.publishableKeyAppIds = v; clearedFields.remove("publishableKeyAppIds"); return this; }
+    /** Send {@code "publishableKeyAppIds": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchNativeApps clearPublishableKeyAppIds() { this.publishableKeyAppIds = null; clearedFields.add("publishableKeyAppIds"); return this; }
+    public AuthConfigPatchNativeApps unregistered(String v) { this.unregistered = v; clearedFields.remove("unregistered"); return this; }
+    /** Send {@code "unregistered": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchNativeApps clearUnregistered() { this.unregistered = null; clearedFields.add("unregistered"); return this; }
+    public AuthConfigPatchNativeApps unregisteredSession(AuthConfigPatchNativeAppsUnregisteredSession v) { this.unregisteredSession = v; clearedFields.remove("unregisteredSession"); return this; }
+    /** Send {@code "unregisteredSession": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchNativeApps clearUnregisteredSession() { this.unregisteredSession = null; clearedFields.add("unregisteredSession"); return this; }
 
     @JsonAnyGetter
     Map<String, Object> clearedAsNull() {

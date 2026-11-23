@@ -47,6 +47,18 @@ public final class MessagesApi {
         return listAll(null);
     }
 
+    /** {@code POST /v1/messages} - Send a transactional email from your app through your own email provider and its failover. Give `to` (one address, or up to 10, each sent separately) and either `template` (the name or id of a template from POST /v1/notification_templates, with `data` variables) or `subject` with `html` and/or `text`, sent exactly as you wrote them. The message is recorded in the ledger (GET /v1/messages) with category `transactional`, your `category` and `tags`, and your provider's delivery callbacks fill in its timeline; bounces and complaints suppress the address like sign-in mail. An address on the suppression list is not sent to: the message is recorded with status `suppressed` and returned. Returns 422 when the instance has no email provider of its own (Atlas never sends your mail from its own sender). Accepts an Idempotency-Key. One address returns the message; several return a list. Scope: {@code messaging:write}. */
+    public MessagesCreateResponse create(MessagesCreateBody body) {
+        return t.request("POST", "/v1/messages", null, body, null, false, new TypeReference<MessagesCreateResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public MessagesCreateResponse create(MessagesCreateBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/messages", null, body, idempotencyKey, false, new TypeReference<MessagesCreateResponse>() {
+        });
+    }
+
     /** {@code GET /v1/messages/summary} - How many messages are in each status over the last `hours` (default 24, up to 720). Scope: {@code messaging:read}. */
     public MessagesGetSummaryResponse getSummary() {
         return t.request("GET", "/v1/messages/summary", null, null, null, false, new TypeReference<MessagesGetSummaryResponse>() {

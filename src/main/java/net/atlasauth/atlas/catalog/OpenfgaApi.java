@@ -33,6 +33,12 @@ public final class OpenfgaApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Object setAssertion(String store, String model, OpenfgaSetAssertionBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/openfga/stores/" + enc(store) + "/assertions/" + enc(model), null, body, idempotencyKey, false, new TypeReference<Object>() {
+        });
+    }
+
     /** {@code POST /v1/openfga/stores/{store}/authorization-models} - Write a new authorization model to a store. Scope: {@code fga:write}. */
     public OpenfgaCreateAuthorizationModelResponse createAuthorizationModel(String store, OpenfgaCreateAuthorizationModelBody body) {
         return t.request("POST", "/v1/openfga/stores/" + enc(store) + "/authorization-models", null, body, null, false, new TypeReference<OpenfgaCreateAuthorizationModelResponse>() {

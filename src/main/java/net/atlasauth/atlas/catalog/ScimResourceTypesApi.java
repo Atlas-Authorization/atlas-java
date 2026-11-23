@@ -65,6 +65,12 @@ public final class ScimResourceTypesApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public void delete(String id, String idempotencyKey) {
+        t.request("DELETE", "/v1/scim_resource_types/" + enc(id), null, null, idempotencyKey, false, new TypeReference<Object>() {
+        });
+    }
+
     /** {@code GET /v1/scim_resource_types/{id}} - Read one custom SCIM resource type. Scope: {@code scim:read}. */
     public ScimResourceTypesGetResponse get(String id) {
         return t.request("GET", "/v1/scim_resource_types/" + enc(id), null, null, null, false, new TypeReference<ScimResourceTypesGetResponse>() {

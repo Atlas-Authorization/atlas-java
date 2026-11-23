@@ -67,6 +67,11 @@ public final class Catalog {
         return new AgentsApi(t);
     }
 
+    /** The {@code /v1/analytics} operations. */
+    public AnalyticsApi analytics() {
+        return new AnalyticsApi(t);
+    }
+
     /** The {@code /v1/api_keys} operations. */
     public ApiKeysApi apiKeys() {
         return new ApiKeysApi(t);
@@ -205,6 +210,11 @@ public final class Catalog {
     /** The {@code /v1/connection_reconnect_settings} operations. */
     public ConnectionReconnectSettingsApi connectionReconnectSettings() {
         return new ConnectionReconnectSettingsApi(t);
+    }
+
+    /** The {@code /v1/connection_templates} operations. */
+    public ConnectionTemplatesApi connectionTemplates() {
+        return new ConnectionTemplatesApi(t);
     }
 
     /** The {@code /v1/connections} operations. */
@@ -397,6 +407,11 @@ public final class Catalog {
         return new McpRegistryApi(t);
     }
 
+    /** The {@code /v1/message_links} operations. */
+    public MessageLinksApi messageLinks() {
+        return new MessageLinksApi(t);
+    }
+
     /** The {@code /v1/message_receivers} operations. */
     public MessageReceiversApi messageReceivers() {
         return new MessageReceiversApi(t);
@@ -432,6 +447,16 @@ public final class Catalog {
         return new MigrationsApi(t);
     }
 
+    /** The {@code /v1/native_apps} operations. */
+    public NativeAppsApi nativeApps() {
+        return new NativeAppsApi(t);
+    }
+
+    /** The {@code /v1/notification_templates} operations. */
+    public NotificationTemplatesApi notificationTemplates() {
+        return new NotificationTemplatesApi(t);
+    }
+
     /** The {@code /v1/oauth_application_types} operations. */
     public OauthApplicationTypesApi oauthApplicationTypes() {
         return new OauthApplicationTypesApi(t);
@@ -442,6 +467,16 @@ public final class Catalog {
         return new OauthClientsApi(t);
     }
 
+    /** The {@code /v1/oauth_consent_requests} operations. */
+    public OauthConsentRequestsApi oauthConsentRequests() {
+        return new OauthConsentRequestsApi(t);
+    }
+
+    /** The {@code /v1/oauth_device_requests} operations. */
+    public OauthDeviceRequestsApi oauthDeviceRequests() {
+        return new OauthDeviceRequestsApi(t);
+    }
+
     /** The {@code /v1/oauth_grants} operations. */
     public OauthGrantsApi oauthGrants() {
         return new OauthGrantsApi(t);
@@ -450,6 +485,11 @@ public final class Catalog {
     /** The {@code /v1/oauth_initial_access_tokens} operations. */
     public OauthInitialAccessTokensApi oauthInitialAccessTokens() {
         return new OauthInitialAccessTokensApi(t);
+    }
+
+    /** The {@code /v1/oauth_login_requests} operations. */
+    public OauthLoginRequestsApi oauthLoginRequests() {
+        return new OauthLoginRequestsApi(t);
     }
 
     /** The {@code /v1/oauth_providers} operations. */
@@ -492,6 +532,11 @@ public final class Catalog {
         return new OrganizationConnectionsApi(t);
     }
 
+    /** The {@code /v1/organization_invitations} operations. */
+    public OrganizationInvitationsApi organizationInvitations() {
+        return new OrganizationInvitationsApi(t);
+    }
+
     /** The {@code /v1/organizations} operations. */
     public OrganizationsApi organizations() {
         return new OrganizationsApi(t);
@@ -512,6 +557,21 @@ public final class Catalog {
         return new PasskeyCampaignsApi(t);
     }
 
+    /** The {@code /v1/pca} operations. */
+    public PcaApi pca() {
+        return new PcaApi(t);
+    }
+
+    /** The {@code /v1/permission_aliases} operations. */
+    public PermissionAliasesApi permissionAliases() {
+        return new PermissionAliasesApi(t);
+    }
+
+    /** The {@code /v1/permissions} operations. */
+    public PermissionsApi permissions() {
+        return new PermissionsApi(t);
+    }
+
     /** The {@code /v1/platform/apps} operations. */
     public PlatformAppsApi platformApps() {
         return new PlatformAppsApi(platform);
@@ -530,6 +590,11 @@ public final class Catalog {
     /** The {@code /v1/platform/config_changelog} operations. */
     public PlatformConfigChangelogApi platformConfigChangelog() {
         return new PlatformConfigChangelogApi(platform);
+    }
+
+    /** The {@code /v1/platform/whoami} operations. */
+    public PlatformWhoamiApi platformWhoami() {
+        return new PlatformWhoamiApi(platform);
     }
 
     /** The {@code /v1/policies} operations. */
@@ -600,6 +665,11 @@ public final class Catalog {
     /** The {@code /v1/resource_servers} operations. */
     public ResourceServersApi resourceServers() {
         return new ResourceServersApi(t);
+    }
+
+    /** The {@code /v1/revocations} operations. */
+    public RevocationsApi revocations() {
+        return new RevocationsApi(t);
     }
 
     /** The {@code /v1/risk_based_mfa} operations. */
@@ -717,9 +787,19 @@ public final class Catalog {
         return new WebBotAuthApi(t);
     }
 
+    /** The {@code /v1/webhook_dlq} operations. */
+    public WebhookDlqApi webhookDlq() {
+        return new WebhookDlqApi(t);
+    }
+
     /** The {@code /v1/webhook_endpoints} operations. */
     public WebhookEndpointsApi webhookEndpoints() {
         return new WebhookEndpointsApi(t);
+    }
+
+    /** The {@code /v1/whoami} operations. */
+    public WhoamiApi whoami() {
+        return new WhoamiApi(t);
     }
 
     /** The {@code /v1/workflow_approvals} operations. */

@@ -18,7 +18,7 @@ public final class SecretKeysRotateBody {
     /** One of: atlas, legacy. */
     @JsonProperty("key_format")
     public String keyFormat;
-    /** Give the replacement this named scope set instead of the old key's scopes. The calling key must hold them. One of: app-runtime. */
+    /** Give the replacement this named scope set instead of the old key's scopes. The calling key must hold them. One of: app-runtime, web-app, provisioning, integrations. */
     @JsonProperty("preset")
     public String preset;
     /** Wire names sent as an explicit JSON null (see the clear methods); unset fields are omitted. */

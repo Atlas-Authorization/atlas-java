@@ -33,6 +33,12 @@ public final class PoliciesApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public PoliciesSetAudienceResponse setAudience(String id, PoliciesSetAudienceBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/policies/" + enc(id) + "/audience", null, body, idempotencyKey, false, new TypeReference<PoliciesSetAudienceResponse>() {
+        });
+    }
+
     /** {@code GET /v1/policies/{id}/versions} - The policy's versions, newest first, each with acceptance_count. Scope: {@code instance:read}. */
     public PoliciesListVersionsResponse listVersions(String id) {
         return t.request("GET", "/v1/policies/" + enc(id) + "/versions", null, null, null, false, new TypeReference<PoliciesListVersionsResponse>() {
@@ -63,6 +69,12 @@ public final class PoliciesApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public PoliciesDeleteVersionResponse deleteVersion(String id, String versionId, String idempotencyKey) {
+        return t.request("DELETE", "/v1/policies/" + enc(id) + "/versions/" + enc(versionId), null, null, idempotencyKey, false, new TypeReference<PoliciesDeleteVersionResponse>() {
+        });
+    }
+
     /** {@code GET /v1/policies/{id}/versions/{versionId}} - One version, by id or label. Scope: {@code instance:read}. */
     public PoliciesGetVersionResponse getVersion(String id, String versionId) {
         return t.request("GET", "/v1/policies/" + enc(id) + "/versions/" + enc(versionId), null, null, null, false, new TypeReference<PoliciesGetVersionResponse>() {
@@ -72,6 +84,12 @@ public final class PoliciesApi {
     /** {@code PATCH /v1/policies/{id}/versions/{versionId}} - Edit a draft (409 for a published version: publish a new version instead). Scope: {@code instance:write}. */
     public PoliciesUpdateVersionResponse updateVersion(String id, String versionId, PoliciesUpdateVersionBody body) {
         return t.request("PATCH", "/v1/policies/" + enc(id) + "/versions/" + enc(versionId), null, body, null, false, new TypeReference<PoliciesUpdateVersionResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public PoliciesUpdateVersionResponse updateVersion(String id, String versionId, PoliciesUpdateVersionBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/policies/" + enc(id) + "/versions/" + enc(versionId), null, body, idempotencyKey, false, new TypeReference<PoliciesUpdateVersionResponse>() {
         });
     }
 
@@ -131,9 +149,21 @@ public final class PoliciesApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public PoliciesDeleteTranslationResponse deleteTranslation(String id, String versionId, String locale, String idempotencyKey) {
+        return t.request("DELETE", "/v1/policies/" + enc(id) + "/versions/" + enc(versionId) + "/translations/" + enc(locale), null, null, idempotencyKey, false, new TypeReference<PoliciesDeleteTranslationResponse>() {
+        });
+    }
+
     /** {@code PUT /v1/policies/{id}/versions/{versionId}/translations/{locale}} - Add or replace the text of a version in one language (content_markdown or content_html, sanitised like the version itself). GET /v1/client/policies?locale= then serves it, and an acceptance records the hash of the text that was shown. A published version can gain languages but a language already there cannot change (409); a draft can change freely. 400 for an external policy. Scope: {@code instance:write}. */
     public PoliciesSetTranslationResponse setTranslation(String id, String versionId, String locale, PoliciesSetTranslationBody body) {
         return t.request("PUT", "/v1/policies/" + enc(id) + "/versions/" + enc(versionId) + "/translations/" + enc(locale), null, body, null, false, new TypeReference<PoliciesSetTranslationResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public PoliciesSetTranslationResponse setTranslation(String id, String versionId, String locale, PoliciesSetTranslationBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/policies/" + enc(id) + "/versions/" + enc(versionId) + "/translations/" + enc(locale), null, body, idempotencyKey, false, new TypeReference<PoliciesSetTranslationResponse>() {
         });
     }
 }

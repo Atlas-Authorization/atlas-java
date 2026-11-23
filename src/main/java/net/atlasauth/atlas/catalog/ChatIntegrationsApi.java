@@ -65,6 +65,12 @@ public final class ChatIntegrationsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ChatIntegrationsDeleteResponse delete(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/chat_integrations/" + enc(id), null, null, idempotencyKey, false, new TypeReference<ChatIntegrationsDeleteResponse>() {
+        });
+    }
+
     /** {@code GET /v1/chat_integrations/{id}} - Read one chat integration. Scope: {@code service_connectors:read}. */
     public ChatIntegrationsGetResponse get(String id) {
         return t.request("GET", "/v1/chat_integrations/" + enc(id), null, null, null, false, new TypeReference<ChatIntegrationsGetResponse>() {
@@ -74,6 +80,12 @@ public final class ChatIntegrationsApi {
     /** {@code PATCH /v1/chat_integrations/{id}} - Turn an integration on or off, change its routing, settings or credentials. `config.agent_approver_user_ids` lists who may decide agent access requests from chat. Scope: {@code service_connectors:write}. */
     public ChatIntegrationsUpdateResponse update(String id, ChatIntegrationsUpdateBody body) {
         return t.request("PATCH", "/v1/chat_integrations/" + enc(id), null, body, null, false, new TypeReference<ChatIntegrationsUpdateResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ChatIntegrationsUpdateResponse update(String id, ChatIntegrationsUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/chat_integrations/" + enc(id), null, body, idempotencyKey, false, new TypeReference<ChatIntegrationsUpdateResponse>() {
         });
     }
 
@@ -156,6 +168,12 @@ public final class ChatIntegrationsApi {
     /** {@code DELETE /v1/chat_integrations/{id}/user_links/{linkId}} - Remove the link between a chat user and an Atlas user. Scope: {@code service_connectors:write}. */
     public ChatIntegrationsDeleteUserLinkResponse deleteUserLink(String id, String linkId) {
         return t.request("DELETE", "/v1/chat_integrations/" + enc(id) + "/user_links/" + enc(linkId), null, null, null, false, new TypeReference<ChatIntegrationsDeleteUserLinkResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ChatIntegrationsDeleteUserLinkResponse deleteUserLink(String id, String linkId, String idempotencyKey) {
+        return t.request("DELETE", "/v1/chat_integrations/" + enc(id) + "/user_links/" + enc(linkId), null, null, idempotencyKey, false, new TypeReference<ChatIntegrationsDeleteUserLinkResponse>() {
         });
     }
 }

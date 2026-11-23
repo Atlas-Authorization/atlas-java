@@ -15,6 +15,7 @@ public record AuthConfigComplianceRetention(
         @JsonProperty("deletionReminders") List<String> deletionReminders,
         @JsonProperty("dsrDueDays") Double dsrDueDays,
         @JsonProperty("erasureGraceDays") Double erasureGraceDays,
+        @JsonProperty("maxPauses") Double maxPauses,
         @JsonProperty("ownershipTransfer") String ownershipTransfer,
         @JsonProperty("requireFinalNotice") Boolean requireFinalNotice) {
 }

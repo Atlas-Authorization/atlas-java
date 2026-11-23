@@ -71,6 +71,12 @@ public final class AgentsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public AgentsSetLifecycleResponse setLifecycle(String id, AgentsSetLifecycleBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/agents/" + enc(id) + "/lifecycle", null, body, idempotencyKey, false, new TypeReference<AgentsSetLifecycleResponse>() {
+        });
+    }
+
     /** {@code POST /v1/agents/{id}/renew} - Extend an agent's registration by extend_days (1 to 365) from its current expiry (or now, when that has passed). A revoked agent cannot be renewed. Scope: {@code machines:write}. */
     public AgentsRenewResponse renew(String id, AgentsRenewBody body) {
         return t.request("POST", "/v1/agents/" + enc(id) + "/renew", null, body, null, false, new TypeReference<AgentsRenewResponse>() {

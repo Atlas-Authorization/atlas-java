@@ -33,6 +33,12 @@ public final class AuditApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public AuditSetChainResponse setChain(AuditSetChainBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/audit/chain", null, body, idempotencyKey, false, new TypeReference<AuditSetChainResponse>() {
+        });
+    }
+
     /** {@code GET /v1/audit/chain/checkpoints} - Signed checkpoints, oldest first. Each is a JWS the instance's signing key made; verify it against jwks_uri. Scope: {@code audit:read}. */
     public AuditListCheckpointsResponse listCheckpoints() {
         return t.request("GET", "/v1/audit/chain/checkpoints", null, null, null, false, new TypeReference<AuditListCheckpointsResponse>() {

@@ -32,4 +32,10 @@ public final class RolesApi {
         return t.request("DELETE", "/v1/roles/" + enc(id), query == null ? null : query.toMap(), null, null, false, new TypeReference<RolesDeleteResponse>() {
         });
     }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public RolesDeleteResponse delete(String id, RolesDeleteQuery query, String idempotencyKey) {
+        return t.request("DELETE", "/v1/roles/" + enc(id), query == null ? null : query.toMap(), null, idempotencyKey, false, new TypeReference<RolesDeleteResponse>() {
+        });
+    }
 }

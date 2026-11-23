@@ -25,6 +25,11 @@ public final class ApiKeysCreateBody {
     public String name;
     @JsonProperty("claims")
     public Map<String, Object> claims;
+    @JsonProperty("metadata")
+    public Map<String, Object> metadata;
+    /** One of: sign_out_everywhere. */
+    @JsonProperty("dies_with")
+    public String diesWith;
     @JsonProperty("expires_at")
     public Double expiresAt;
     @JsonProperty("expires_in_seconds")
@@ -51,6 +56,11 @@ public final class ApiKeysCreateBody {
     public List<ApiKeysCreateBodyLimitsItem> limits;
     @JsonProperty("public_key")
     public String publicKey;
+    /** One of: secret, key_pair. */
+    @JsonProperty("credential")
+    public String credential;
+    @JsonProperty("audience")
+    public String audience;
     @JsonProperty("import")
     public ApiKeysCreateBodyImport import_;
     /** Wire names sent as an explicit JSON null (see the clear methods); unset fields are omitted. */
@@ -78,6 +88,12 @@ public final class ApiKeysCreateBody {
     public ApiKeysCreateBody claims(Map<String, Object> v) { this.claims = v; clearedFields.remove("claims"); return this; }
     /** Send {@code "claims": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public ApiKeysCreateBody clearClaims() { this.claims = null; clearedFields.add("claims"); return this; }
+    public ApiKeysCreateBody metadata(Map<String, Object> v) { this.metadata = v; clearedFields.remove("metadata"); return this; }
+    /** Send {@code "metadata": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public ApiKeysCreateBody clearMetadata() { this.metadata = null; clearedFields.add("metadata"); return this; }
+    public ApiKeysCreateBody diesWith(String v) { this.diesWith = v; clearedFields.remove("dies_with"); return this; }
+    /** Send {@code "dies_with": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public ApiKeysCreateBody clearDiesWith() { this.diesWith = null; clearedFields.add("dies_with"); return this; }
     public ApiKeysCreateBody expiresAt(Double v) { this.expiresAt = v; clearedFields.remove("expires_at"); return this; }
     /** Send {@code "expires_at": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public ApiKeysCreateBody clearExpiresAt() { this.expiresAt = null; clearedFields.add("expires_at"); return this; }
@@ -117,6 +133,12 @@ public final class ApiKeysCreateBody {
     public ApiKeysCreateBody publicKey(String v) { this.publicKey = v; clearedFields.remove("public_key"); return this; }
     /** Send {@code "public_key": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public ApiKeysCreateBody clearPublicKey() { this.publicKey = null; clearedFields.add("public_key"); return this; }
+    public ApiKeysCreateBody credential(String v) { this.credential = v; clearedFields.remove("credential"); return this; }
+    /** Send {@code "credential": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public ApiKeysCreateBody clearCredential() { this.credential = null; clearedFields.add("credential"); return this; }
+    public ApiKeysCreateBody audience(String v) { this.audience = v; clearedFields.remove("audience"); return this; }
+    /** Send {@code "audience": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public ApiKeysCreateBody clearAudience() { this.audience = null; clearedFields.add("audience"); return this; }
     public ApiKeysCreateBody import_(ApiKeysCreateBodyImport v) { this.import_ = v; clearedFields.remove("import"); return this; }
     /** Send {@code "import": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public ApiKeysCreateBody clearImport() { this.import_ = null; clearedFields.add("import"); return this; }

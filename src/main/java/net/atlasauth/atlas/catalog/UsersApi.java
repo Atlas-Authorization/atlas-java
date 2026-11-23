@@ -115,6 +115,33 @@ public final class UsersApi {
         });
     }
 
+    /** {@code PUT /v1/users/by_external_id/{external_id}} - Create-or-update the user keyed by your own id (external_id, the path segment, URL-encoded): 201 with the new user when none holds it (the body is that of POST /v1/users, email_address required, external_id from the path), else 200 with the existing user updated (only first_name, last_name, image_url, public_metadata, private_metadata, unsafe_metadata, password and referral_code apply; email fields and the other create-only fields are ignored). Two calls racing for a new external_id create exactly one user. When nobody holds the id but a user already has the address, the answer is 409 IDENTIFIER_EXISTS with meta.user_id; send link_by_verified_email: true to adopt that user instead (200), which works only when the address is verified in Atlas and the user has no external_id yet (a different id is never overwritten). Emits user.created or user.updated. Scope: {@code users:write}. */
+    public User setByExternalId(String externalId, UsersSetByExternalIdBody body) {
+        return t.request("PUT", "/v1/users/by_external_id/" + enc(externalId), null, body, null, false, new TypeReference<User>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public User setByExternalId(String externalId, UsersSetByExternalIdBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/users/by_external_id/" + enc(externalId), null, body, idempotencyKey, false, new TypeReference<User>() {
+        });
+    }
+
+    /** {@code GET /v1/users/deleted} - Reconcile missed `user.deleted` webhooks: every user deleted at or after `since`, oldest first, as `id`, `external_id` and `deleted_at`. Nothing else about the person is returned. Page with `starting_after` = the previous `next_cursor`. Rows exist until the personal-data scrub (`compliance.retention.deletedUserGraceDays`, default 30 days), so reconcile at least that often; failed deliveries themselves are listed by `GET /v1/webhook_dlq?event_type=user.deleted`. Scope: {@code users:read}. */
+    public UsersListDeletedResponse listDeleted(UsersListDeletedQuery query) {
+        return t.request("GET", "/v1/users/deleted", query == null ? null : query.toMap(), null, null, false, new TypeReference<UsersListDeletedResponse>() {
+        });
+    }
+
+    /** Every item across every page of {@code GET /v1/users/deleted}, fetched lazily (the cursor is followed for you). */
+    public Iterable<UsersListDeletedResponseDataItem> listDeletedAll(UsersListDeletedQuery query) {
+        final UsersListDeletedQuery base = query.copy();
+        return Pagination.iterate(cursor -> {
+            UsersListDeletedResponse r = listDeleted(base.copy().startingAfter(cursor));
+            return new CursorPage<>(r.data(), Boolean.TRUE.equals(r.hasMore()), r.nextCursor());
+        });
+    }
+
     /** {@code POST /v1/users/deleted_addresses} - Remember email addresses and E.164 phone numbers of accounts that were deleted before this instance recorded deletions, so deletedUserReturn "block" refuses them. Same keyed, unreadable hash a delete writes. Up to 5000 per call, safe to repeat. The answer counts new, already remembered and invalid entries (with the first invalid positions). Honours Idempotency-Key. Scope: {@code users:delete}. */
     public UsersCreateDeletedAddresseResponse createDeletedAddresse(UsersCreateDeletedAddresseBody body) {
         return t.request("POST", "/v1/users/deleted_addresses", null, body, null, false, new TypeReference<UsersCreateDeletedAddresseResponse>() {
@@ -230,6 +257,12 @@ public final class UsersApi {
     /** {@code PATCH /v1/users/search/views/{id}} - Rename a saved view or change its filter or sort. Scope: {@code users:write}. */
     public UserSearchView updateView(String id, UsersUpdateViewBody body) {
         return t.request("PATCH", "/v1/users/search/views/" + enc(id), null, body, null, false, new TypeReference<UserSearchView>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public UserSearchView updateView(String id, UsersUpdateViewBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/users/search/views/" + enc(id), null, body, idempotencyKey, false, new TypeReference<UserSearchView>() {
         });
     }
 
@@ -355,6 +388,12 @@ public final class UsersApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public UsersDeleteAppRoleResponse deleteAppRole(String id, String roleId, String idempotencyKey) {
+        return t.request("DELETE", "/v1/users/" + enc(id) + "/app_roles/" + enc(roleId), null, null, idempotencyKey, false, new TypeReference<UsersDeleteAppRoleResponse>() {
+        });
+    }
+
     /** {@code GET /v1/users/{id}/approval_devices} - Every device the user can approve from (registered signing keys, passkeys and verified push devices), each marked trusted or not, with the `trusted_device_id` to revoke. Needs `approvals:read` (`users:read` keeps working). Scope: {@code approvals:read}. */
     public UsersListApprovalDevicesResponse listApprovalDevices(String id) {
         return t.request("GET", "/v1/users/" + enc(id) + "/approval_devices", null, null, null, false, new TypeReference<UsersListApprovalDevicesResponse>() {
@@ -397,6 +436,38 @@ public final class UsersApi {
     public UsersDeleteApprovalDeviceResponse deleteApprovalDevice(String id, String deviceId) {
         return t.request("DELETE", "/v1/users/" + enc(id) + "/approval_devices/" + enc(deviceId), null, null, null, false, new TypeReference<UsersDeleteApprovalDeviceResponse>() {
         });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public UsersDeleteApprovalDeviceResponse deleteApprovalDevice(String id, String deviceId, String idempotencyKey) {
+        return t.request("DELETE", "/v1/users/" + enc(id) + "/approval_devices/" + enc(deviceId), null, null, idempotencyKey, false, new TypeReference<UsersDeleteApprovalDeviceResponse>() {
+        });
+    }
+
+    /** {@code GET /v1/users/{id}/approval_requests} - Everything one user has open, in one list: approval requests about them (filter with `status`; `limit` 1 to 100, default 25) and, while `status` is pending or absent, their sign-in "approve in your app" requests (`kind: "sign_in_approval"`, with `purpose`, the shuffled `choices` and `requested_from`; the right number is never included). Replaces keeping your own pointer to the latest request. Needs `approvals:read` (a key with `users:read` keeps working). Scope: {@code approvals:read}. */
+    public UsersListApprovalRequestsResponse listApprovalRequests(String id) {
+        return t.request("GET", "/v1/users/" + enc(id) + "/approval_requests", null, null, null, false, new TypeReference<UsersListApprovalRequestsResponse>() {
+        });
+    }
+
+    /** As above, with every optional parameter. */
+    public UsersListApprovalRequestsResponse listApprovalRequests(String id, UsersListApprovalRequestsQuery query) {
+        return t.request("GET", "/v1/users/" + enc(id) + "/approval_requests", query == null ? null : query.toMap(), null, null, false, new TypeReference<UsersListApprovalRequestsResponse>() {
+        });
+    }
+
+    /** Every item across every page of {@code GET /v1/users/{id}/approval_requests}, fetched lazily (the cursor is followed for you). */
+    public Iterable<UsersListApprovalRequestsResponseDataItem> listApprovalRequestsAll(String id, UsersListApprovalRequestsQuery query) {
+        final UsersListApprovalRequestsQuery base = query == null ? new UsersListApprovalRequestsQuery() : query.copy();
+        return Pagination.iterate(cursor -> {
+            UsersListApprovalRequestsResponse r = listApprovalRequests(id, base.copy().startingAfter(cursor));
+            return new CursorPage<>(r.data(), Boolean.TRUE.equals(r.hasMore()), (r.data() == null || r.data().isEmpty() ? null : r.data().get(r.data().size() - 1).id()));
+        });
+    }
+
+    /** As above, with no query options. */
+    public Iterable<UsersListApprovalRequestsResponseDataItem> listApprovalRequestsAll(String id) {
+        return listApprovalRequestsAll(id, null);
     }
 
     /** {@code POST /v1/users/{id}/approval_requests} - Request a transaction approval from a user: push a number-matching "approve this action" prompt (carrying a human-readable description and optional context) to the user's registered push devices. Returns the approval id and the match_number the CALLER displays to the user to confirm on their phone: the number is never sent inside the push. Optional `ttl_seconds`, `approvers` (N of M named users or an organization role), `require_signature`, `binding` and `reference`; see POST /v1/approval_requests. 409 when the user has no registered push device (subject mode). Accepts Idempotency-Key. Needs `approvals:write` (a key with `users:write` keeps working). → 201. Scope: {@code approvals:write}. */
@@ -456,6 +527,36 @@ public final class UsersApi {
     /** {@code DELETE /v1/users/{id}/cookie_consents} - Erase the cookie consent records linked to a user. Deleting the user does this too. Audited. Scope: {@code data_subject_requests:write}. */
     public UsersDeleteCookieConsentsResponse deleteCookieConsents(String id) {
         return t.request("DELETE", "/v1/users/" + enc(id) + "/cookie_consents", null, null, null, false, new TypeReference<UsersDeleteCookieConsentsResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public UsersDeleteCookieConsentsResponse deleteCookieConsents(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/users/" + enc(id) + "/cookie_consents", null, null, idempotencyKey, false, new TypeReference<UsersDeleteCookieConsentsResponse>() {
+        });
+    }
+
+    /** {@code POST /v1/users/{id}/delegation_tokens} - Mint a short-lived delegation token so your server can act as this user for one purpose. The token is limited to a named `audience` and a list of `scopes` (both must be on the instance's `delegationTokens` settings), lives at most 300 seconds (default 120), and carries an `act` claim naming `actor.sub`, so a service can see it is not the user themselves. Refused for banned, deleted and impersonation-protected users, and for an `org_id` the user does not belong to. Every mint is audited on the user's trail as `user.delegation_token_issued` (the token itself is never stored). Rate limited per key and per user. Send an Idempotency-Key to make a retry return the same token. Scope: {@code delegation_tokens:write}. */
+    public UsersCreateDelegationTokenResponse createDelegationToken(String id, UsersCreateDelegationTokenBody body) {
+        return t.request("POST", "/v1/users/" + enc(id) + "/delegation_tokens", null, body, null, false, new TypeReference<UsersCreateDelegationTokenResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public UsersCreateDelegationTokenResponse createDelegationToken(String id, UsersCreateDelegationTokenBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/users/" + enc(id) + "/delegation_tokens", null, body, idempotencyKey, false, new TypeReference<UsersCreateDelegationTokenResponse>() {
+        });
+    }
+
+    /** {@code PATCH /v1/users/{id}/deletion} - Move a scheduled deletion to a new date. Send exactly one of `effective_at` (ISO 8601, not in the past) or `grace_seconds` (from now). The user's deletion date, the in-flight erasure request's scheduled date and the reminder plan all move together; the person is mailed the new date and `user.deletion_rescheduled` is emitted. The `pre_user_deletion` Actions are asked again for the new date (a refusal is 403 ACTION_BLOCKED) and a legal hold refuses the move. 409 when the user has no scheduled deletion, the deletion is paused (resume it with POST /v1/users/&#123;id&#125;/deletion/reconfirm first) or the user is already erased. Returns the user. Scope: {@code users:delete}. */
+    public User updateDeletion(String id, UsersUpdateDeletionBody body) {
+        return t.request("PATCH", "/v1/users/" + enc(id) + "/deletion", null, body, null, false, new TypeReference<User>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public User updateDeletion(String id, UsersUpdateDeletionBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/users/" + enc(id) + "/deletion", null, body, idempotencyKey, false, new TypeReference<User>() {
         });
     }
 
@@ -555,7 +656,7 @@ public final class UsersApi {
         });
     }
 
-    /** {@code POST /v1/users/{id}/identities} - Merge a secondary user into this primary: moves the secondary's provider accounts and verified identifiers over (skipping collisions), re-points org memberships without escalating role, revokes the secondary's sessions and retires it. Never clears the primary's MFA or ban. Scope: {@code users:write}. */
+    /** {@code POST /v1/users/{id}/identities} - Merge a secondary user into this primary: moves the secondary's provider accounts and verified identifiers over (skipping collisions), re-points org memberships without escalating role, revokes the secondary's sessions and retires it. Never clears the primary's MFA or ban. Fires user.merged (via identity_link). A pre_user_merge Action can refuse it (403 ACTION_BLOCKED); two different external ids answer 409 unless external_id is keep_target or keep_source. Scope: {@code users:write}. */
     public UsersCreateIdentityResponse createIdentity(String id, UsersCreateIdentityBody body) {
         return t.request("POST", "/v1/users/" + enc(id) + "/identities", null, body, null, false, new TypeReference<UsersCreateIdentityResponse>() {
         });
@@ -644,6 +745,12 @@ public final class UsersApi {
     /** As above, with every optional parameter. */
     public UsersDeleteJourneysResponse deleteJourneys(String id, UsersDeleteJourneysQuery query) {
         return t.request("DELETE", "/v1/users/" + enc(id) + "/journeys", query == null ? null : query.toMap(), null, null, false, new TypeReference<UsersDeleteJourneysResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public UsersDeleteJourneysResponse deleteJourneys(String id, UsersDeleteJourneysQuery query, String idempotencyKey) {
+        return t.request("DELETE", "/v1/users/" + enc(id) + "/journeys", query == null ? null : query.toMap(), null, idempotencyKey, false, new TypeReference<UsersDeleteJourneysResponse>() {
         });
     }
 
@@ -881,6 +988,62 @@ public final class UsersApi {
         });
     }
 
+    /** {@code DELETE /v1/users/{id}/risk_signals} - End every live risk signal on one user now. Their points leave the next evaluation; the rows stay readable with status `revoked`. Recorded once in the audit log. Safe to repeat: with nothing live, it clears nothing. Scope: {@code risk_signals:write}. */
+    public UsersDeleteRiskSignalsResponse deleteRiskSignals(String id) {
+        return t.request("DELETE", "/v1/users/" + enc(id) + "/risk_signals", null, null, null, false, new TypeReference<UsersDeleteRiskSignalsResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public UsersDeleteRiskSignalsResponse deleteRiskSignals(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/users/" + enc(id) + "/risk_signals", null, null, idempotencyKey, false, new TypeReference<UsersDeleteRiskSignalsResponse>() {
+        });
+    }
+
+    /** {@code GET /v1/users/{id}/risk_signals} - The risk signals reported for one user, newest first; `status=active` keeps only live ones. Page with `before`. Scope: {@code risk_signals:read}. */
+    public UsersListRiskSignalsResponse listRiskSignals(String id) {
+        return t.request("GET", "/v1/users/" + enc(id) + "/risk_signals", null, null, null, false, new TypeReference<UsersListRiskSignalsResponse>() {
+        });
+    }
+
+    /** As above, with every optional parameter. */
+    public UsersListRiskSignalsResponse listRiskSignals(String id, UsersListRiskSignalsQuery query) {
+        return t.request("GET", "/v1/users/" + enc(id) + "/risk_signals", query == null ? null : query.toMap(), null, null, false, new TypeReference<UsersListRiskSignalsResponse>() {
+        });
+    }
+
+    /** Every item across every page of {@code GET /v1/users/{id}/risk_signals}, fetched lazily (the cursor is followed for you). */
+    public Iterable<UsersListRiskSignalsResponseDataItem> listRiskSignalsAll(String id, UsersListRiskSignalsQuery query) {
+        final UsersListRiskSignalsQuery base = query == null ? new UsersListRiskSignalsQuery() : query.copy();
+        return Pagination.iterate(cursor -> {
+            UsersListRiskSignalsResponse r = listRiskSignals(id, base.copy().startingAfter(cursor));
+            return new CursorPage<>(r.data(), Boolean.TRUE.equals(r.hasMore()), r.nextCursor());
+        });
+    }
+
+    /** As above, with no query options. */
+    public Iterable<UsersListRiskSignalsResponseDataItem> listRiskSignalsAll(String id) {
+        return listRiskSignalsAll(id, null);
+    }
+
+    /** {@code POST /v1/users/{id}/risk_signals} - Raise one user's sign-in risk for a window. The same signal as POST /v1/risk_signals with the user named by the path. While it is live and risk-based MFA is on, it adds points to every sign-in evaluation of that user (low 10, medium 25, high 50, critical 100; the total is capped at 100), which can turn into a second factor, an enrolment or a block under the instance's risk policy. It never lowers friction. ttl_seconds 60 to 2592000, default 3600; it expires by itself. Honours Idempotency-Key. Emits risk_signal.created. Scope: {@code risk_signals:write}. */
+    public UsersCreateRiskSignalResponse createRiskSignal(String id, UsersCreateRiskSignalBody body) {
+        return t.request("POST", "/v1/users/" + enc(id) + "/risk_signals", null, body, null, false, new TypeReference<UsersCreateRiskSignalResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public UsersCreateRiskSignalResponse createRiskSignal(String id, UsersCreateRiskSignalBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/users/" + enc(id) + "/risk_signals", null, body, idempotencyKey, false, new TypeReference<UsersCreateRiskSignalResponse>() {
+        });
+    }
+
+    /** {@code GET /v1/users/{id}/security_summary} - One read of how the account is protected: password and when it last changed, sign-in methods the user can use right now, linked providers, verified second factors, recovery codes left, passkeys, remembered browsers and device keys, and the open sessions (count and the newest). Ids and labels only: never a password hash, second-factor secret, recovery code, credential id or key material. Scope: {@code users:read}. */
+    public UsersGetSecuritySummaryResponse getSecuritySummary(String id) {
+        return t.request("GET", "/v1/users/" + enc(id) + "/security_summary", null, null, null, false, new TypeReference<UsersGetSecuritySummaryResponse>() {
+        });
+    }
+
     /** {@code GET /v1/users/{id}/sessions} - List a user's active sessions. Scope: {@code users:read}. */
     public UsersListSessionsResponse listSessions(String id) {
         return t.request("GET", "/v1/users/" + enc(id) + "/sessions", null, null, null, false, new TypeReference<UsersListSessionsResponse>() {
@@ -960,6 +1123,12 @@ public final class UsersApi {
     /** {@code DELETE /v1/users/{id}/temporary_access/{pass_id}} - Revoke a temporary access pass. Scope: {@code users:write}. */
     public UsersDeleteTemporaryAccessResponse deleteTemporaryAccess(String id, String passId) {
         return t.request("DELETE", "/v1/users/" + enc(id) + "/temporary_access/" + enc(passId), null, null, null, false, new TypeReference<UsersDeleteTemporaryAccessResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public UsersDeleteTemporaryAccessResponse deleteTemporaryAccess(String id, String passId, String idempotencyKey) {
+        return t.request("DELETE", "/v1/users/" + enc(id) + "/temporary_access/" + enc(passId), null, null, idempotencyKey, false, new TypeReference<UsersDeleteTemporaryAccessResponse>() {
         });
     }
 

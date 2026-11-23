@@ -33,6 +33,12 @@ public final class TelemetryExportApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public TelemetryExportSetResponse set(TelemetryExportSetBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/telemetry_export", null, body, idempotencyKey, false, new TypeReference<TelemetryExportSetResponse>() {
+        });
+    }
+
     /** {@code POST /v1/telemetry_export/test} - Send one test span to the configured collector now. Answers ok or the collector's error; never fails the request. Scope: {@code instance:write}. */
     public TelemetryExportTestResponse test() {
         return t.request("POST", "/v1/telemetry_export/test", null, null, null, false, new TypeReference<TelemetryExportTestResponse>() {

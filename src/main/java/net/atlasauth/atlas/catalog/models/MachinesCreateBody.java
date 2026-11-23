@@ -18,6 +18,8 @@ public final class MachinesCreateBody {
     public String ownerUserId;
     @JsonProperty("data")
     public Map<String, Object> data;
+    @JsonProperty("dies_with")
+    public String diesWith;
     /** Wire names sent as an explicit JSON null (see the clear methods); unset fields are omitted. */
     @JsonIgnore
     private final java.util.Set<String> clearedFields = new java.util.LinkedHashSet<>();
@@ -34,6 +36,9 @@ public final class MachinesCreateBody {
     public MachinesCreateBody data(Map<String, Object> v) { this.data = v; clearedFields.remove("data"); return this; }
     /** Send {@code "data": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public MachinesCreateBody clearData() { this.data = null; clearedFields.add("data"); return this; }
+    public MachinesCreateBody diesWith(String v) { this.diesWith = v; clearedFields.remove("dies_with"); return this; }
+    /** Send {@code "dies_with": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public MachinesCreateBody clearDiesWith() { this.diesWith = null; clearedFields.add("dies_with"); return this; }
 
     @JsonAnyGetter
     Map<String, Object> clearedAsNull() {

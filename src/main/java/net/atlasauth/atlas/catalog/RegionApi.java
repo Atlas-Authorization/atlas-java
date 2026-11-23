@@ -33,6 +33,12 @@ public final class RegionApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public RegionSetResponse set(RegionSetBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/region", null, body, idempotencyKey, false, new TypeReference<RegionSetResponse>() {
+        });
+    }
+
     /** {@code GET /v1/region/failover} - The upstreams a path-mounted Frontend API's reverse proxy lists to fail over to the instance's failover region, with ready nginx and Caddy rules. 422 when the instance has no failover region or the region table has no origin for it. Scope: {@code instance:read}. */
     public RegionGetFailoverResponse getFailover(RegionGetFailoverQuery query) {
         return t.request("GET", "/v1/region/failover", query == null ? null : query.toMap(), null, null, false, new TypeReference<RegionGetFailoverResponse>() {

@@ -17,8 +17,16 @@ public final class AuthConfigPatchSession {
     public Double absoluteMs;
     @JsonProperty("audience")
     public Object audience;
+    @JsonProperty("browserHandoff")
+    public Boolean browserHandoff;
+    /** Explicit Domain for the session cookies, for example ".example.com". Needed by a path-mounted instance, where cookies are otherwise host-only. It must cover your sign-in host and can never be a public suffix or Atlas's own domain; an invalid value is refused on write. Default null. */
+    @JsonProperty("cookieDomain")
+    public String cookieDomain;
     @JsonProperty("crossSubdomainCookies")
     public Boolean crossSubdomainCookies;
+    /** Set a readable __atlas_csrf cookie with each session token: a signed token tied to the session, replaced whenever the session token is. Verify it in your backend with the instance JWKS. Default false. */
+    @JsonProperty("csrfCookie")
+    public Boolean csrfCookie;
     @JsonProperty("customData")
     public AuthConfigPatchSessionCustomData customData;
     @JsonProperty("deviceBoundSessions")
@@ -37,8 +45,12 @@ public final class AuthConfigPatchSession {
     public Boolean includeEndUserPoolClaim;
     @JsonProperty("includeOrgsClaim")
     public Boolean includeOrgsClaim;
+    /** Add a res claim with the user direct resource role assignments (capped; resource_claims_truncated when over the cap). */
+    @JsonProperty("includeResourceRoleClaims")
+    public Boolean includeResourceRoleClaims;
     @JsonProperty("includeRiskClaim")
     public Boolean includeRiskClaim;
+    /** Lifetime of the session token (the __session JWT) in seconds, 30 to 900, default 60. A shorter lifetime means faster revocation: a signed-out or banned user stops being accepted by your backend sooner. A longer lifetime means fewer lapses in throttled background tabs, where the browser delays the timer that renews the token. */
     @JsonProperty("jwtTtlSeconds")
     public Double jwtTtlSeconds;
     /** Long first-party sessions: raises the absoluteMs ceiling from 90 to 365 days. Needs refreshRotation (refused while it is off). Organization caps still only shorten a session. */
@@ -52,10 +64,16 @@ public final class AuthConfigPatchSession {
     public Double nonPersistentAbsoluteMs;
     @JsonProperty("nonPersistentIdleMs")
     public Double nonPersistentIdleMs;
+    /** Seconds after a refresh token rotates during which presenting the previous one returns the same new token instead of ending the session. 0 to 30, default 30. */
+    @JsonProperty("refreshGraceSeconds")
+    public Double refreshGraceSeconds;
     @JsonProperty("refreshRotation")
     public Boolean refreshRotation;
     @JsonProperty("rememberMe")
     public Boolean rememberMe;
+    /** Cap for the res claim (default 25). */
+    @JsonProperty("resourceRoleClaimsMax")
+    public Double resourceRoleClaimsMax;
     @JsonProperty("revokeOnPasswordChange")
     public Boolean revokeOnPasswordChange;
     @JsonProperty("tokenIncludedSettingsKeys")
@@ -76,9 +94,18 @@ public final class AuthConfigPatchSession {
     public AuthConfigPatchSession audience(Object v) { this.audience = v; clearedFields.remove("audience"); return this; }
     /** Send {@code "audience": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchSession clearAudience() { this.audience = null; clearedFields.add("audience"); return this; }
+    public AuthConfigPatchSession browserHandoff(Boolean v) { this.browserHandoff = v; clearedFields.remove("browserHandoff"); return this; }
+    /** Send {@code "browserHandoff": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchSession clearBrowserHandoff() { this.browserHandoff = null; clearedFields.add("browserHandoff"); return this; }
+    public AuthConfigPatchSession cookieDomain(String v) { this.cookieDomain = v; clearedFields.remove("cookieDomain"); return this; }
+    /** Send {@code "cookieDomain": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchSession clearCookieDomain() { this.cookieDomain = null; clearedFields.add("cookieDomain"); return this; }
     public AuthConfigPatchSession crossSubdomainCookies(Boolean v) { this.crossSubdomainCookies = v; clearedFields.remove("crossSubdomainCookies"); return this; }
     /** Send {@code "crossSubdomainCookies": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchSession clearCrossSubdomainCookies() { this.crossSubdomainCookies = null; clearedFields.add("crossSubdomainCookies"); return this; }
+    public AuthConfigPatchSession csrfCookie(Boolean v) { this.csrfCookie = v; clearedFields.remove("csrfCookie"); return this; }
+    /** Send {@code "csrfCookie": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchSession clearCsrfCookie() { this.csrfCookie = null; clearedFields.add("csrfCookie"); return this; }
     public AuthConfigPatchSession customData(AuthConfigPatchSessionCustomData v) { this.customData = v; clearedFields.remove("customData"); return this; }
     /** Send {@code "customData": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchSession clearCustomData() { this.customData = null; clearedFields.add("customData"); return this; }
@@ -103,6 +130,9 @@ public final class AuthConfigPatchSession {
     public AuthConfigPatchSession includeOrgsClaim(Boolean v) { this.includeOrgsClaim = v; clearedFields.remove("includeOrgsClaim"); return this; }
     /** Send {@code "includeOrgsClaim": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchSession clearIncludeOrgsClaim() { this.includeOrgsClaim = null; clearedFields.add("includeOrgsClaim"); return this; }
+    public AuthConfigPatchSession includeResourceRoleClaims(Boolean v) { this.includeResourceRoleClaims = v; clearedFields.remove("includeResourceRoleClaims"); return this; }
+    /** Send {@code "includeResourceRoleClaims": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchSession clearIncludeResourceRoleClaims() { this.includeResourceRoleClaims = null; clearedFields.add("includeResourceRoleClaims"); return this; }
     public AuthConfigPatchSession includeRiskClaim(Boolean v) { this.includeRiskClaim = v; clearedFields.remove("includeRiskClaim"); return this; }
     /** Send {@code "includeRiskClaim": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchSession clearIncludeRiskClaim() { this.includeRiskClaim = null; clearedFields.add("includeRiskClaim"); return this; }
@@ -124,12 +154,18 @@ public final class AuthConfigPatchSession {
     public AuthConfigPatchSession nonPersistentIdleMs(Double v) { this.nonPersistentIdleMs = v; clearedFields.remove("nonPersistentIdleMs"); return this; }
     /** Send {@code "nonPersistentIdleMs": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchSession clearNonPersistentIdleMs() { this.nonPersistentIdleMs = null; clearedFields.add("nonPersistentIdleMs"); return this; }
+    public AuthConfigPatchSession refreshGraceSeconds(Double v) { this.refreshGraceSeconds = v; clearedFields.remove("refreshGraceSeconds"); return this; }
+    /** Send {@code "refreshGraceSeconds": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchSession clearRefreshGraceSeconds() { this.refreshGraceSeconds = null; clearedFields.add("refreshGraceSeconds"); return this; }
     public AuthConfigPatchSession refreshRotation(Boolean v) { this.refreshRotation = v; clearedFields.remove("refreshRotation"); return this; }
     /** Send {@code "refreshRotation": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchSession clearRefreshRotation() { this.refreshRotation = null; clearedFields.add("refreshRotation"); return this; }
     public AuthConfigPatchSession rememberMe(Boolean v) { this.rememberMe = v; clearedFields.remove("rememberMe"); return this; }
     /** Send {@code "rememberMe": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchSession clearRememberMe() { this.rememberMe = null; clearedFields.add("rememberMe"); return this; }
+    public AuthConfigPatchSession resourceRoleClaimsMax(Double v) { this.resourceRoleClaimsMax = v; clearedFields.remove("resourceRoleClaimsMax"); return this; }
+    /** Send {@code "resourceRoleClaimsMax": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchSession clearResourceRoleClaimsMax() { this.resourceRoleClaimsMax = null; clearedFields.add("resourceRoleClaimsMax"); return this; }
     public AuthConfigPatchSession revokeOnPasswordChange(Boolean v) { this.revokeOnPasswordChange = v; clearedFields.remove("revokeOnPasswordChange"); return this; }
     /** Send {@code "revokeOnPasswordChange": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchSession clearRevokeOnPasswordChange() { this.revokeOnPasswordChange = null; clearedFields.add("revokeOnPasswordChange"); return this; }

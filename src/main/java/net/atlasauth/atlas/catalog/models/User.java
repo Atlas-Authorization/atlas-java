@@ -26,6 +26,7 @@ public record User(
         @JsonProperty("has_passkey") Boolean hasPasskey,
         @JsonProperty("required_factors") List<String> requiredFactors,
         @JsonProperty("is_anonymous") Boolean isAnonymous,
+        @JsonProperty("sandbox") Boolean sandbox,
         @JsonProperty("banned") Boolean banned,
         @JsonProperty("ban_reason") String banReason,
         @JsonProperty("ban_note") String banNote,
@@ -41,5 +42,8 @@ public record User(
         @JsonProperty("referral_code") String referralCode,
         @JsonProperty("warnings") List<String> warnings,
         @JsonProperty("referral_link") String referralLink,
+        @JsonProperty("phone_numbers") List<UserPhoneNumbersItem> phoneNumbers,
+        @JsonProperty("primary_phone_number") String primaryPhoneNumber,
+        @JsonProperty("phone_number_verified") Boolean phoneNumberVerified,
         @JsonProperty("external_accounts") List<UserExternalAccount> externalAccounts) {
 }

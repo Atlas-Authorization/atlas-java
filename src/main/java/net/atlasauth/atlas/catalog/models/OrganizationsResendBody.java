@@ -14,6 +14,8 @@ import java.util.Map;
 public final class OrganizationsResendBody {
     @JsonProperty("redirect_url")
     public String redirectUrl;
+    @JsonProperty("keep_old_link")
+    public Boolean keepOldLink;
     /** Wire names sent as an explicit JSON null (see the clear methods); unset fields are omitted. */
     @JsonIgnore
     private final java.util.Set<String> clearedFields = new java.util.LinkedHashSet<>();
@@ -24,6 +26,9 @@ public final class OrganizationsResendBody {
     public OrganizationsResendBody redirectUrl(String v) { this.redirectUrl = v; clearedFields.remove("redirect_url"); return this; }
     /** Send {@code "redirect_url": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public OrganizationsResendBody clearRedirectUrl() { this.redirectUrl = null; clearedFields.add("redirect_url"); return this; }
+    public OrganizationsResendBody keepOldLink(Boolean v) { this.keepOldLink = v; clearedFields.remove("keep_old_link"); return this; }
+    /** Send {@code "keep_old_link": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OrganizationsResendBody clearKeepOldLink() { this.keepOldLink = null; clearedFields.add("keep_old_link"); return this; }
 
     @JsonAnyGetter
     Map<String, Object> clearedAsNull() {

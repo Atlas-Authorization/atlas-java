@@ -65,6 +65,12 @@ public final class ErasureConnectorsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public void delete(String id, String idempotencyKey) {
+        t.request("DELETE", "/v1/erasure_connectors/" + enc(id), null, null, idempotencyKey, false, new TypeReference<Object>() {
+        });
+    }
+
     /** {@code GET /v1/erasure_connectors/{id}} - One erasure connector. Scope: {@code data_subject_requests:read}. */
     public ErasureConnectorsGetResponse get(String id) {
         return t.request("GET", "/v1/erasure_connectors/" + enc(id), null, null, null, false, new TypeReference<ErasureConnectorsGetResponse>() {
@@ -74,6 +80,12 @@ public final class ErasureConnectorsApi {
     /** {@code PATCH /v1/erasure_connectors/{id}} - Change a connector's name, mode, ack_source, enabled or notes. The key cannot change. Scope: {@code data_subject_requests:write}. */
     public ErasureConnectorsUpdateResponse update(String id, ErasureConnectorsUpdateBody body) {
         return t.request("PATCH", "/v1/erasure_connectors/" + enc(id), null, body, null, false, new TypeReference<ErasureConnectorsUpdateResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ErasureConnectorsUpdateResponse update(String id, ErasureConnectorsUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/erasure_connectors/" + enc(id), null, body, idempotencyKey, false, new TypeReference<ErasureConnectorsUpdateResponse>() {
         });
     }
 

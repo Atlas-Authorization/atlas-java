@@ -8,7 +8,7 @@ import java.util.Map;
 
 /** Query parameters of {@code GET /v1/identity_verifications}. */
 public final class IdentityVerificationsListQuery {
-    /** Only checks in this state. Defaults to needs_review. One of: pending, approved, declined, needs_review. */
+    /** Only checks in this state. Defaults to needs_review. One of: pending, processing, approved, declined, needs_review. */
     public String status;
     /** Page size, 1-500. Without limit (and without starting_after) the whole list is returned. */
     public Long limit;

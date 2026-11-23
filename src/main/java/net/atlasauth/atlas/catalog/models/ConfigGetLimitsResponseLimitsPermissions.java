@@ -10,5 +10,7 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record ConfigGetLimitsResponseLimitsPermissions(
         @JsonProperty("max_implied_per_permission") Long maxImpliedPerPermission,
-        @JsonProperty("key_max_length") Long keyMaxLength) {
+        @JsonProperty("key_max_length") Long keyMaxLength,
+        @JsonProperty("max_parts") Long maxParts,
+        @JsonProperty("part_max_length") Long partMaxLength) {
 }

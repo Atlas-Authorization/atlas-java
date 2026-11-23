@@ -12,6 +12,7 @@ public record ApprovalRequestsCancelResponseDecisionsItem(
         @JsonProperty("approver_user_id") String approverUserId,
         @JsonProperty("decision") String decision,
         @JsonProperty("method") String method,
+        @JsonProperty("note") String note,
         @JsonProperty("key_id") String keyId,
         @JsonProperty("trusted_device_id") String trustedDeviceId,
         @JsonProperty("decided_at") Long decidedAt) {

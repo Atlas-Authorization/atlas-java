@@ -51,6 +51,12 @@ public final class WorkflowsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Workflow update(String id, WorkflowsUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/workflows/" + enc(id), null, body, idempotencyKey, false, new TypeReference<Workflow>() {
+        });
+    }
+
     /** {@code POST /v1/workflows/{id}/dry_run} - Check what a workflow would do for a user (`user_id`; none for cron) without changing anything. Every step is validated against live data and reported as `would_run` or `failed`. Scope: {@code actions:write}. */
     public WorkflowRun dryRun(String id, WorkflowsDryRunBody body) {
         return t.request("POST", "/v1/workflows/" + enc(id) + "/dry_run", null, body, null, false, new TypeReference<WorkflowRun>() {
@@ -93,9 +99,21 @@ public final class WorkflowsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public WorkflowsDeleteKvResponse deleteKv(String id, String key, String idempotencyKey) {
+        return t.request("DELETE", "/v1/workflows/" + enc(id) + "/kv/" + enc(key), null, null, idempotencyKey, false, new TypeReference<WorkflowsDeleteKvResponse>() {
+        });
+    }
+
     /** {@code PUT /v1/workflows/{id}/kv/{key}} - Set a key in the workflow key-value table. Scope: {@code actions:write}. */
     public WorkflowsSetKvResponse setKv(String id, String key, WorkflowsSetKvBody body) {
         return t.request("PUT", "/v1/workflows/" + enc(id) + "/kv/" + enc(key), null, body, null, false, new TypeReference<WorkflowsSetKvResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public WorkflowsSetKvResponse setKv(String id, String key, WorkflowsSetKvBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/workflows/" + enc(id) + "/kv/" + enc(key), null, body, idempotencyKey, false, new TypeReference<WorkflowsSetKvResponse>() {
         });
     }
 

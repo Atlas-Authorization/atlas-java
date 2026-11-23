@@ -10,16 +10,20 @@ import java.util.Map;
 public final class MigrationsGetStatusQuery {
     /** Days without legacy use before it counts as unused. Default 14. */
     public Long quietDays;
+    /** true: do not let imported users who never signed in on Atlas block `safe_to_delete_old_auth`. */
+    public Boolean acceptUnmigrated;
 
     public MigrationsGetStatusQuery() {
     }
 
     public MigrationsGetStatusQuery quietDays(Long v) { this.quietDays = v; return this; }
+    public MigrationsGetStatusQuery acceptUnmigrated(Boolean v) { this.acceptUnmigrated = v; return this; }
 
     /** A shallow copy. */
     public MigrationsGetStatusQuery copy() {
         MigrationsGetStatusQuery c = new MigrationsGetStatusQuery();
         c.quietDays = this.quietDays;
+        c.acceptUnmigrated = this.acceptUnmigrated;
         return c;
     }
 
@@ -27,6 +31,7 @@ public final class MigrationsGetStatusQuery {
     public Map<String, Object> toMap() {
         Params p = Params.of();
         p.set("quiet_days", quietDays);
+        p.set("accept_unmigrated", acceptUnmigrated);
         Map<String, Object> m = p.map();
         return m;
     }

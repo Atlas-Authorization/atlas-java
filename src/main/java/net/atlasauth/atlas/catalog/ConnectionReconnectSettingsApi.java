@@ -32,4 +32,10 @@ public final class ConnectionReconnectSettingsApi {
         return t.request("PUT", "/v1/connection_reconnect_settings", null, body, null, false, new TypeReference<ConnectionReconnectSettingsSetResponse>() {
         });
     }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ConnectionReconnectSettingsSetResponse set(ConnectionReconnectSettingsSetBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/connection_reconnect_settings", null, body, idempotencyKey, false, new TypeReference<ConnectionReconnectSettingsSetResponse>() {
+        });
+    }
 }

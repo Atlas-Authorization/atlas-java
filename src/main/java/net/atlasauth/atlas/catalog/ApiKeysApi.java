@@ -47,7 +47,7 @@ public final class ApiKeysApi {
         return listAll(null);
     }
 
-    /** {@code POST /v1/api_keys} - Mint an end-user API key for a user, organization or machine (returns the ak_ secret once), OR import an existing key by its SHA-256 hash (hash_algorithm "sha256" or "sha256_hex"), or by its bcrypt or Argon2id hash string (hash_algorithm "bcrypt" or "argon2id": verified on first use by the imported prefix, then re-hashed to SHA-256), so it verifies against the original secret. Normally authenticated with an sk_ key; a LAN/offline MACHINE may instead self-provision a key for ITSELF by presenting Authorization: Bearer &lt;machine JWT&gt; (token_use:m2m from /v1/machines/token) + x-publishable-key — the subject is forced to that machine and it cannot grant itself management-plane scopes. Pass public_key (an SPKI PEM) to make the key proof-of-possession: tokens minted from it carry cnf.jkt and a resource verifies a holder-signed proof OFFLINE. Pass limits (an array of &#123; unit, amount, period &#125; with period request|second|minute|day|month|total) to set per-key spend caps and rate limits, metered with POST /v1/api_keys/&#123;id&#125;/usage. Key controls: enabled (false = minted disabled), rate_limit &#123; max, window_seconds &#125; (per-key verify throttle), remaining (a use budget each successful verify spends), prefix (a custom secret prefix such as acme, giving acme_&lt;id&gt;_&lt;secret&gt;), type (a key type such as sk, giving ak_sk_&lt;id&gt;_&lt;secret&gt;; required and checked against endUserApiKeys.keyTypes when the instance sets that list, 400 otherwise; also accepted on import), and expires_in_seconds as an alternative to expires_at, and allowed_ips (up to 100 IPv4/IPv6 addresses or CIDR ranges; verify then needs the end caller's client_ip and refuses callers outside the list). The instance expiry policy (endUserApiKeys.defaultExpiresInSeconds / maxExpiresInSeconds) gives a key sent without an expiry the default lifetime and refuses one longer than the ceiling (400). Emits api_key.created (on mint, import and machine self-provisioning). An import is idempotent: it honours Idempotency-Key (a retry replays the first answer), and re-sending the same hash for the same subject, prefix and type answers 200 with the stored key and `outcome: "already_present"` (nothing is written, no event fires); a first import answers 201 with `outcome: "created"`. A hash that already exists with a different subject, prefix or type is refused with 409 CONFLICT and nothing is changed. Scope: {@code api_keys:write}. */
+    /** {@code POST /v1/api_keys} - Mint an end-user API key for a user, organization or machine (returns the ak_ secret once; `metadata` is your own vocabulary on the key, the same object as `claims`, returned on verify; `dies_with: "sign_out_everywhere"` on a user key revokes it when that user signs out everywhere), OR import an existing key by its SHA-256 hash (hash_algorithm "sha256" or "sha256_hex"), or by its bcrypt or Argon2id hash string (hash_algorithm "bcrypt" or "argon2id": verified on first use by the imported prefix, then re-hashed to SHA-256), so it verifies against the original secret. Normally authenticated with an sk_ key; a LAN/offline MACHINE may instead self-provision a key for ITSELF by presenting Authorization: Bearer &lt;machine JWT&gt; (token_use:m2m from /v1/machines/token) + x-publishable-key — the subject is forced to that machine and it cannot grant itself management-plane scopes. Send credential: "key_pair" to mint a key with NO shared secret (like an Apple .p8): Atlas generates a P-256 pair and returns the private key once as private_key (a PKCS#8 PEM; never stored, logged, sent in a webhook, or replayed by an Idempotency-Key retry), or, when you send public_key (SPKI PEM, P-256 or Ed25519), keeps only yours and returns no private key. The holder signs short-lived JWT assertions (alg ES256 or EdDSA, kid = the key id, iss = the key id, aud = audience, iat, exp, optional nbf, jti, scope) that you verify with POST /v1/api_keys/verify &#123;token&#125; or exchange at POST /v1/api_keys/token. audience (1-256 characters, key_pair only) defaults to the instance id. secret is null on a key_pair key, and it is never accepted as an ak_ bearer. Pass public_key (an SPKI PEM) to make the key proof-of-possession: tokens minted from it carry cnf.jkt and a resource verifies a holder-signed proof OFFLINE. Pass limits (an array of &#123; unit, amount, period &#125; with period request|second|minute|day|month|total) to set per-key spend caps and rate limits, metered with POST /v1/api_keys/&#123;id&#125;/usage. Key controls: enabled (false = minted disabled), rate_limit &#123; max, window_seconds &#125; (per-key verify throttle), remaining (a use budget each successful verify spends), prefix (a custom secret prefix such as acme, giving acme_&lt;id&gt;_&lt;secret&gt;), type (a key type such as sk, giving ak_sk_&lt;id&gt;_&lt;secret&gt;; required and checked against endUserApiKeys.keyTypes when the instance sets that list, 400 otherwise; also accepted on import), and expires_in_seconds as an alternative to expires_at, and allowed_ips (up to 100 IPv4/IPv6 addresses or CIDR ranges; verify then needs the end caller's client_ip and refuses callers outside the list). The instance expiry policy (endUserApiKeys.defaultExpiresInSeconds / maxExpiresInSeconds) gives a key sent without an expiry the default lifetime and refuses one longer than the ceiling (400). Emits api_key.created (on mint, import and machine self-provisioning). An import is idempotent: it honours Idempotency-Key (a retry replays the first answer), and re-sending the same hash for the same subject, prefix and type answers 200 with the stored key and `outcome: "already_present"` (nothing is written, no event fires); a first import answers 201 with `outcome: "created"`. A hash that already exists with a different subject, prefix or type is refused with 409 CONFLICT and nothing is changed. Scope: {@code api_keys:write}. */
     public ApiKeyCreate create(ApiKeysCreateBody body) {
         return t.request("POST", "/v1/api_keys", null, body, null, false, new TypeReference<ApiKeyCreate>() {
         });
@@ -85,7 +85,45 @@ public final class ApiKeysApi {
         return listPostureAll(null);
     }
 
-    /** {@code POST /v1/api_keys/verify} - Verify a presented end-user API key secret. Any secret works: a natively minted ak_ key AND an imported key of any format or prefix (resolved by its SHA-256). Returns the subject, name, claims, scopes, constraints, spend caps (limits) and their current-window usage, or valid:false alone (unknown, revoked, expired, disabled or subject deleted; never says which). Send required_scopes to require scopes the key must carry. A live key refused by its own policy answers valid:false with a code: insufficient_scope (missing_scopes), rate_limited (retry_after_ms, from the key rate_limit) usage_exhausted (no remaining uses left), ip_not_allowed (client_ip is outside the key's allowed_ips) or client_ip_required (the key has allowed_ips and no client_ip was sent; fails closed). Send client_ip, the END caller's address, because this call is server-to-server. Each successful verify spends one remaining use, atomically. Rate-limited. Scope: {@code api_keys:read}. */
+    /** {@code GET /v1/api_keys/revoked} - Revocation feed: the keys revoked since a cursor (since=&lt;iso|cursor&gt;), so a resource can deny-list revoked key ids while their short-lived delegated tokens are still live. Keyset-paginated. Readable with an sk_ bearer, an Authorization: Bearer ak_… key, OR an x-publishable-key header; it exposes only key id + revoked_at, so a public pk caller leaks nothing. The api_keys:read scope applies ONLY to the sk_ path; the ak_ and publishable-key paths are self-scoped. Scope: {@code api_keys:read}. */
+    public ApiKeysListRevokedResponse listRevoked() {
+        return t.request("GET", "/v1/api_keys/revoked", null, null, null, false, new TypeReference<ApiKeysListRevokedResponse>() {
+        });
+    }
+
+    /** As above, with every optional parameter. */
+    public ApiKeysListRevokedResponse listRevoked(ApiKeysListRevokedQuery query) {
+        return t.request("GET", "/v1/api_keys/revoked", query == null ? null : query.toMap(), null, null, false, new TypeReference<ApiKeysListRevokedResponse>() {
+        });
+    }
+
+    /** Every item across every page of {@code GET /v1/api_keys/revoked}, fetched lazily (the cursor is followed for you). */
+    public Iterable<RevokedApiKey> listRevokedAll(ApiKeysListRevokedQuery query) {
+        final ApiKeysListRevokedQuery base = query == null ? new ApiKeysListRevokedQuery() : query.copy();
+        return Pagination.iterate(cursor -> {
+            ApiKeysListRevokedResponse r = listRevoked(base.copy().startingAfter(cursor));
+            return new CursorPage<>(r.data(), Boolean.TRUE.equals(r.hasMore()), r.nextCursor());
+        });
+    }
+
+    /** As above, with no query options. */
+    public Iterable<RevokedApiKey> listRevokedAll() {
+        return listRevokedAll(null);
+    }
+
+    /** {@code POST /v1/api_keys/token} - Mint a short-lived, JWKS-signed access JWT (token_use:api_key, jti) whose exp is clamped to the smallest of the request, the key expiry and the org ceiling; scopes + constraints are embedded so a resource verifies it OFFLINE against the instance JWKS. When the key registered a public_key, the token also carries cnf.jkt (proof-of-possession) and a resource additionally checks a holder-signed proof. Authenticate with (1) an sk_ bearer + the ak_ in the body, (2) an Authorization: Bearer ak_… that self-mints for itself, or (3) no bearer + x-publishable-key naming the instance with the ak_ in the body. A key_pair key's signed assertion is accepted in the same places: Authorization: Bearer &lt;assertion&gt; (self-mint), or an sk_ bearer or publishable key with the assertion in the body field assertion. The token's lifetime never exceeds the assertion's exp, and a token minted from a key_pair key carries no cnf. A key only ever mints within its own instance. The api_keys:read scope applies ONLY to the sk_ path; the ak_ and publishable-key paths are self-scoped. Scope: {@code api_keys:read}. */
+    public ApiKeyToken token(ApiKeysTokenBody body) {
+        return t.request("POST", "/v1/api_keys/token", null, body, null, false, new TypeReference<ApiKeyToken>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ApiKeyToken token(ApiKeysTokenBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/api_keys/token", null, body, idempotencyKey, false, new TypeReference<ApiKeyToken>() {
+        });
+    }
+
+    /** {@code POST /v1/api_keys/verify} - Verify a presented end-user API key secret, or a key-pair assertion. Send token (a JWT signed with the private key of a key_pair key) instead of secret (sending both is a 400; sending neither answers valid: false, as before). An assertion must carry alg ES256 (raw 64-byte r||s) or EdDSA matching the stored key, kid and iss equal to the key id, aud the key's audience, iat (at most 60 s ahead) and exp (lifetime at most the key's max_token_lifetime_seconds, default 3600, hard cap 86400); a jti is single-use until exp; an optional scope (space-separated) must be a subset of the key's scopes and narrows the result. A success adds credential: "key_pair", audience, jti and exp (epoch seconds) to the verification. Refusals: valid:false with code invalid_assertion (nothing proving the holder signed it, no id), then, only for a genuine signature, assertion_expired, assertion_not_yet_valid, wrong_audience, assertion_lifetime_too_long, assertion_replayed, scope_not_granted. Any secret works: a natively minted ak_ key AND an imported key of any format or prefix (resolved by its SHA-256). Returns the subject, name, claims, scopes, constraints, spend caps (limits) and their current-window usage, or valid:false alone (unknown, revoked, expired, disabled or subject deleted; never says which). Send required_scopes to require scopes the key must carry. A live key refused by its own policy answers valid:false with a code: insufficient_scope (missing_scopes), rate_limited (retry_after_ms, from the key rate_limit) usage_exhausted (no remaining uses left), ip_not_allowed (client_ip is outside the key's allowed_ips) or client_ip_required (the key has allowed_ips and no client_ip was sent; fails closed). Send client_ip, the END caller's address, because this call is server-to-server. Each successful verify spends one remaining use, atomically. Rate-limited. Scope: {@code api_keys:read}. */
     public ApiKeyVerification verify(ApiKeysVerifyBody body) {
         return t.request("POST", "/v1/api_keys/verify", null, body, null, false, new TypeReference<ApiKeyVerification>() {
         });
@@ -103,9 +141,15 @@ public final class ApiKeysApi {
         });
     }
 
-    /** {@code PATCH /v1/api_keys/{id}} - Update an end-user API key: name, claims, expires_at (held to the instance expiry ceiling), scopes, constraints, max_token_lifetime_seconds, limits (null clears the caps; counters are kept), enabled (disable or re-enable without revoking), rate_limit (null removes it) remaining (null = unlimited) or allowed_ips (null or [] removes the list). Emits api_key.updated. Scope: {@code api_keys:write}. */
+    /** {@code PATCH /v1/api_keys/{id}} - Update an end-user API key: name, claims (or `metadata`, the same object), dies_with (`sign_out_everywhere` to end the key when its user signs out everywhere, null to detach), expires_at (held to the instance expiry ceiling), scopes, constraints, max_token_lifetime_seconds, limits (null clears the caps; counters are kept), enabled (disable or re-enable without revoking), rate_limit (null removes it) remaining (null = unlimited) or allowed_ips (null or [] removes the list). Emits api_key.updated. Scope: {@code api_keys:write}. */
     public ApiKey update(String id, ApiKeysUpdateBody body) {
         return t.request("PATCH", "/v1/api_keys/" + enc(id), null, body, null, false, new TypeReference<ApiKey>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ApiKey update(String id, ApiKeysUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/api_keys/" + enc(id), null, body, idempotencyKey, false, new TypeReference<ApiKey>() {
         });
     }
 

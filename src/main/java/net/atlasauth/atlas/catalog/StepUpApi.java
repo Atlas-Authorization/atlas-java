@@ -77,6 +77,12 @@ public final class StepUpApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public StepUpDeletePolicyResponse deletePolicy(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/step_up/policies/" + enc(id), null, null, idempotencyKey, false, new TypeReference<StepUpDeletePolicyResponse>() {
+        });
+    }
+
     /** {@code GET /v1/step_up/policies/{id}} - Read one step-up policy. Scope: {@code step_up:read}. */
     public StepUpGetPolicyResponse getPolicy(String id) {
         return t.request("GET", "/v1/step_up/policies/" + enc(id), null, null, null, false, new TypeReference<StepUpGetPolicyResponse>() {
@@ -86,6 +92,12 @@ public final class StepUpApi {
     /** {@code PATCH /v1/step_up/policies/{id}} - Change a step-up policy. Send only the fields to change. The change applies to the next assertion. Scope: {@code step_up:write}. */
     public StepUpUpdatePolicyResponse updatePolicy(String id, StepUpUpdatePolicyBody body) {
         return t.request("PATCH", "/v1/step_up/policies/" + enc(id), null, body, null, false, new TypeReference<StepUpUpdatePolicyResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public StepUpUpdatePolicyResponse updatePolicy(String id, StepUpUpdatePolicyBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/step_up/policies/" + enc(id), null, body, idempotencyKey, false, new TypeReference<StepUpUpdatePolicyResponse>() {
         });
     }
 }

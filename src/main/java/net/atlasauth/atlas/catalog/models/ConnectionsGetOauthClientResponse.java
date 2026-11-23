@@ -19,6 +19,7 @@ public record ConnectionsGetOauthClientResponse(
         @JsonProperty("scopes") List<String> scopes,
         @JsonProperty("host_params") Map<String, String> hostParams,
         @JsonProperty("enabled") Boolean enabled,
+        @JsonProperty("ru_name") String ruName,
         @JsonProperty("redirect_uri") String redirectUri,
         @JsonProperty("callback_url") String callbackUrl,
         @JsonProperty("forward_url") String forwardUrl,

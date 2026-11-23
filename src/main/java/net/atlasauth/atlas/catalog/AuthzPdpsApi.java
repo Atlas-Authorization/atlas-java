@@ -52,4 +52,10 @@ public final class AuthzPdpsApi {
         return t.request("DELETE", "/v1/authz_pdps/" + enc(id), null, null, null, false, new TypeReference<AuthzPdpsDeleteResponse>() {
         });
     }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public AuthzPdpsDeleteResponse delete(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/authz_pdps/" + enc(id), null, null, idempotencyKey, false, new TypeReference<AuthzPdpsDeleteResponse>() {
+        });
+    }
 }

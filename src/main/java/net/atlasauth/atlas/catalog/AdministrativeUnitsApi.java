@@ -65,6 +65,12 @@ public final class AdministrativeUnitsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public AdministrativeUnitsDeleteResponse delete(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/administrative_units/" + enc(id), null, null, idempotencyKey, false, new TypeReference<AdministrativeUnitsDeleteResponse>() {
+        });
+    }
+
     /** {@code GET /v1/administrative_units/{id}} - Read one unit by id or key. Scope: {@code organizations:read}. */
     public AdministrativeUnitsGetResponse get(String id) {
         return t.request("GET", "/v1/administrative_units/" + enc(id), null, null, null, false, new TypeReference<AdministrativeUnitsGetResponse>() {
@@ -74,6 +80,12 @@ public final class AdministrativeUnitsApi {
     /** {@code PATCH /v1/administrative_units/{id}} - Change a unit's name, description or filter. Scope: {@code organizations:write}. */
     public AdministrativeUnitsUpdateResponse update(String id, AdministrativeUnitsUpdateBody body) {
         return t.request("PATCH", "/v1/administrative_units/" + enc(id), null, body, null, false, new TypeReference<AdministrativeUnitsUpdateResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public AdministrativeUnitsUpdateResponse update(String id, AdministrativeUnitsUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/administrative_units/" + enc(id), null, body, idempotencyKey, false, new TypeReference<AdministrativeUnitsUpdateResponse>() {
         });
     }
 

@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-/** Who decides. Leave out for the v1 flow (the user answers on their own device with number matching). Name `user_ids` (1 to 20) or an `organization_id` with a `role`; `required` of them must approve (default 1, at most the number of user ids). Any one denial ends the request. A role with fewer holders than `required` is refused with 422 (`meta.reason` = `approvers_insufficient`). A request with approvers always needs signed approvals. */
+/** Who decides. Leave out for the v1 flow (the user answers on their own device with number matching). Name `user_ids` (1 to 20), a `group_id` (every member of the group may decide), or an `organization_id` with a `role` (or up to 10 `roles`; a holder of any of them may decide). A role or group is the way to name a big set: "any 2 of ops" is the role `ops` with `required: 2`. `required` of them must approve (default 1; at most the number of user ids, and at most 50 for a role or group). Membership is read when someone decides, so leaving the group or role ends the right to decide. Any one denial ends the request. A role or group with fewer members than `required` is refused with 422 (`meta.reason` = `approvers_insufficient`). A request with approvers always needs signed approvals. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class ApprovalRequestsCreateBodyApprovers {
     @JsonProperty("user_ids")
@@ -19,6 +19,12 @@ public final class ApprovalRequestsCreateBodyApprovers {
     /** An organization role key; members holding it may decide. */
     @JsonProperty("role")
     public String role;
+    /** Several role keys of `organization_id`; a holder of any may decide. Not together with `role`. */
+    @JsonProperty("roles")
+    public List<String> roles;
+    /** A group; its members may decide. Not together with `user_ids` or `organization_id`. */
+    @JsonProperty("group_id")
+    public String groupId;
     @JsonProperty("required")
     public Long required;
     /** Wire names sent as an explicit JSON null (see the clear methods); unset fields are omitted. */
@@ -37,6 +43,12 @@ public final class ApprovalRequestsCreateBodyApprovers {
     public ApprovalRequestsCreateBodyApprovers role(String v) { this.role = v; clearedFields.remove("role"); return this; }
     /** Send {@code "role": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public ApprovalRequestsCreateBodyApprovers clearRole() { this.role = null; clearedFields.add("role"); return this; }
+    public ApprovalRequestsCreateBodyApprovers roles(List<String> v) { this.roles = v; clearedFields.remove("roles"); return this; }
+    /** Send {@code "roles": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public ApprovalRequestsCreateBodyApprovers clearRoles() { this.roles = null; clearedFields.add("roles"); return this; }
+    public ApprovalRequestsCreateBodyApprovers groupId(String v) { this.groupId = v; clearedFields.remove("group_id"); return this; }
+    /** Send {@code "group_id": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public ApprovalRequestsCreateBodyApprovers clearGroupId() { this.groupId = null; clearedFields.add("group_id"); return this; }
     public ApprovalRequestsCreateBodyApprovers required(Long v) { this.required = v; clearedFields.remove("required"); return this; }
     /** Send {@code "required": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public ApprovalRequestsCreateBodyApprovers clearRequired() { this.required = null; clearedFields.add("required"); return this; }

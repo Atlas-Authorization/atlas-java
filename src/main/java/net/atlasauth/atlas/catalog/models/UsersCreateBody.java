@@ -56,6 +56,8 @@ public final class UsersCreateBody {
     public String referralCode;
     @JsonProperty("notify")
     public Boolean notify_;
+    @JsonProperty("sandbox")
+    public Boolean sandbox;
     @JsonProperty("mfa")
     public UsersCreateBodyMfa mfa;
     /** Wire names sent as an explicit JSON null (see the clear methods); unset fields are omitted. */
@@ -131,6 +133,9 @@ public final class UsersCreateBody {
     public UsersCreateBody notify_(Boolean v) { this.notify_ = v; clearedFields.remove("notify"); return this; }
     /** Send {@code "notify": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public UsersCreateBody clearNotify() { this.notify_ = null; clearedFields.add("notify"); return this; }
+    public UsersCreateBody sandbox(Boolean v) { this.sandbox = v; clearedFields.remove("sandbox"); return this; }
+    /** Send {@code "sandbox": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public UsersCreateBody clearSandbox() { this.sandbox = null; clearedFields.add("sandbox"); return this; }
     public UsersCreateBody mfa(UsersCreateBodyMfa v) { this.mfa = v; clearedFields.remove("mfa"); return this; }
     /** Send {@code "mfa": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public UsersCreateBody clearMfa() { this.mfa = null; clearedFields.add("mfa"); return this; }

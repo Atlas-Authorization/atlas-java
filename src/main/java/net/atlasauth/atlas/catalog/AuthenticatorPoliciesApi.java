@@ -71,6 +71,12 @@ public final class AuthenticatorPoliciesApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public AuthenticatorPoliciesDeleteResponse delete(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/authenticator_policies/" + enc(id), null, null, idempotencyKey, false, new TypeReference<AuthenticatorPoliciesDeleteResponse>() {
+        });
+    }
+
     /** {@code GET /v1/authenticator_policies/{id}} - Read one authenticator policy. Scope: {@code access_policies:read}. */
     public AuthenticatorPoliciesGetResponse get(String id) {
         return t.request("GET", "/v1/authenticator_policies/" + enc(id), null, null, null, false, new TypeReference<AuthenticatorPoliciesGetResponse>() {
@@ -80,6 +86,12 @@ public final class AuthenticatorPoliciesApi {
     /** {@code PATCH /v1/authenticator_policies/{id}} - Update an authenticator policy. Scope: {@code access_policies:write}. */
     public AuthenticatorPoliciesUpdateResponse update(String id, AuthenticatorPoliciesUpdateBody body) {
         return t.request("PATCH", "/v1/authenticator_policies/" + enc(id), null, body, null, false, new TypeReference<AuthenticatorPoliciesUpdateResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public AuthenticatorPoliciesUpdateResponse update(String id, AuthenticatorPoliciesUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/authenticator_policies/" + enc(id), null, body, idempotencyKey, false, new TypeReference<AuthenticatorPoliciesUpdateResponse>() {
         });
     }
 }

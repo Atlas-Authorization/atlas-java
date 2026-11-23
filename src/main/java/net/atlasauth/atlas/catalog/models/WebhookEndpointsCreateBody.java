@@ -47,6 +47,9 @@ public final class WebhookEndpointsCreateBody {
     /** Have Atlas get an OAuth bearer token with the client-credentials grant and send it as `Authorization: Bearer` on every delivery. Replaces the whole setting. The client secret is stored encrypted and never returned. null clears it. */
     @JsonProperty("oauth")
     public WebhookEndpointsCreateBodyOauth oauth;
+    /** Opt in to the seat private_metadata on organization_membership events sent to this endpoint. Only instance-owned endpoints can; org-owned and per-app endpoints never receive it. Default false. */
+    @JsonProperty("include_private_membership")
+    public Boolean includePrivateMembership;
     /** Most deliveries per second Atlas sends to this endpoint; the rest wait their turn. null = unlimited. */
     @JsonProperty("max_rps")
     public Long maxRps;
@@ -108,6 +111,9 @@ public final class WebhookEndpointsCreateBody {
     public WebhookEndpointsCreateBody oauth(WebhookEndpointsCreateBodyOauth v) { this.oauth = v; clearedFields.remove("oauth"); return this; }
     /** Send {@code "oauth": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public WebhookEndpointsCreateBody clearOauth() { this.oauth = null; clearedFields.add("oauth"); return this; }
+    public WebhookEndpointsCreateBody includePrivateMembership(Boolean v) { this.includePrivateMembership = v; clearedFields.remove("include_private_membership"); return this; }
+    /** Send {@code "include_private_membership": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public WebhookEndpointsCreateBody clearIncludePrivateMembership() { this.includePrivateMembership = null; clearedFields.add("include_private_membership"); return this; }
     public WebhookEndpointsCreateBody maxRps(Long v) { this.maxRps = v; clearedFields.remove("max_rps"); return this; }
     /** Send {@code "max_rps": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public WebhookEndpointsCreateBody clearMaxRps() { this.maxRps = null; clearedFields.add("max_rps"); return this; }

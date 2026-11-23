@@ -21,15 +21,51 @@ public final class MessagingProvidersApi {
         this.t = t;
     }
 
+    /** {@code GET /v1/messaging_providers} - Read the instance's BYOK email and SMS provider config: transport, from-address and which secret keys are set. Never returns a secret value. Scope: {@code messaging:read}. */
+    public MessagingProvidersGetResponse get() {
+        return t.request("GET", "/v1/messaging_providers", null, null, null, false, new TypeReference<MessagingProvidersGetResponse>() {
+        });
+    }
+
+    /** {@code PUT /v1/messaging_providers/email} - Configure the email delivery provider. The body is discriminated by `transport` (resend, ses, smtp, brevo, mailgun, smtp2go, hermetica, webhook; `hermeticor` is accepted as an alias for `hermetica`); each transport has its own `config` keys, listed in its schema. Unknown or missing keys are refused with a 422 naming `config.&lt;key&gt;`. Secrets are write-only; on an update of the same transport an omitted secret keeps the stored one. Scope: {@code messaging:write}. */
+    public MessagingProvider setEmail(MessagingProvidersSetEmailBody body) {
+        return t.request("PUT", "/v1/messaging_providers/email", null, body, null, false, new TypeReference<MessagingProvider>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public MessagingProvider setEmail(MessagingProvidersSetEmailBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/messaging_providers/email", null, body, idempotencyKey, false, new TypeReference<MessagingProvider>() {
+        });
+    }
+
     /** {@code PUT /v1/messaging_providers/push} - Configure the push sender used for push MFA and in-app sign-in approval. The body is discriminated by `transport`: `apns_fcm` (one row carrying APNS and/or FCM credentials; devices are routed by their platform) or `expo` (an Expo access token, write-only; delivers to ExponentPushToken devices registered with platform `expo`). Unknown or missing keys are refused with a 422 naming `config.&lt;key&gt;`. Secrets are write-only. Scope: {@code messaging:write}. */
     public void setPush(MessagingProvidersSetPushBody body) {
         t.request("PUT", "/v1/messaging_providers/push", null, body, null, false, new TypeReference<Object>() {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public void setPush(MessagingProvidersSetPushBody body, String idempotencyKey) {
+        t.request("PUT", "/v1/messaging_providers/push", null, body, idempotencyKey, false, new TypeReference<Object>() {
+        });
+    }
+
     /** {@code PUT /v1/messaging_providers/sms} - Configure the SMS delivery provider. The body is discriminated by `transport` (twilio, vonage, messagebird, plivo, telnyx, sinch, infobip, clicksend, bandwidth, aws_sns, webhook); each transport has its own `config` keys. Unknown or missing keys are refused with a 422 naming `config.&lt;key&gt;`. Secrets are write-only. Scope: {@code messaging:write}. */
     public MessagingProvider setSms(MessagingProvidersSetSmsBody body) {
         return t.request("PUT", "/v1/messaging_providers/sms", null, body, null, false, new TypeReference<MessagingProvider>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public MessagingProvider setSms(MessagingProvidersSetSmsBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/messaging_providers/sms", null, body, idempotencyKey, false, new TypeReference<MessagingProvider>() {
+        });
+    }
+
+    /** {@code GET /v1/messaging_providers/{channel}} - Read one channel's provider (`email`, `sms` or `push`): transport, mode, from-address and which secret keys are set. Never returns a secret value. When the channel has no provider: 200 `&#123; object: "messaging_provider", channel, configured: false &#125;` (not a 404). An unknown channel is 404. Scope: {@code messaging:read}. */
+    public MessagingProvidersGetByChannelResponse getByChannel(String channel) {
+        return t.request("GET", "/v1/messaging_providers/" + enc(channel), null, null, null, false, new TypeReference<MessagingProvidersGetByChannelResponse>() {
         });
     }
 
@@ -77,15 +113,33 @@ public final class MessagingProvidersApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public MessagingProvidersSetOrderResponse setOrder(String channel, MessagingProvidersSetOrderBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/messaging_providers/" + enc(channel) + "/fallbacks/order", null, body, idempotencyKey, false, new TypeReference<MessagingProvidersSetOrderResponse>() {
+        });
+    }
+
     /** {@code DELETE /v1/messaging_providers/{channel}/fallbacks/{id}} - Remove a fallback provider, and any country route that pointed at it. Scope: {@code messaging:write}. */
     public MessagingProvidersDeleteFallbackResponse deleteFallback(String channel, String id) {
         return t.request("DELETE", "/v1/messaging_providers/" + enc(channel) + "/fallbacks/" + enc(id), null, null, null, false, new TypeReference<MessagingProvidersDeleteFallbackResponse>() {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public MessagingProvidersDeleteFallbackResponse deleteFallback(String channel, String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/messaging_providers/" + enc(channel) + "/fallbacks/" + enc(id), null, null, idempotencyKey, false, new TypeReference<MessagingProvidersDeleteFallbackResponse>() {
+        });
+    }
+
     /** {@code PUT /v1/messaging_providers/{channel}/fallbacks/{id}} - Change a fallback provider. An omitted secret keeps the stored one. Scope: {@code messaging:write}. */
     public MessagingProvidersSetFallbackResponse setFallback(String channel, String id, MessagingProvidersSetFallbackBody body) {
         return t.request("PUT", "/v1/messaging_providers/" + enc(channel) + "/fallbacks/" + enc(id), null, body, null, false, new TypeReference<MessagingProvidersSetFallbackResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public MessagingProvidersSetFallbackResponse setFallback(String channel, String id, MessagingProvidersSetFallbackBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/messaging_providers/" + enc(channel) + "/fallbacks/" + enc(id), null, body, idempotencyKey, false, new TypeReference<MessagingProvidersSetFallbackResponse>() {
         });
     }
 }

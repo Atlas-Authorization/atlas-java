@@ -21,9 +21,41 @@ public final class ConnectionProvidersApi {
         this.t = t;
     }
 
+    /** {@code GET /v1/connection_providers/policies} - List every provider that has a stored instance policy, in the shape of the single-provider read (unique_external_id, whether a webhook secret or dev id is stored, events_url). Secrets are never returned. Scope: {@code organizations:read}. */
+    public ConnectionProvidersListPoliciesResponse listPolicies() {
+        return t.request("GET", "/v1/connection_providers/policies", null, null, null, false, new TypeReference<ConnectionProvidersListPoliciesResponse>() {
+        });
+    }
+
+    /** As above, with every optional parameter. */
+    public ConnectionProvidersListPoliciesResponse listPolicies(ConnectionProvidersListPoliciesQuery query) {
+        return t.request("GET", "/v1/connection_providers/policies", query == null ? null : query.toMap(), null, null, false, new TypeReference<ConnectionProvidersListPoliciesResponse>() {
+        });
+    }
+
+    /** Every item across every page of {@code GET /v1/connection_providers/policies}, fetched lazily (the cursor is followed for you). */
+    public Iterable<ConnectionProvidersListPoliciesResponseDataItem> listPoliciesAll(ConnectionProvidersListPoliciesQuery query) {
+        final ConnectionProvidersListPoliciesQuery base = query == null ? new ConnectionProvidersListPoliciesQuery() : query.copy();
+        return Pagination.iterate(cursor -> {
+            ConnectionProvidersListPoliciesResponse r = listPolicies(base.copy().startingAfter(cursor));
+            return new CursorPage<>(r.data(), Boolean.TRUE.equals(r.hasMore()), r.nextCursor());
+        });
+    }
+
+    /** As above, with no query options. */
+    public Iterable<ConnectionProvidersListPoliciesResponseDataItem> listPoliciesAll() {
+        return listPoliciesAll(null);
+    }
+
     /** {@code DELETE /v1/connection_providers/{provider}/policy} - Remove the instance policy for a provider (back to the defaults). Scope: {@code organizations:write}. */
     public void deletePolicy(String provider) {
         t.request("DELETE", "/v1/connection_providers/" + enc(provider) + "/policy", null, null, null, false, new TypeReference<Object>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public void deletePolicy(String provider, String idempotencyKey) {
+        t.request("DELETE", "/v1/connection_providers/" + enc(provider) + "/policy", null, null, idempotencyKey, false, new TypeReference<Object>() {
         });
     }
 
@@ -36,6 +68,12 @@ public final class ConnectionProvidersApi {
     /** {@code PUT /v1/connection_providers/{provider}/policy} - Set the instance policy for one provider's connections. unique_external_id: true makes a connect or import answer 409 external_id_taken (with the other connection's id) when another owner already holds that provider account (a revoked connection does not count). webhook_secret is the secret the provider's uninstall ingress verifies with where it is not the app's client secret: eBay verification token, Square signature key, Wix public key (PEM), Etsy webhook signing secret; null clears it. Write-only. Scope: {@code organizations:write}. */
     public ConnectionProvidersSetPolicyResponse setPolicy(String provider, ConnectionProvidersSetPolicyBody body) {
         return t.request("PUT", "/v1/connection_providers/" + enc(provider) + "/policy", null, body, null, false, new TypeReference<ConnectionProvidersSetPolicyResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ConnectionProvidersSetPolicyResponse setPolicy(String provider, ConnectionProvidersSetPolicyBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/connection_providers/" + enc(provider) + "/policy", null, body, idempotencyKey, false, new TypeReference<ConnectionProvidersSetPolicyResponse>() {
         });
     }
 }

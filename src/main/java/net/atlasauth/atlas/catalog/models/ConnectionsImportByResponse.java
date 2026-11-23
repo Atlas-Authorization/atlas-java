@@ -18,5 +18,7 @@ public record ConnectionsImportByResponse(
         @JsonProperty("would_create") Long wouldCreate,
         @JsonProperty("would_update") Long wouldUpdate,
         @JsonProperty("failed") Long failed,
+        @JsonProperty("errors") List<ConnectionsImportByResponseErrorsItem> errors,
+        @JsonProperty("would_return") Map<String, Object> wouldReturn,
         @JsonProperty("data") List<ConnectionsImportByResponseDataItem> data) {
 }

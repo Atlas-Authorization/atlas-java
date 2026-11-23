@@ -14,6 +14,8 @@ public final class MessagesListQuery {
     public String status;
     /** Only this template. */
     public String template;
+    /** Only `auth` or `transactional` messages. */
+    public String category;
     /** Only this provider (`resend`, `ses`, `twilio`, ...). */
     public String provider;
     /** Only messages to this address or number (looked up by its keyed hash; the address is never stored). */
@@ -33,6 +35,7 @@ public final class MessagesListQuery {
     public MessagesListQuery channel(String v) { this.channel = v; return this; }
     public MessagesListQuery status(String v) { this.status = v; return this; }
     public MessagesListQuery template(String v) { this.template = v; return this; }
+    public MessagesListQuery category(String v) { this.category = v; return this; }
     public MessagesListQuery provider(String v) { this.provider = v; return this; }
     public MessagesListQuery recipient(String v) { this.recipient = v; return this; }
     public MessagesListQuery since(String v) { this.since = v; return this; }
@@ -46,6 +49,7 @@ public final class MessagesListQuery {
         c.channel = this.channel;
         c.status = this.status;
         c.template = this.template;
+        c.category = this.category;
         c.provider = this.provider;
         c.recipient = this.recipient;
         c.since = this.since;
@@ -61,6 +65,7 @@ public final class MessagesListQuery {
         p.set("channel", channel);
         p.set("status", status);
         p.set("template", template);
+        p.set("category", category);
         p.set("provider", provider);
         p.set("recipient", recipient);
         p.set("since", since);

@@ -130,6 +130,12 @@ public final class IgaApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public IgaUpdateBirthrightRuleResponse updateBirthrightRule(String id, IgaUpdateBirthrightRuleBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/iga/birthright_rules/" + enc(id), null, body, idempotencyKey, false, new TypeReference<IgaUpdateBirthrightRuleResponse>() {
+        });
+    }
+
     /** {@code GET /v1/iga/bundles} - List access bundles (packages of entitlements requested together). Scope: {@code iga:read}. */
     public IgaListBundlesResponse listBundles() {
         return t.request("GET", "/v1/iga/bundles", null, null, null, false, new TypeReference<IgaListBundlesResponse>() {
@@ -174,6 +180,12 @@ public final class IgaApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public IgaDeleteBundleResponse deleteBundle(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/iga/bundles/" + enc(id), null, null, idempotencyKey, false, new TypeReference<IgaDeleteBundleResponse>() {
+        });
+    }
+
     /** {@code GET /v1/iga/bundles/{id}} - Read one bundle by id or key. Scope: {@code iga:read}. */
     public IgaGetBundleResponse getBundle(String id) {
         return t.request("GET", "/v1/iga/bundles/" + enc(id), null, null, null, false, new TypeReference<IgaGetBundleResponse>() {
@@ -183,6 +195,12 @@ public final class IgaApi {
     /** {@code PATCH /v1/iga/bundles/{id}} - Change an access bundle, its entitlements, form fields or policy. Scope: {@code iga:write}. */
     public IgaUpdateBundleResponse updateBundle(String id, IgaUpdateBundleBody body) {
         return t.request("PATCH", "/v1/iga/bundles/" + enc(id), null, body, null, false, new TypeReference<IgaUpdateBundleResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public IgaUpdateBundleResponse updateBundle(String id, IgaUpdateBundleBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/iga/bundles/" + enc(id), null, body, idempotencyKey, false, new TypeReference<IgaUpdateBundleResponse>() {
         });
     }
 
@@ -448,6 +466,12 @@ public final class IgaApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public IgaDeleteEligibilityResponse deleteEligibility(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/iga/eligibilities/" + enc(id), null, null, idempotencyKey, false, new TypeReference<IgaDeleteEligibilityResponse>() {
+        });
+    }
+
     /** {@code GET /v1/iga/entitlements} - List the governed entitlement catalog. Scope: {@code iga:read}. */
     public IgaListEntitlementsResponse listEntitlements() {
         return t.request("GET", "/v1/iga/entitlements", null, null, null, false, new TypeReference<IgaListEntitlementsResponse>() {
@@ -507,6 +531,12 @@ public final class IgaApi {
     /** {@code PATCH /v1/iga/entitlements/{id}} - Change an entitlement (its kind cannot change). A change to the approval rules applies to requests filed afterwards. Scope: {@code iga:write}. */
     public IgaUpdateEntitlementResponse updateEntitlement(String id, IgaUpdateEntitlementBody body) {
         return t.request("PATCH", "/v1/iga/entitlements/" + enc(id), null, body, null, false, new TypeReference<IgaUpdateEntitlementResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public IgaUpdateEntitlementResponse updateEntitlement(String id, IgaUpdateEntitlementBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/iga/entitlements/" + enc(id), null, body, idempotencyKey, false, new TypeReference<IgaUpdateEntitlementResponse>() {
         });
     }
 
@@ -619,6 +649,12 @@ public final class IgaApi {
     /** {@code PATCH /v1/iga/sod_rules/{id}} - Change a separation-of-duties rule. Scope: {@code iga:write}. */
     public IgaUpdateSodRuleResponse updateSodRule(String id, IgaUpdateSodRuleBody body) {
         return t.request("PATCH", "/v1/iga/sod_rules/" + enc(id), null, body, null, false, new TypeReference<IgaUpdateSodRuleResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public IgaUpdateSodRuleResponse updateSodRule(String id, IgaUpdateSodRuleBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/iga/sod_rules/" + enc(id), null, body, idempotencyKey, false, new TypeReference<IgaUpdateSodRuleResponse>() {
         });
     }
 }

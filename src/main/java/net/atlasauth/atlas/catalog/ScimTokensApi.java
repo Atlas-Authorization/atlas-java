@@ -65,6 +65,12 @@ public final class ScimTokensApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ScimTokensUpdateResponse update(String id, ScimTokensUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/scim_tokens/" + enc(id), null, body, idempotencyKey, false, new TypeReference<ScimTokensUpdateResponse>() {
+        });
+    }
+
     /** {@code POST /v1/scim_tokens/{id}/rotate} - Rotate a live SCIM token: mint its replacement (same organization, connection, scopes, role mappings, IP allow-list and profile lock) and retire the old one after grace_period_seconds (default one day; 0 revokes it now), so the identity provider can be switched over without a gap in provisioning. The new secret is revealed once. Only a live token can be rotated (409 otherwise). An operator token needs a recent MFA. Accepts Idempotency-Key. Scope: {@code scim:write}. */
     public ScimTokensRotateResponse rotate(String id, ScimTokensRotateBody body) {
         return t.request("POST", "/v1/scim_tokens/" + enc(id) + "/rotate", null, body, null, false, new TypeReference<ScimTokensRotateResponse>() {

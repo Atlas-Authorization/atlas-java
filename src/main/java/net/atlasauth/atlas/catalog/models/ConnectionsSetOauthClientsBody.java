@@ -29,11 +29,14 @@ public final class ConnectionsSetOauthClientsBody {
     public String clientSecret;
     @JsonProperty("scopes")
     public List<String> scopes;
-    /** Values that fill the provider's host templates for this one connection, for example &#123;"subdomain":"acme"&#125; (Zendesk), &#123;"shop":"acme"&#125; (Shopify), &#123;"domain":"acme.my.salesforce.com"&#125; (Salesforce My Domain), &#123;"data_center":"eu"&#125; (Zoho), &#123;"tenant":"contoso.onmicrosoft.com"&#125; (Microsoft), &#123;"host":"git.example.com"&#125; (self-managed GitLab). Each key is checked against that provider's allowlist pattern; a value that is not a plain label or public hostname is refused with 400 `host_params.&lt;key&gt;`. */
+    /** Defaults for connections that use this client: the provider's host values plus its own non-secret settings, such as &#123;"service_id":"…"&#125; for TikTok Shop (required for it). An unknown key or a malformed value is refused with 400 `host_params.&lt;key&gt;`. */
     @JsonProperty("host_params")
     public Map<String, String> hostParams;
     @JsonProperty("enabled")
     public Boolean enabled;
+    /** eBay only: the RuName registered for your eBay app (letters, digits, hyphen, underscore). Shorthand for host_params.ru_name. It is sent as redirect_uri on both legs of consent, so the owner authorizes at Atlas; set the client's callback_url as the RuName's accepted URL in the eBay developer portal. null clears it. */
+    @JsonProperty("ru_name")
+    public String ruName;
     /** How Atlas authenticates to the provider's token endpoint. client_secret (default) keeps the provider's own style. private_key_jwt: send `generate_key: true` (Atlas keeps the key and publishes its public half) or your PKCS#8 private key in `client_secret`; Atlas then signs a fresh single-use assertion on every token request. tls_client_auth (mutual TLS): send the certificate in `mtls_cert` and its private key in `client_secret`; the pair is checked. One of: client_secret, private_key_jwt, tls_client_auth. */
     @JsonProperty("auth_method")
     public String authMethod;
@@ -76,6 +79,9 @@ public final class ConnectionsSetOauthClientsBody {
     public ConnectionsSetOauthClientsBody enabled(Boolean v) { this.enabled = v; clearedFields.remove("enabled"); return this; }
     /** Send {@code "enabled": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public ConnectionsSetOauthClientsBody clearEnabled() { this.enabled = null; clearedFields.add("enabled"); return this; }
+    public ConnectionsSetOauthClientsBody ruName(String v) { this.ruName = v; clearedFields.remove("ru_name"); return this; }
+    /** Send {@code "ru_name": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public ConnectionsSetOauthClientsBody clearRuName() { this.ruName = null; clearedFields.add("ru_name"); return this; }
     public ConnectionsSetOauthClientsBody authMethod(String v) { this.authMethod = v; clearedFields.remove("auth_method"); return this; }
     /** Send {@code "auth_method": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public ConnectionsSetOauthClientsBody clearAuthMethod() { this.authMethod = null; clearedFields.add("auth_method"); return this; }

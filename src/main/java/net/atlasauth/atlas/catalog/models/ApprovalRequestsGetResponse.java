@@ -24,6 +24,8 @@ public record ApprovalRequestsGetResponse(
         @JsonProperty("binding") String binding,
         @JsonProperty("require_signature") Boolean requireSignature,
         @JsonProperty("require_trusted_device") Boolean requireTrustedDevice,
+        @JsonProperty("exclude_requester") Boolean excludeRequester,
+        @JsonProperty("step_up_policy") String stepUpPolicy,
         @JsonProperty("approvers") ApprovalRequestsGetResponseApprovers approvers,
         @JsonProperty("digest") String digest,
         @JsonProperty("canonical") String canonical,

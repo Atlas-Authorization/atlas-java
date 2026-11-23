@@ -65,6 +65,12 @@ public final class OrganizationConnectionsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OrganizationConnectionsDeleteResponse delete(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/organization_connections/" + enc(id), null, null, idempotencyKey, false, new TypeReference<OrganizationConnectionsDeleteResponse>() {
+        });
+    }
+
     /** {@code POST /v1/organization_connections/{id}/accept} - Accept an invitation with its token: the partner organization gains access to the application. The token works once. Scope: {@code organizations:write}. */
     public OrganizationConnectionsAcceptResponse accept(String id, OrganizationConnectionsAcceptBody body) {
         return t.request("POST", "/v1/organization_connections/" + enc(id) + "/accept", null, body, null, false, new TypeReference<OrganizationConnectionsAcceptResponse>() {

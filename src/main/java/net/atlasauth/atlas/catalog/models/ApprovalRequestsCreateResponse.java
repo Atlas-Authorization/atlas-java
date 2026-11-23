@@ -18,6 +18,8 @@ public record ApprovalRequestsCreateResponse(
         @JsonProperty("approvers") Map<String, Object> approvers,
         @JsonProperty("require_signature") Boolean requireSignature,
         @JsonProperty("require_trusted_device") Boolean requireTrustedDevice,
+        @JsonProperty("exclude_requester") Boolean excludeRequester,
+        @JsonProperty("step_up_policy") String stepUpPolicy,
         @JsonProperty("digest") String digest,
         @JsonProperty("reference") String reference,
         @JsonProperty("binding") String binding) {

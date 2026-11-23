@@ -21,6 +21,32 @@ public final class GrantsApi {
         this.t = t;
     }
 
+    /** {@code GET /v1/grants} - List every grant in one cursor-paged list: users' consent grants and OpenID Grant Management grants, told apart by `type`. Filter by `user_id`, `client_id` (the public client id), `type` (consent, managed, all) and `status` (active by default; revoking a consent removes it, so revoked grants are managed ones). Scope: {@code grants:read}. */
+    public GrantsListResponse list() {
+        return t.request("GET", "/v1/grants", null, null, null, false, new TypeReference<GrantsListResponse>() {
+        });
+    }
+
+    /** As above, with every optional parameter. */
+    public GrantsListResponse list(GrantsListQuery query) {
+        return t.request("GET", "/v1/grants", query == null ? null : query.toMap(), null, null, false, new TypeReference<GrantsListResponse>() {
+        });
+    }
+
+    /** Every item across every page of {@code GET /v1/grants}, fetched lazily (the cursor is followed for you). */
+    public Iterable<GrantsListResponseDataItem> listAll(GrantsListQuery query) {
+        final GrantsListQuery base = query == null ? new GrantsListQuery() : query.copy();
+        return Pagination.iterate(cursor -> {
+            GrantsListResponse r = list(base.copy().startingAfter(cursor));
+            return new CursorPage<>(r.data(), Boolean.TRUE.equals(r.hasMore()), r.nextCursor());
+        });
+    }
+
+    /** As above, with no query options. */
+    public Iterable<GrantsListResponseDataItem> listAll() {
+        return listAll(null);
+    }
+
     /** {@code POST /v1/grants/{grantType}/{id}/consume} - Take an amount from one of a grant's counters, atomically. A denial is a 200 decision with `allowed: false`. Scope: {@code machines:write}. */
     public GrantsConsumeResponse consume(String grantType, String id, GrantsConsumeBody body) {
         return t.request("POST", "/v1/grants/" + enc(grantType) + "/" + enc(id) + "/consume", null, body, null, false, new TypeReference<GrantsConsumeResponse>() {
@@ -60,6 +86,24 @@ public final class GrantsApi {
     /** {@code GET /v1/grants/{grantType}/{id}/usage} - The current window of every counter a grant defines, and the leases still holding an amount. Scope: {@code machines:read}. */
     public GrantsGetUsageResponse getUsage(String grantType, String id) {
         return t.request("GET", "/v1/grants/" + enc(grantType) + "/" + enc(id) + "/usage", null, null, null, false, new TypeReference<GrantsGetUsageResponse>() {
+        });
+    }
+
+    /** {@code GET /v1/grants/{id}} - Read one grant of either kind, with its metadata. Scope: {@code grants:read}. */
+    public GrantsGetResponse get(String id) {
+        return t.request("GET", "/v1/grants/" + enc(id), null, null, null, false, new TypeReference<GrantsGetResponse>() {
+        });
+    }
+
+    /** {@code PATCH /v1/grants/{id}} - Change a grant's `metadata` (secret key only). The keys you send are merged into what is stored: a key sent as null is removed. The result is at most 4 KB of JSON. Audited; idempotent. Scope: {@code grants:write}. */
+    public GrantsUpdateResponse update(String id, GrantsUpdateBody body) {
+        return t.request("PATCH", "/v1/grants/" + enc(id), null, body, null, false, new TypeReference<GrantsUpdateResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public GrantsUpdateResponse update(String id, GrantsUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/grants/" + enc(id), null, body, idempotencyKey, false, new TypeReference<GrantsUpdateResponse>() {
         });
     }
 }

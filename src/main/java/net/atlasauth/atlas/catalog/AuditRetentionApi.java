@@ -32,4 +32,10 @@ public final class AuditRetentionApi {
         return t.request("PUT", "/v1/audit_retention", null, body, null, false, new TypeReference<Map<String, Object>>() {
         });
     }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Map<String, Object> set(AuditRetentionSetBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/audit_retention", null, body, idempotencyKey, false, new TypeReference<Map<String, Object>>() {
+        });
+    }
 }

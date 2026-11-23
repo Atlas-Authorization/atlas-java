@@ -23,6 +23,7 @@ public record WebhookEndpoint(
         @JsonProperty("header_names") List<String> headerNames,
         @JsonProperty("oauth") Map<String, Object> oauth,
         @JsonProperty("max_rps") Long maxRps,
+        @JsonProperty("include_private_membership") Boolean includePrivateMembership,
         @JsonProperty("destination") WebhookEndpointDestination destination,
         @JsonProperty("health") String health,
         @JsonProperty("failing_since") Long failingSince,
