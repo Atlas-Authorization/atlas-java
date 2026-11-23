@@ -22,14 +22,14 @@ Maven:
 <dependency>
   <groupId>net.atlasauth</groupId>
   <artifactId>atlas-java</artifactId>
-  <version>1.23.0</version>
+  <version>1.23.1</version>
 </dependency>
 ```
 
 Gradle:
 
 ```kotlin
-implementation("net.atlasauth:atlas-java:1.23.0")
+implementation("net.atlasauth:atlas-java:1.23.1")
 ```
 
 ## The management client
@@ -745,6 +745,8 @@ atlas.catalog().administrativeUnits().update("au_1",
 Hand-written methods keep their signatures; the catalog also carries typed models for fields the older models lack.
 
 ## Resilience, telemetry and doctor
+
+Every client retries once, after a short jittered delay, when a request fails with a connection error before any response (an idle pooled connection the server closed). That covers GET, HEAD, OPTIONS, PUT, DELETE and any call with an idempotency key; timeouts and other writes are never replayed.
 
 ```java
 AtlasClient atlas = AtlasClient.builder().secretKey(key)

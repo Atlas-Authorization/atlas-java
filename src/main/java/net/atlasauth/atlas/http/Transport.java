@@ -339,6 +339,23 @@ public final class Transport {
         }
     }
 
+    /** A connection failure before any response on a request that is safe to replay; never a timeout. */
+    private static boolean resetRetryable(IOException e, String method, String idempotencyKey,
+                                          HttpRequest.BodyPublisher publisher) {
+        if (e instanceof java.net.http.HttpTimeoutException || !replayable(publisher)) {
+            return false;
+        }
+        String m = method.toUpperCase();
+        // java.net.http.HttpClient already retries GET and HEAD once on a closed connection (MultiExchange), so
+        // retrying those here too would make it two retries.
+        if (m.equals("GET") || m.equals("HEAD")) {
+            return false;
+        }
+        boolean safe = m.equals("OPTIONS") || m.equals("PUT") || m.equals("DELETE")
+                || (idempotencyKey != null && !idempotencyKey.isEmpty());
+        return safe && !(e.getCause() instanceof java.net.http.HttpTimeoutException);
+    }
+
     /** A body publisher built from bytes or a string can be sent again; a streaming one cannot. */
     private static boolean replayable(HttpRequest.BodyPublisher publisher) {
         return publisher.contentLength() >= 0;
@@ -437,8 +454,18 @@ public final class Transport {
         builder.method(method, publisher);
 
         HttpResponse<byte[]> response;
+        HttpRequest built = builder.build();
         try {
-            response = http.send(builder.build(), HttpResponse.BodyHandlers.ofByteArray());
+            try {
+                response = http.send(built, HttpResponse.BodyHandlers.ofByteArray());
+            } catch (IOException first) {
+                if (!resetRetryable(first, method, idempotencyKey, publisher)) {
+                    throw first;
+                }
+                // An idle pooled connection the server closed fails before any response: retry once.
+                Thread.sleep(25 + java.util.concurrent.ThreadLocalRandom.current().nextInt(100));
+                response = http.send(built, HttpResponse.BodyHandlers.ofByteArray());
+            }
         } catch (IOException e) {
             throw new AtlasConnectionException("Atlas API request to " + uri + " failed: " + e.getMessage(), e);
         } catch (InterruptedException e) {
