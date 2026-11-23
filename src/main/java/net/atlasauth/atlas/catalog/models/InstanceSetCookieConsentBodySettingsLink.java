@@ -15,7 +15,7 @@ public final class InstanceSetCookieConsentBodySettingsLink {
     /** The base link text (English), e.g. "Cookie settings". Required. */
     @JsonProperty("label")
     public String label;
-    /** Per-language link text, keyed by page locale (en, es, fr, de, pt-BR, ja, nl; any other key is refused with a 400). Each value is 1-60 characters. The hosted page renders labels[&lt;page locale&gt;], else (on a non-English page) the preset's own translation of "Cookie settings", else label. */
+    /** Per-language link text, keyed by page locale (any language the hosted pages speak: en, es, fr, de, pt-BR, ja, nl, ar, he, fa, hi, zh-Hans, zh-Hant, ko, it, pl, tr, ru, sv, id, vi, th; any other key is refused with a 400). Each value is 1-60 characters. The hosted page renders labels[&lt;page locale&gt;], else (on a non-English page) the preset's own translation of "Cookie settings", else label. */
     @JsonProperty("labels")
     public Map<String, String> labels;
     /** Fills in the CMP's reopen trigger: cookiemunch adds data-cc="show-settings"; cookiebot calls Cookiebot.renew(); onetrust calls OneTrust.ToggleInfoDisplay(); custom adds nothing (use attributes). One of: cookiemunch, cookiebot, onetrust, custom. */

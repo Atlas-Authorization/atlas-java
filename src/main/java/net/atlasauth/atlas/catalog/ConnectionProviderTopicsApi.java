@@ -27,9 +27,15 @@ public final class ConnectionProviderTopicsApi {
         });
     }
 
-    /** {@code PUT /v1/connection_provider_topics} - Replace the instance's business topics: &#123; topics: &#123; shopify: [...], ebay: [...] &#125; &#125;, up to 50 per provider, spelled as the provider spells them (Shopify orders/create; eBay Trading events such as ItemSold, or Commerce Notification topic ids in UPPER_SNAKE_CASE). Connections made afterwards subscribe automatically; call POST /v1/connections/&#123;id&#125;/provider_subscriptions/sync for existing ones. A topic not listed here is acknowledged and ignored on delivery. Scope: {@code organizations:write}. */
+    /** {@code PUT /v1/connection_provider_topics} - Replace the instance's business topics: &#123; topics: &#123; shopify: [...], ebay: [...], bigcommerce: [...], square: [...], etsy: [...], tiktok_shop: [...] &#125; &#125;, up to 50 per provider (or ["*"] to pass every topic the provider sends through as connection.provider_event with the raw payload), spelled as the provider spells them (Shopify orders/create; eBay Trading events such as ItemSold, or Commerce Notification topic ids in UPPER_SNAKE_CASE). Connections made afterwards subscribe automatically; call POST /v1/connections/&#123;id&#125;/provider_subscriptions/sync for existing ones. A topic not listed here is acknowledged and ignored on delivery. Scope: {@code organizations:write}. */
     public ConnectionProviderTopicsSetResponse set(ConnectionProviderTopicsSetBody body) {
         return t.request("PUT", "/v1/connection_provider_topics", null, body, null, false, new TypeReference<ConnectionProviderTopicsSetResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ConnectionProviderTopicsSetResponse set(ConnectionProviderTopicsSetBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/connection_provider_topics", null, body, idempotencyKey, false, new TypeReference<ConnectionProviderTopicsSetResponse>() {
         });
     }
 }

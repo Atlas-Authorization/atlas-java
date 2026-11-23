@@ -53,9 +53,21 @@ public final class MessagingApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public MessagingSetCountryRoutesResponse setCountryRoutes(MessagingSetCountryRoutesBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/messaging/country_routes", null, body, idempotencyKey, false, new TypeReference<MessagingSetCountryRoutesResponse>() {
+        });
+    }
+
     /** {@code DELETE /v1/messaging/country_routes/{country}} - Remove the route for a country. Scope: {@code messaging:write}. */
     public MessagingDeleteCountryRouteResponse deleteCountryRoute(String country) {
         return t.request("DELETE", "/v1/messaging/country_routes/" + enc(country), null, null, null, false, new TypeReference<MessagingDeleteCountryRouteResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public MessagingDeleteCountryRouteResponse deleteCountryRoute(String country, String idempotencyKey) {
+        return t.request("DELETE", "/v1/messaging/country_routes/" + enc(country), null, null, idempotencyKey, false, new TypeReference<MessagingDeleteCountryRouteResponse>() {
         });
     }
 
@@ -68,6 +80,12 @@ public final class MessagingApi {
     /** {@code PUT /v1/messaging/settings} - Change messaging behaviour. Send only the fields to change. Audited. Scope: {@code messaging:write}. */
     public MessagingSetSettingsResponse setSettings(MessagingSetSettingsBody body) {
         return t.request("PUT", "/v1/messaging/settings", null, body, null, false, new TypeReference<MessagingSetSettingsResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public MessagingSetSettingsResponse setSettings(MessagingSetSettingsBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/messaging/settings", null, body, idempotencyKey, false, new TypeReference<MessagingSetSettingsResponse>() {
         });
     }
 
@@ -112,6 +130,12 @@ public final class MessagingApi {
     /** {@code DELETE /v1/messaging/suppressions/{email}} - Remove an address from the suppression list. Scope: {@code email_suppressions:write}. */
     public MessagingDeleteSuppressionResponse deleteSuppression(String email) {
         return t.request("DELETE", "/v1/messaging/suppressions/" + enc(email), null, null, null, false, new TypeReference<MessagingDeleteSuppressionResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public MessagingDeleteSuppressionResponse deleteSuppression(String email, String idempotencyKey) {
+        return t.request("DELETE", "/v1/messaging/suppressions/" + enc(email), null, null, idempotencyKey, false, new TypeReference<MessagingDeleteSuppressionResponse>() {
         });
     }
 }

@@ -53,6 +53,12 @@ public final class PartnerLinksApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public PartnerLinksSetOutboundResponse setOutbound(String partner, PartnerLinksSetOutboundBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/partner_links/outbound/" + enc(partner), null, body, idempotencyKey, false, new TypeReference<PartnerLinksSetOutboundResponse>() {
+        });
+    }
+
     /** {@code POST /v1/partner_links/outbound/{partner}/request} - Ask a partner for a link on this instance's behalf, instead of pasting the credentials it issues: Atlas POSTs `&lt;partner base&gt;/v1/partner_link_requests` with `scopes[]` (partner-side scopes), `resource` and Atlas's own callback. Once the partner's owner approves, the partner delivers the credentials to Atlas signed, and they are stored as an outbound link (`source: oauth_install`). `base_url` is required for a partner that is not a preset. With an operator token, needs multi-factor sign-in within 5 minutes. Scope: {@code partner_links:write}. */
     public PartnerLinksRequestResponse request(String partner, PartnerLinksRequestBody body) {
         return t.request("POST", "/v1/partner_links/outbound/" + enc(partner) + "/request", null, body, null, false, new TypeReference<PartnerLinksRequestResponse>() {
@@ -124,6 +130,12 @@ public final class PartnerLinksApi {
     /** {@code PATCH /v1/partner_links/{id}} - Lock a partner link to client certificates (mTLS): `cert_fingerprints[]` (SHA-256, hex or base64url; at most 5; [] removes the lock). With a lock, every use of the link (its secret, client_credentials, and tokens minted from it) must come with one of these certificates, and the token endpoint accepts the certificate in place of the secret. Tokens minted before the change stop working. Scope: {@code partner_links:write}. */
     public PartnerLinksUpdateResponse update(String id, PartnerLinksUpdateBody body) {
         return t.request("PATCH", "/v1/partner_links/" + enc(id), null, body, null, false, new TypeReference<PartnerLinksUpdateResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public PartnerLinksUpdateResponse update(String id, PartnerLinksUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/partner_links/" + enc(id), null, body, idempotencyKey, false, new TypeReference<PartnerLinksUpdateResponse>() {
         });
     }
 }

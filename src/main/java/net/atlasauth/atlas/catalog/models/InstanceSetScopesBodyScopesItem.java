@@ -15,16 +15,22 @@ public final class InstanceSetScopesBodyScopesItem {
     /** 1-64 characters of letters, digits and : . _ - Required. */
     @JsonProperty("name")
     public String name;
-    /** Title per locale, e.g. &#123; "en": "Read listings", "es": "Leer anuncios" &#125;. Up to 200 characters each; longer is refused with 422, never cut. */
+    /** Title per locale, e.g. &#123; "en": "Read listings", "es": "Leer anuncios" &#125;. Up to 500 characters each; longer is refused with 422 unless ?too_long=truncate. */
     @JsonProperty("label")
     public Map<String, String> label;
-    /** Explanation per locale. Up to 500 characters each; longer is refused with 422 (param scopes.&lt;n&gt;.description), never cut. */
+    /** Explanation per locale. Up to 2000 characters each; longer is refused with 422 (param scopes.&lt;n&gt;.description) unless ?too_long=truncate. */
     @JsonProperty("description")
     public Map<String, String> description;
     @JsonProperty("sensitive")
     public Boolean sensitive;
     @JsonProperty("requires_verified_client")
     public Boolean requiresVerifiedClient;
+    /** The client level that may request the scope. One of: any, verified, certified. */
+    @JsonProperty("requires_client_level")
+    public String requiresClientLevel;
+    /** The developer who owns a client may request the scope with it on their own account whatever its level. */
+    @JsonProperty("owner_exempt")
+    public Boolean ownerExempt;
     /** Wire names sent as an explicit JSON null (see the clear methods); unset fields are omitted. */
     @JsonIgnore
     private final java.util.Set<String> clearedFields = new java.util.LinkedHashSet<>();
@@ -45,6 +51,12 @@ public final class InstanceSetScopesBodyScopesItem {
     public InstanceSetScopesBodyScopesItem requiresVerifiedClient(Boolean v) { this.requiresVerifiedClient = v; clearedFields.remove("requires_verified_client"); return this; }
     /** Send {@code "requires_verified_client": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public InstanceSetScopesBodyScopesItem clearRequiresVerifiedClient() { this.requiresVerifiedClient = null; clearedFields.add("requires_verified_client"); return this; }
+    public InstanceSetScopesBodyScopesItem requiresClientLevel(String v) { this.requiresClientLevel = v; clearedFields.remove("requires_client_level"); return this; }
+    /** Send {@code "requires_client_level": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public InstanceSetScopesBodyScopesItem clearRequiresClientLevel() { this.requiresClientLevel = null; clearedFields.add("requires_client_level"); return this; }
+    public InstanceSetScopesBodyScopesItem ownerExempt(Boolean v) { this.ownerExempt = v; clearedFields.remove("owner_exempt"); return this; }
+    /** Send {@code "owner_exempt": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public InstanceSetScopesBodyScopesItem clearOwnerExempt() { this.ownerExempt = null; clearedFields.add("owner_exempt"); return this; }
 
     @JsonAnyGetter
     Map<String, Object> clearedAsNull() {

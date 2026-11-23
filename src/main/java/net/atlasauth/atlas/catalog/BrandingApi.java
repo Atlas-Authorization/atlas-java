@@ -33,6 +33,12 @@ public final class BrandingApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Branding update(BrandingPatch body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/branding", null, body, idempotencyKey, false, new TypeReference<Branding>() {
+        });
+    }
+
     /** {@code POST /v1/branding/preview} - Render a draft branding through the real sign-in hosted-page renderer (same sanitizers + CSP) so an agent sees what would ship before saving. Scope: {@code branding:read}. */
     public BrandingPreviewResponse preview(BrandingSettings body) {
         return t.request("POST", "/v1/branding/preview", null, body, null, false, new TypeReference<BrandingPreviewResponse>() {

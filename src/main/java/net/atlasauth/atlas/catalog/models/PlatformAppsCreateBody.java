@@ -24,6 +24,8 @@ public final class PlatformAppsCreateBody {
     public String secretKeyPreset;
     @JsonProperty("provisioning_key")
     public Boolean provisioningKey;
+    @JsonProperty("secret_key_profile")
+    public String secretKeyProfile;
     @JsonProperty("tags")
     public List<String> tags;
     @JsonProperty("metadata")
@@ -55,6 +57,9 @@ public final class PlatformAppsCreateBody {
     public PlatformAppsCreateBody provisioningKey(Boolean v) { this.provisioningKey = v; clearedFields.remove("provisioning_key"); return this; }
     /** Send {@code "provisioning_key": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public PlatformAppsCreateBody clearProvisioningKey() { this.provisioningKey = null; clearedFields.add("provisioning_key"); return this; }
+    public PlatformAppsCreateBody secretKeyProfile(String v) { this.secretKeyProfile = v; clearedFields.remove("secret_key_profile"); return this; }
+    /** Send {@code "secret_key_profile": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public PlatformAppsCreateBody clearSecretKeyProfile() { this.secretKeyProfile = null; clearedFields.add("secret_key_profile"); return this; }
     public PlatformAppsCreateBody tags(List<String> v) { this.tags = v; clearedFields.remove("tags"); return this; }
     /** Send {@code "tags": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public PlatformAppsCreateBody clearTags() { this.tags = null; clearedFields.add("tags"); return this; }

@@ -53,6 +53,12 @@ public final class DevicesApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Device set(DevicesSetBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/devices", null, body, idempotencyKey, false, new TypeReference<Device>() {
+        });
+    }
+
     /** {@code GET /v1/devices/{id}/compliance_history} - The compliance transitions of one device, newest first. Scope: {@code device_assurance:read}. */
     public DevicesListComplianceHistoryResponse listComplianceHistory(String id) {
         return t.request("GET", "/v1/devices/" + enc(id) + "/compliance_history", null, null, null, false, new TypeReference<DevicesListComplianceHistoryResponse>() {

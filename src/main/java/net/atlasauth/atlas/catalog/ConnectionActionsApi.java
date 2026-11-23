@@ -51,6 +51,12 @@ public final class ConnectionActionsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public void delete(String provider, String name, String idempotencyKey) {
+        t.request("DELETE", "/v1/connection_actions/" + enc(provider) + "/" + enc(name), null, null, idempotencyKey, false, new TypeReference<Object>() {
+        });
+    }
+
     /** {@code GET /v1/connection_actions/{provider}/{name}} - One action with its input schema. Scope: {@code organizations:read}. */
     public ConnectionActionsGetResponse get(String provider, String name) {
         return t.request("GET", "/v1/connection_actions/" + enc(provider) + "/" + enc(name), null, null, null, false, new TypeReference<ConnectionActionsGetResponse>() {
@@ -60,6 +66,12 @@ public final class ConnectionActionsApi {
     /** {@code PUT /v1/connection_actions/{provider}/{name}} - Define or replace a custom action: data only (an input schema, a request template, a response mapping), never code. A definition with a first-party action's name replaces it for this instance. Scope: {@code organizations:write}. */
     public ConnectionActionsSetResponse set(String provider, String name, ConnectionActionsSetBody body) {
         return t.request("PUT", "/v1/connection_actions/" + enc(provider) + "/" + enc(name), null, body, null, false, new TypeReference<ConnectionActionsSetResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ConnectionActionsSetResponse set(String provider, String name, ConnectionActionsSetBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/connection_actions/" + enc(provider) + "/" + enc(name), null, body, idempotencyKey, false, new TypeReference<ConnectionActionsSetResponse>() {
         });
     }
 }

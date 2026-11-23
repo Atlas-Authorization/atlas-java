@@ -21,6 +21,7 @@ public record StepUpGetPolicyResponse(
         @JsonProperty("phishing_resistant") Boolean phishingResistant,
         @JsonProperty("allowed_methods") List<String> allowedMethods,
         @JsonProperty("accepted_factors") List<String> acceptedFactors,
+        @JsonProperty("accepted_factor_info") List<StepUpGetPolicyResponseAcceptedFactorInfoItem> acceptedFactorInfo,
         @JsonProperty("receipt_ttl_seconds") Long receiptTtlSeconds,
         @JsonProperty("created_at") Long createdAt,
         @JsonProperty("updated_at") Long updatedAt) {

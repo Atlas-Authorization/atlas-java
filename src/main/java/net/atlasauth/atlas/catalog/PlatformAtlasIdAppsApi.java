@@ -57,6 +57,12 @@ public final class PlatformAtlasIdAppsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public PlatformAtlasIdAppsUpdateResponse update(String id, PlatformAtlasIdAppsUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/platform/atlas_id_apps/" + enc(id), null, body, idempotencyKey, false, new TypeReference<PlatformAtlasIdAppsUpdateResponse>() {
+        });
+    }
+
     /** {@code GET /v1/platform/atlas_id_apps/{id}/adoption_codes} - The adoption codes issued for an app and what became of them (never the code itself). Scope: {@code platform:atlas_id_apps:read}. */
     public PlatformAtlasIdAppsListAdoptionCodesResponse listAdoptionCodes(String id) {
         return t.request("GET", "/v1/platform/atlas_id_apps/" + enc(id) + "/adoption_codes", null, null, null, false, new TypeReference<PlatformAtlasIdAppsListAdoptionCodesResponse>() {
@@ -101,9 +107,21 @@ public final class PlatformAtlasIdAppsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public PlatformAtlasIdAppsDeleteAdoptionCodeResponse deleteAdoptionCode(String id, String codeId, String idempotencyKey) {
+        return t.request("DELETE", "/v1/platform/atlas_id_apps/" + enc(id) + "/adoption_codes/" + enc(codeId), null, null, idempotencyKey, false, new TypeReference<PlatformAtlasIdAppsDeleteAdoptionCodeResponse>() {
+        });
+    }
+
     /** {@code PUT /v1/platform/atlas_id_apps/{id}/managed_by} - Hand an existing app's grant management to an instance of the same account (adoption), or take it back with `instance_id: null`. That instance's secret key, scoped to `atlas_id_grants:read|write` or `privacy:grants:revoke`, can then list the app (GET /v1/atlas_id_apps), look a person up (…/users?email=) and revoke their grant (DELETE …/grants/&#123;grantId&#125;), here or at /v1/platform/atlas_id_apps/&#123;id&#125;/…, and an erasure on that instance revokes the person's grant (matched by verified email). The app stays yours to edit; `managed_via` becomes `adopted`. 404 for an instance of another account; 409 for the app of an instance's Sign in with Atlas toggle (already managed). With an operator token, needs multi-factor sign-in within 5 minutes. Audited on the account and on the instance. Scope: {@code platform:atlas_id_apps:write}. */
     public PlatformAtlasIdAppsSetManagedByResponse setManagedBy(String id, PlatformAtlasIdAppsSetManagedByBody body) {
         return t.request("PUT", "/v1/platform/atlas_id_apps/" + enc(id) + "/managed_by", null, body, null, false, new TypeReference<PlatformAtlasIdAppsSetManagedByResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public PlatformAtlasIdAppsSetManagedByResponse setManagedBy(String id, PlatformAtlasIdAppsSetManagedByBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/platform/atlas_id_apps/" + enc(id) + "/managed_by", null, body, idempotencyKey, false, new TypeReference<PlatformAtlasIdAppsSetManagedByResponse>() {
         });
     }
 
@@ -128,6 +146,12 @@ public final class PlatformAtlasIdAppsApi {
     /** {@code DELETE /v1/platform/atlas_id_apps/{id}/provisioned_accounts/{testAccountId}} - Remove a test account: the Atlas account is deleted, every session it holds ends, and its grants, refresh tokens and approvals are revoked (the app gets back-channel logout and grant.revoked as usual). The address can be provisioned again. Takes a platform key with `platform:atlas_id_apps:provision` (every app) or `atlas_id_apps:&lt;app id&gt;:provision` (this app only). With an operator token, needs multi-factor sign-in within 5 minutes. Audited on the account (naming the key or operator) and on the Atlas ID instance. Scope: {@code platform:atlas_id_apps:provision}. */
     public PlatformAtlasIdAppsDeleteProvisionedAccountResponse deleteProvisionedAccount(String id, String testAccountId) {
         return t.request("DELETE", "/v1/platform/atlas_id_apps/" + enc(id) + "/provisioned_accounts/" + enc(testAccountId), null, null, null, false, new TypeReference<PlatformAtlasIdAppsDeleteProvisionedAccountResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public PlatformAtlasIdAppsDeleteProvisionedAccountResponse deleteProvisionedAccount(String id, String testAccountId, String idempotencyKey) {
+        return t.request("DELETE", "/v1/platform/atlas_id_apps/" + enc(id) + "/provisioned_accounts/" + enc(testAccountId), null, null, idempotencyKey, false, new TypeReference<PlatformAtlasIdAppsDeleteProvisionedAccountResponse>() {
         });
     }
 

@@ -104,4 +104,10 @@ public final class AbacApi {
         return t.request("PUT", "/v1/abac/token_mapping", null, body, null, false, new TypeReference<Map<String, Object>>() {
         });
     }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Map<String, Object> setTokenMapping(AbacSetTokenMappingBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/abac/token_mapping", null, body, idempotencyKey, false, new TypeReference<Map<String, Object>>() {
+        });
+    }
 }

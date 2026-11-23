@@ -15,7 +15,7 @@ public final class ConnectionsCreateBody {
     /** Required. */
     @JsonProperty("owner")
     public ConnectionsCreateBodyOwner owner;
-    /** One of: oauth, api_key, client_credentials, bearer, basic, custom_header, hmac_secret, jwt_bearer, oauth1, github_app_installation, admin_consent. Required. */
+    /** One of: oauth, api_key, client_credentials, bearer, basic, custom_header, hmac_secret, jwt_bearer, oauth1, github_app_installation, admin_consent, cookie_jar. Required. */
     @JsonProperty("kind")
     public String kind;
     /** A built-in or custom OAuth provider key for oauth; any short key otherwise. Required. */

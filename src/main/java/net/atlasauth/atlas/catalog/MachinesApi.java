@@ -59,6 +59,32 @@ public final class MachinesApi {
         });
     }
 
+    /** {@code GET /v1/machines/revoked} - The machine deny feed: machines revoked and machine grants ended since a cursor (since=&lt;iso|cursor&gt;), oldest first, so a service that verifies machine tokens offline can deny a revoked machine within one poll. A `machine` entry denies every token with that `sub` issued before `revoked_at`; a `machine_grant` entry denies tokens with that `sub` and `aud` (the `audience`) issued before it. Readable with an sk_ bearer or a publishable key; a publishable key sees ids, audiences and times only. The revocation stream carries the same events as pushes. Scope: {@code machines:read}. */
+    public MachinesListRevokedResponse listRevoked() {
+        return t.request("GET", "/v1/machines/revoked", null, null, null, false, new TypeReference<MachinesListRevokedResponse>() {
+        });
+    }
+
+    /** As above, with every optional parameter. */
+    public MachinesListRevokedResponse listRevoked(MachinesListRevokedQuery query) {
+        return t.request("GET", "/v1/machines/revoked", query == null ? null : query.toMap(), null, null, false, new TypeReference<MachinesListRevokedResponse>() {
+        });
+    }
+
+    /** Every item across every page of {@code GET /v1/machines/revoked}, fetched lazily (the cursor is followed for you). */
+    public Iterable<MachinesListRevokedResponseDataItem> listRevokedAll(MachinesListRevokedQuery query) {
+        final MachinesListRevokedQuery base = query == null ? new MachinesListRevokedQuery() : query.copy();
+        return Pagination.iterate(cursor -> {
+            MachinesListRevokedResponse r = listRevoked(base.copy().startingAfter(cursor));
+            return new CursorPage<>(r.data(), Boolean.TRUE.equals(r.hasMore()), r.nextCursor());
+        });
+    }
+
+    /** As above, with no query options. */
+    public Iterable<MachinesListRevokedResponseDataItem> listRevokedAll() {
+        return listRevokedAll(null);
+    }
+
     /** {@code GET /v1/machines/{id}} - Fetch one named machine identity by id. Scope: {@code machines:read}. */
     public Machine get(String id) {
         return t.request("GET", "/v1/machines/" + enc(id), null, null, null, false, new TypeReference<Machine>() {
@@ -68,6 +94,12 @@ public final class MachinesApi {
     /** {@code PATCH /v1/machines/{id}} - Rename a machine identity, or set the sender constraint its tokens must carry. Scope: {@code machines:write}. */
     public Machine update(String id, MachinesUpdateBody body) {
         return t.request("PATCH", "/v1/machines/" + enc(id), null, body, null, false, new TypeReference<Machine>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Machine update(String id, MachinesUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/machines/" + enc(id), null, body, idempotencyKey, false, new TypeReference<Machine>() {
         });
     }
 
@@ -83,15 +115,65 @@ public final class MachinesApi {
         });
     }
 
+    /** {@code GET /v1/machines/{id}/grants} - List the resource servers a machine may obtain tokens for, and up to which scopes. `include_ended=true` adds the grants that were ended (kept 90 days) with their end reason, actor and time. Scope: {@code machines:read}. */
+    public MachinesListGrantsResponse listGrants(String id) {
+        return t.request("GET", "/v1/machines/" + enc(id) + "/grants", null, null, null, false, new TypeReference<MachinesListGrantsResponse>() {
+        });
+    }
+
+    /** As above, with every optional parameter. */
+    public MachinesListGrantsResponse listGrants(String id, MachinesListGrantsQuery query) {
+        return t.request("GET", "/v1/machines/" + enc(id) + "/grants", query == null ? null : query.toMap(), null, null, false, new TypeReference<MachinesListGrantsResponse>() {
+        });
+    }
+
+    /** Every item across every page of {@code GET /v1/machines/{id}/grants}, fetched lazily (the cursor is followed for you). */
+    public Iterable<MachineGrant> listGrantsAll(String id, MachinesListGrantsQuery query) {
+        final MachinesListGrantsQuery base = query == null ? new MachinesListGrantsQuery() : query.copy();
+        return Pagination.iterate(cursor -> {
+            MachinesListGrantsResponse r = listGrants(id, base.copy().startingAfter(cursor));
+            return new CursorPage<>(r.data(), Boolean.TRUE.equals(r.hasMore()), r.nextCursor());
+        });
+    }
+
+    /** As above, with no query options. */
+    public Iterable<MachineGrant> listGrantsAll(String id) {
+        return listGrantsAll(id, null);
+    }
+
+    /** {@code POST /v1/machines/{id}/grants} - Authorize a machine for a resource server and its scopes. 409 if it already has a grant there. Scope: {@code machines:write}. */
+    public MachineGrant createGrant(String id, MachinesCreateGrantBody body) {
+        return t.request("POST", "/v1/machines/" + enc(id) + "/grants", null, body, null, false, new TypeReference<MachineGrant>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public MachineGrant createGrant(String id, MachinesCreateGrantBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/machines/" + enc(id) + "/grants", null, body, idempotencyKey, false, new TypeReference<MachineGrant>() {
+        });
+    }
+
     /** {@code PATCH /v1/machines/{id}/grants/{grantId}} - Change a machine's grant in place: scopes, constraints or expiry. 409 once the grant has expired. Scope: {@code machines:write}. */
     public void updateGrant(String id, String grantId, MachinesUpdateGrantBody body) {
         t.request("PATCH", "/v1/machines/" + enc(id) + "/grants/" + enc(grantId), null, body, null, false, new TypeReference<Object>() {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public void updateGrant(String id, String grantId, MachinesUpdateGrantBody body, String idempotencyKey) {
+        t.request("PATCH", "/v1/machines/" + enc(id) + "/grants/" + enc(grantId), null, body, idempotencyKey, false, new TypeReference<Object>() {
+        });
+    }
+
     /** {@code PATCH /v1/machines/{id}/metadata} - Merge device metadata (hostname, os, app_version, last_seen_at) into a machine. Scope: {@code machines:write}. */
     public Machine updateMetadata(String id, MachinesUpdateMetadataBody body) {
         return t.request("PATCH", "/v1/machines/" + enc(id) + "/metadata", null, body, null, false, new TypeReference<Machine>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Machine updateMetadata(String id, MachinesUpdateMetadataBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/machines/" + enc(id) + "/metadata", null, body, idempotencyKey, false, new TypeReference<Machine>() {
         });
     }
 

@@ -27,6 +27,12 @@ public final class DevApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public DevDeleteEmailsResponse deleteEmails(String idempotencyKey) {
+        return t.request("DELETE", "/v1/dev/emails", null, null, idempotencyKey, false, new TypeReference<DevDeleteEmailsResponse>() {
+        });
+    }
+
     /** {@code GET /v1/dev/emails} - Read the development email inbox (development instances only), newest first. A development instance with no email provider stores the end-user mail it would have sent (verification codes, password reset, magic links) here instead of failing with EMAIL_DELIVERY_NOT_CONFIGURED; nothing is delivered. Messages are kept for 24 hours, at most 200 per instance. Filter with `to`. Refused on a production instance (422 TEST_MODE_ONLY), which keeps failing with EMAIL_DELIVERY_NOT_CONFIGURED when it has no provider. Scope: {@code instance:read}. */
     public DevListEmailsResponse listEmails() {
         return t.request("GET", "/v1/dev/emails", null, null, null, false, new TypeReference<DevListEmailsResponse>() {

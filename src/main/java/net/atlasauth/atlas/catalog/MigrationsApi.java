@@ -59,7 +59,7 @@ public final class MigrationsApi {
         return listSourcesAll(null);
     }
 
-    /** {@code GET /v1/migrations/status} - Where the move stands: imported users by credential type (bcrypt, argon2, scrypt, pbkdf2, other, social, none; imported = has an external_id), bridged sessions, imported legacy sessions still live, failed bridge attempts by reason, daily use per source, and `safe_to_delete_old_auth` with the blockers that keep it false (recent use, live sessions, an open dual-run window, an enabled bridge, or `no_enabled_source` when no bridge or verifier was ever enabled or used, so nothing has been proven quiet). `quiet_days` (default 14, max 90) sets how long the old auth must be unused. Scope: {@code legacy_auth:read}. */
+    /** {@code GET /v1/migrations/status} - Where the move stands: imported users by credential type (bcrypt, argon2, scrypt, pbkdf2, other, social, none; imported = has an external_id), bridged sessions, imported legacy sessions still live, failed bridge attempts by reason, daily use per source, and `safe_to_delete_old_auth` with the blockers that keep it false (recent use, live sessions, an open dual-run window, an enabled bridge, `unmigrated_users` (imported users who never signed in on Atlas and hold no session; counted in `unmigrated_users` with a `unmigrated_user_sample` of ids), or `no_enabled_source` when no bridge or verifier was ever enabled or used, so nothing has been proven quiet). `quiet_days` (default 14, max 90) sets how long the old auth must be unused. Scope: {@code legacy_auth:read}. */
     public MigrationsGetStatusResponse getStatus() {
         return t.request("GET", "/v1/migrations/status", null, null, null, false, new TypeReference<MigrationsGetStatusResponse>() {
         });
@@ -110,6 +110,18 @@ public final class MigrationsApi {
     /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
     public MigrationsDryRunResponse dryRun(String source, String id, MigrationsDryRunBody body, String idempotencyKey) {
         return t.request("POST", "/v1/migrations/" + enc(source) + "/imports/" + enc(id) + "/dry_run", null, body, idempotencyKey, false, new TypeReference<MigrationsDryRunResponse>() {
+        });
+    }
+
+    /** {@code POST /v1/migrations/{source}/sessions} - Bulk-import live legacy sessions (up to 1000 a call) so the bridge can answer from Atlas alone (`mode: session_table`) and close early: the old system no longer has to be reachable for a person to cross over. Each row names the legacy session (`token`, or its SHA-256 hex as `token_hash`), the person (an Atlas `user_id` or your `external_id`) and `expires_at`; `mfa_verified` carries a completed second factor. Rows that cannot be linked to a person or have expired are reported in `errors` (`user_not_found`, `session_expired`, `invalid_row`, `unknown_field`, `already_exchanged`), never guessed. Re-sending a row only refreshes it, so a retry is safe. `dry_run: true` validates and counts without writing. Scope: {@code legacy_auth:write}. */
+    public MigrationsCreateSessionResponse createSession(String source, MigrationsCreateSessionBody body) {
+        return t.request("POST", "/v1/migrations/" + enc(source) + "/sessions", null, body, null, false, new TypeReference<MigrationsCreateSessionResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public MigrationsCreateSessionResponse createSession(String source, MigrationsCreateSessionBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/migrations/" + enc(source) + "/sessions", null, body, idempotencyKey, false, new TypeReference<MigrationsCreateSessionResponse>() {
         });
     }
 

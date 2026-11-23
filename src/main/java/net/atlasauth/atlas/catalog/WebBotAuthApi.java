@@ -33,6 +33,12 @@ public final class WebBotAuthApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public WebBotAuthSetResponse set(WebBotAuthSetBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/web_bot_auth", null, body, idempotencyKey, false, new TypeReference<WebBotAuthSetResponse>() {
+        });
+    }
+
     /** {@code GET /v1/web_bot_auth/directories} - The listed directories, one row each with its list (allow or block). Scope: {@code machines:read}. */
     public WebBotAuthListDirectoriesResponse listDirectories() {
         return t.request("GET", "/v1/web_bot_auth/directories", null, null, null, false, new TypeReference<WebBotAuthListDirectoriesResponse>() {
@@ -60,6 +66,12 @@ public final class WebBotAuthApi {
     /** {@code DELETE /v1/web_bot_auth/directories/{id}} - Take a directory off both lists. Scope: {@code machines:write}. */
     public WebBotAuthDeleteDirectoryResponse deleteDirectory(String id) {
         return t.request("DELETE", "/v1/web_bot_auth/directories/" + enc(id), null, null, null, false, new TypeReference<WebBotAuthDeleteDirectoryResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public WebBotAuthDeleteDirectoryResponse deleteDirectory(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/web_bot_auth/directories/" + enc(id), null, null, idempotencyKey, false, new TypeReference<WebBotAuthDeleteDirectoryResponse>() {
         });
     }
 }

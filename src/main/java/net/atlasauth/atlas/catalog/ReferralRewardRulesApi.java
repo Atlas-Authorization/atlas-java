@@ -32,4 +32,10 @@ public final class ReferralRewardRulesApi {
         return t.request("PUT", "/v1/referral_reward_rules", null, body, null, false, new TypeReference<ReferralRewardRulesSetResponse>() {
         });
     }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ReferralRewardRulesSetResponse set(ReferralRewardRulesSetBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/referral_reward_rules", null, body, idempotencyKey, false, new TypeReference<ReferralRewardRulesSetResponse>() {
+        });
+    }
 }

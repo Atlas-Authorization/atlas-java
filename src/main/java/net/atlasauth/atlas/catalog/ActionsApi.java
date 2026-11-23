@@ -71,6 +71,12 @@ public final class ActionsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Action update(String id, ActionsUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/actions/" + enc(id), null, body, idempotencyKey, false, new TypeReference<Action>() {
+        });
+    }
+
     /** {@code POST /v1/actions/{id}/gallery_update} - Update an installed action to its template's latest version. The code is replaced; name, enabled state, bindings and secrets stay. Pass any newly required secrets; a changed trigger is a 409. Scope: {@code actions:write}. */
     public ActionGalleryUpdateResult galleryUpdate(String id, ActionsGalleryUpdateBody body) {
         return t.request("POST", "/v1/actions/" + enc(id) + "/gallery_update", null, body, null, false, new TypeReference<ActionGalleryUpdateResult>() {
@@ -98,6 +104,12 @@ public final class ActionsApi {
     /** {@code PATCH /v1/actions/{id}/rollout} - Move a staged rollout: 1-99 changes its share, 100 promotes the staged version to current, 0 aborts it and drops it. 409 when the Action has no staged version. Scope: {@code actions:write}. */
     public Action updateRollout(String id, ActionsUpdateRolloutBody body) {
         return t.request("PATCH", "/v1/actions/" + enc(id) + "/rollout", null, body, null, false, new TypeReference<Action>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Action updateRollout(String id, ActionsUpdateRolloutBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/actions/" + enc(id) + "/rollout", null, body, idempotencyKey, false, new TypeReference<Action>() {
         });
     }
 

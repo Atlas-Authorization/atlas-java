@@ -65,6 +65,12 @@ public final class PasskeyCampaignsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public PasskeyCampaignsDeleteResponse delete(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/passkey_campaigns/" + enc(id), null, null, idempotencyKey, false, new TypeReference<PasskeyCampaignsDeleteResponse>() {
+        });
+    }
+
     /** {@code GET /v1/passkey_campaigns/{id}} - Read one passkey campaign with its completion metrics. Scope: {@code passkey_campaigns:read}. */
     public PasskeyCampaignsGetResponse get(String id) {
         return t.request("GET", "/v1/passkey_campaigns/" + enc(id), null, null, null, false, new TypeReference<PasskeyCampaignsGetResponse>() {

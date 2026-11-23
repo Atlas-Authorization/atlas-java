@@ -13,5 +13,8 @@ public record InstanceListScopesResponseDataItem(
         @JsonProperty("label") Map<String, String> label,
         @JsonProperty("description") Map<String, String> description,
         @JsonProperty("sensitive") Boolean sensitive,
-        @JsonProperty("requires_verified_client") Boolean requiresVerifiedClient) {
+        @JsonProperty("requires_verified_client") Boolean requiresVerifiedClient,
+        @JsonProperty("requires_client_level") String requiresClientLevel,
+        @JsonProperty("owner_exempt") Boolean ownerExempt,
+        @JsonProperty("wildcard") Boolean wildcard) {
 }

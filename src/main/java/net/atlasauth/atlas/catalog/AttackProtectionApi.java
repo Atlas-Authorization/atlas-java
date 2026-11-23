@@ -32,4 +32,10 @@ public final class AttackProtectionApi {
         return t.request("PATCH", "/v1/attack_protection", null, body, null, false, new TypeReference<AttackProtection>() {
         });
     }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public AttackProtection update(AttackProtectionUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/attack_protection", null, body, idempotencyKey, false, new TypeReference<AttackProtection>() {
+        });
+    }
 }

@@ -59,6 +59,18 @@ public final class ConnectionsApi {
         });
     }
 
+    /** {@code POST /v1/connections/export} - Export connections. Without include_secrets: metadata only (provider, owner, account, environment, scopes, status), scope connections:export. With include_secrets: needs scope connections:export_secrets, the header X-Atlas-Confirm: export-secrets and recipient_public_key (a public JWK: RSA of 3072 bits or more, or EC P-256/384/521). The secrets (OAuth tokens, and for every other kind the entered credential: api keys, OAuth 1.0a secrets and RSA private keys, cookie jars; each as the `credentials` an import row takes, next to `kind` and `config`) come back as one compact JWE sealed to that key that only its holder can open; Atlas keeps no plaintext. Pages hold up to 200 connections with secrets (500 without); follow next_cursor with starting_after. Every export is audited with its count, never the secrets. Opened, each connection is a valid import row. Scope: {@code connections:export}. */
+    public ConnectionsExportResponse export(ConnectionsExportBody body) {
+        return t.request("POST", "/v1/connections/export", null, body, null, false, new TypeReference<ConnectionsExportResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ConnectionsExportResponse export(ConnectionsExportBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/connections/export", null, body, idempotencyKey, false, new TypeReference<ConnectionsExportResponse>() {
+        });
+    }
+
     /** {@code POST /v1/connections/import} - Bulk-import existing provider refresh tokens as connections, up to 500 rows, so nobody reconnects. Each row: provider, owner, external_id (the provider-side account: how a re-import finds the same connection), refresh_token (or access_token), and optionally scopes, metadata, environment, host_params, name, allowed_hosts and token_family (rows that were exported with the same token_family came from one grant and share one refresh token: the first row spends it, the others join its token set as siblings). By default (validate true) each refresh token is spent once against the provider with the OAuth client that will own the connection, and the tokens the provider issues are stored, so the imported copy stops being current on a rotating provider. Rows are OAuth by default; a row with `kind` (api_key, bearer, basic, custom_header, hmac_secret, client_credentials, oauth1 and the other credential kinds) instead carries `credentials` (the kind's secret fields exactly as PUT /v1/connections/&#123;id&#125;/credentials takes them: api_key, token, username and password, value, secret, client_secret, or for oauth1 consumer_key, consumer_secret, token and token_secret), a non-secret `config` (placement, header name, signing, oauth1 preset such as discogs, trademe, bricklink or cardmarket...) and allowed_hosts. Credentials are checked by the same parser as credential entry and stored encrypted in the vault the same way; nothing is sent to the provider, so a dry run reports them ok_unverified or invalid_row (a missing credential field). An imported Shopify access token without a refresh token is a non-expiring offline token: it is stored as is and keeps working, unless exchange_expiring is true, which swaps it for an expiring token with a refresh token. A failing row creates and changes nothing. Rows may also carry refresh_token_expires_at (epoch ms or ISO 8601) and config.scopes. dry_run (in the body or as ?dry_run=true) stores nothing and reports per row `check`: ok (the provider accepted a refresh), refresh_refused, invalid_row, provider_unavailable, or ok_unverified (shape checked only). A provider that rotates refresh tokens would lose the customer's token to a dry-run refresh, so its rows are ok_unverified unless verify is true (body or ?verify=true), which accepts that rotation. A row whose provider has a unique_external_id policy and whose account another owner holds fails with external_id_taken. Idempotent on Idempotency-Key. Tokens go straight to the vault and never appear in the answer or the audit log. Scope: {@code connections:import}. */
     public ConnectionsImportByResponse importBy(ConnectionsImportByBody body) {
         return t.request("POST", "/v1/connections/import", null, body, null, false, new TypeReference<ConnectionsImportByResponse>() {
@@ -121,6 +133,12 @@ public final class ConnectionsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ConnectionsSetOauthClientsResponse setOauthClients(ConnectionsSetOauthClientsBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/connections/oauth_clients", null, body, idempotencyKey, false, new TypeReference<ConnectionsSetOauthClientsResponse>() {
+        });
+    }
+
     /** {@code POST /v1/connections/oauth_clients/register} - Create the OAuth client at the provider instead of by hand (dynamic client registration, RFC 7591). Atlas registers a web client whose redirect URI is the callback shown in the answer (or your `redirect_uri`), stores the returned credentials sealed, and records the registration. `token_endpoint_auth_method`: client_secret_basic (default), client_secret_post or private_key_jwt (Atlas generates the key and registers its public half). The endpoint must be https and public. An owner that already has a client for the provider and environment gets 409: delete it first. The secret, the registration token and any initial access token are never returned or logged. Scope: {@code organizations:write}. */
     public Map<String, Object> register(ConnectionsRegisterBody body) {
         return t.request("POST", "/v1/connections/oauth_clients/register", null, body, null, false, new TypeReference<Map<String, Object>>() {
@@ -133,9 +151,39 @@ public final class ConnectionsApi {
         });
     }
 
+    /** {@code DELETE /v1/connections/oauth_clients/{id}} - Delete an owner OAuth client and its sealed secret. 409 while connections still hold tokens it issued (they could no longer refresh), unless `rehome_to` names another client of the same provider and environment: every connection is then moved to it first (each proven with a refresh, as POST /v1/connections/rehome does) and the client is deleted only when all of them moved. Scope: {@code organizations:write}. */
+    public void deleteOauthClient(String id) {
+        t.request("DELETE", "/v1/connections/oauth_clients/" + enc(id), null, null, null, false, new TypeReference<Object>() {
+        });
+    }
+
+    /** As above, with every optional parameter. */
+    public void deleteOauthClient(String id, ConnectionsDeleteOauthClientQuery query) {
+        t.request("DELETE", "/v1/connections/oauth_clients/" + enc(id), query == null ? null : query.toMap(), null, null, false, new TypeReference<Object>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public void deleteOauthClient(String id, ConnectionsDeleteOauthClientQuery query, String idempotencyKey) {
+        t.request("DELETE", "/v1/connections/oauth_clients/" + enc(id), query == null ? null : query.toMap(), null, idempotencyKey, false, new TypeReference<Object>() {
+        });
+    }
+
     /** {@code GET /v1/connections/oauth_clients/{id}} - Read one owner OAuth client. Scope: {@code organizations:read}. */
     public ConnectionsGetOauthClientResponse getOauthClient(String id) {
         return t.request("GET", "/v1/connections/oauth_clients/" + enc(id), null, null, null, false, new TypeReference<ConnectionsGetOauthClientResponse>() {
+        });
+    }
+
+    /** {@code POST /v1/connections/rehome} - Move OAuth connections from one owner client to another (a retired owner client you can now delete, two clients merged). Both clients must be the same provider and environment. When both are the same provider app (same client_id) every token stays valid and the rows simply move. Otherwise (verify, the default and the only allowed mode) one real refresh is made per connection with the TARGET client's credentials and only connections the provider accepts move; the others stay on the old client untouched and are reported failed with a reason (a failed probe changes no status). Token-family siblings move together. Dry run reports what would move without calling the provider. Never returns tokens. Idempotent on Idempotency-Key; audited as connection.rehomed (ids and counts). Scope: {@code organizations:write}. */
+    public ConnectionsRehomeResponse rehome(ConnectionsRehomeBody body) {
+        return t.request("POST", "/v1/connections/rehome", null, body, null, false, new TypeReference<ConnectionsRehomeResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ConnectionsRehomeResponse rehome(ConnectionsRehomeBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/connections/rehome", null, body, idempotencyKey, false, new TypeReference<ConnectionsRehomeResponse>() {
         });
     }
 
@@ -151,6 +199,12 @@ public final class ConnectionsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ConnectionsSetRelayLimitsResponse setRelayLimits(ConnectionsSetRelayLimitsBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/connections/relay_limits", null, body, idempotencyKey, false, new TypeReference<ConnectionsSetRelayLimitsResponse>() {
+        });
+    }
+
     /** {@code GET /v1/connections/token_limits} - The connection-token rate limits of this instance (requests per minute on GET /v1/connections/&#123;id&#125;/token, POST /v1/connections/&#123;id&#125;/token/refresh and POST /v1/connections/tokens/batch) and how much of the current one-minute window is used: per_key (the calling secret key, all connections; default 6,000), per_connection (one connection, per key; default 300; no usage shown) per_app (one provider app client: the instance client shared by every owner, or an owner's own client; no limit unless you set one) and providers (one provider across all of the instance's keys; no limit unless you set one). With per_app set, token reads carry x-app-ratelimit-limit, x-app-ratelimit-remaining and x-app-ratelimit-reset (seconds) for the app client the connection runs under. Conditional reads (If-None-Match) get ten times the per-key and per-connection budgets and do not count against provider limits. Scope: {@code organizations:read}. */
     public ConnectionsGetTokenLimitsResponse getTokenLimits() {
         return t.request("GET", "/v1/connections/token_limits", null, null, null, false, new TypeReference<ConnectionsGetTokenLimitsResponse>() {
@@ -160,6 +214,12 @@ public final class ConnectionsApi {
     /** {@code PUT /v1/connections/token_limits} - Set this instance's connection-token rate limits, in requests per minute. per_key goes up to 60,000 and per_connection up to 3,000 (ten times the defaults); null restores the default. per_app (up to 60,000; null removes it) is one shared budget per provider app client, on top of the per-key and per-connection ones, answered with 429 and Retry-After when spent. providers maps a provider id to an instance-wide limit for that provider's connections (up to 60,000; null removes one; up to 100 providers) and merges into the stored map; providers null clears them all. Takes effect at once. Over a provider limit, the token routes answer 429 with Retry-After and the batch route marks those ids rate_limited / provider_limit. Scope: {@code organizations:write}. */
     public ConnectionsSetTokenLimitsResponse setTokenLimits(ConnectionsSetTokenLimitsBody body) {
         return t.request("PUT", "/v1/connections/token_limits", null, body, null, false, new TypeReference<ConnectionsSetTokenLimitsResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ConnectionsSetTokenLimitsResponse setTokenLimits(ConnectionsSetTokenLimitsBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/connections/token_limits", null, body, idempotencyKey, false, new TypeReference<ConnectionsSetTokenLimitsResponse>() {
         });
     }
 
@@ -175,9 +235,21 @@ public final class ConnectionsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ConnectionsUpdateResponse update(String id, ConnectionsUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/connections/" + enc(id), null, body, idempotencyKey, false, new TypeReference<ConnectionsUpdateResponse>() {
+        });
+    }
+
     /** {@code DELETE /v1/connections/{id}/access_rules} - Remove every access rule: the connection is open again. Scope: {@code organizations:write}. */
     public void deleteAccessRules(String id) {
         t.request("DELETE", "/v1/connections/" + enc(id) + "/access_rules", null, null, null, false, new TypeReference<Object>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public void deleteAccessRules(String id, String idempotencyKey) {
+        t.request("DELETE", "/v1/connections/" + enc(id) + "/access_rules", null, null, idempotencyKey, false, new TypeReference<Object>() {
         });
     }
 
@@ -190,6 +262,12 @@ public final class ConnectionsApi {
     /** {@code PUT /v1/connections/{id}/access_rules} - Replace the connection's access rules (at most 100; an empty list opens the connection again). Rules gate credential use: `read_token` (token reads and refreshes), `relay`, `run_actions` and `sign`; a key that no rule names gets 403 with reason `connection_access_denied`. Managing the connection and its rules stays under organizations:read and organizations:write. Scope: {@code organizations:write}. */
     public ConnectionsSetAccessRulesResponse setAccessRules(String id, ConnectionsSetAccessRulesBody body) {
         return t.request("PUT", "/v1/connections/" + enc(id) + "/access_rules", null, body, null, false, new TypeReference<ConnectionsSetAccessRulesResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ConnectionsSetAccessRulesResponse setAccessRules(String id, ConnectionsSetAccessRulesBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/connections/" + enc(id) + "/access_rules", null, body, idempotencyKey, false, new TypeReference<ConnectionsSetAccessRulesResponse>() {
         });
     }
 
@@ -258,6 +336,12 @@ public final class ConnectionsApi {
     /** {@code PUT /v1/connections/{id}/credentials} - Enter the credential for a non-OAuth connection (api_key, bearer, basic, custom_header, hmac_secret, client_credentials, jwt_bearer, oauth1, github_app_installation). Write-only: it is sealed in the vault and never returned. Replaces the earlier credential as a new vault version; use POST .../credentials/rotate to keep the old version valid for an overlap window. Scope: {@code organizations:write}. */
     public ConnectionsSetCredentialsResponse setCredentials(String id, ConnectionsSetCredentialsBody body) {
         return t.request("PUT", "/v1/connections/" + enc(id) + "/credentials", null, body, null, false, new TypeReference<ConnectionsSetCredentialsResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ConnectionsSetCredentialsResponse setCredentials(String id, ConnectionsSetCredentialsBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/connections/" + enc(id) + "/credentials", null, body, idempotencyKey, false, new TypeReference<ConnectionsSetCredentialsResponse>() {
         });
     }
 
@@ -475,6 +559,12 @@ public final class ConnectionsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ConnectionsDeleteTriggerResponse deleteTrigger(String id, String triggerId, String idempotencyKey) {
+        return t.request("DELETE", "/v1/connections/" + enc(id) + "/triggers/" + enc(triggerId), null, null, idempotencyKey, false, new TypeReference<ConnectionsDeleteTriggerResponse>() {
+        });
+    }
+
     /** {@code GET /v1/connections/{id}/triggers/{triggerId}} - Read one trigger of a connection. Scope: {@code organizations:read}. */
     public ConnectionsGetTriggerResponse getTrigger(String id, String triggerId) {
         return t.request("GET", "/v1/connections/" + enc(id) + "/triggers/" + enc(triggerId), null, null, null, false, new TypeReference<ConnectionsGetTriggerResponse>() {
@@ -484,6 +574,12 @@ public final class ConnectionsApi {
     /** {@code PATCH /v1/connections/{id}/triggers/{triggerId}} - Pause or resume a trigger. Scope: {@code organizations:write}. */
     public ConnectionsUpdateTriggerResponse updateTrigger(String id, String triggerId, ConnectionsUpdateTriggerBody body) {
         return t.request("PATCH", "/v1/connections/" + enc(id) + "/triggers/" + enc(triggerId), null, body, null, false, new TypeReference<ConnectionsUpdateTriggerResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ConnectionsUpdateTriggerResponse updateTrigger(String id, String triggerId, ConnectionsUpdateTriggerBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/connections/" + enc(id) + "/triggers/" + enc(triggerId), null, body, idempotencyKey, false, new TypeReference<ConnectionsUpdateTriggerResponse>() {
         });
     }
 }

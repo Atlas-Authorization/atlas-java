@@ -14,7 +14,9 @@ public record AuthConfigOauthProviderCustomScopesItem(
         @JsonProperty("descriptions") Map<String, String> descriptions,
         @JsonProperty("labels") Map<String, String> labels,
         @JsonProperty("name") String name,
+        @JsonProperty("ownerExempt") Boolean ownerExempt,
         @JsonProperty("parameters") List<String> parameters,
+        @JsonProperty("requiresClientLevel") String requiresClientLevel,
         @JsonProperty("requiresVerifiedClient") Boolean requiresVerifiedClient,
         @JsonProperty("sensitive") Boolean sensitive) {
 }

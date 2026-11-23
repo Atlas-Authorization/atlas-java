@@ -19,5 +19,6 @@ public record MessagingProvider(
         @JsonProperty("status") String status,
         @JsonProperty("config") Map<String, String> config,
         @JsonProperty("secrets_set") Map<String, Boolean> secretsSet,
+        @JsonProperty("secret_fingerprints") Map<String, String> secretFingerprints,
         @JsonProperty("updated_at") Long updatedAt) {
 }

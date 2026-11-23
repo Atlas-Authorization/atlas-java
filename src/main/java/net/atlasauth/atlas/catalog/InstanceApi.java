@@ -39,6 +39,12 @@ public final class InstanceApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceUpdateResponse update(InstanceUpdateBody body, InstanceUpdateQuery query, String idempotencyKey) {
+        return t.request("PATCH", "/v1/instance", query == null ? null : query.toMap(), body, idempotencyKey, false, new TypeReference<InstanceUpdateResponse>() {
+        });
+    }
+
     /** {@code GET /v1/instance/app_event_types} - The event types third-party apps can subscribe to, each with the scope a user must have granted the app. Scope: {@code instance:read}. */
     public InstanceListAppEventTypesResponse listAppEventTypes() {
         return t.request("GET", "/v1/instance/app_event_types", null, null, null, false, new TypeReference<InstanceListAppEventTypesResponse>() {
@@ -68,6 +74,12 @@ public final class InstanceApi {
     /** {@code PUT /v1/instance/app_event_types} - Replace the event types third-party apps can subscribe to (send an array, or &#123; types: [...] &#125;). Each has a type (lowercase dotted, not an Atlas event name), an optional description and schema, and a required_scope that must exist in the scope catalogue. Publish with POST /v1/app_events &#123; user_id &#125;; subscribe a client with PUT /v1/oauth_clients/&#123;id&#125;/webhook. Scope: {@code instance:write}. */
     public InstanceSetAppEventTypesResponse setAppEventTypes(List<InstanceSetAppEventTypesBodyItem> body) {
         return t.request("PUT", "/v1/instance/app_event_types", null, body, null, false, new TypeReference<InstanceSetAppEventTypesResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceSetAppEventTypesResponse setAppEventTypes(List<InstanceSetAppEventTypesBodyItem> body, String idempotencyKey) {
+        return t.request("PUT", "/v1/instance/app_event_types", null, body, idempotencyKey, false, new TypeReference<InstanceSetAppEventTypesResponse>() {
         });
     }
 
@@ -121,6 +133,12 @@ public final class InstanceApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceDeleteConfigSnapshotResponse deleteConfigSnapshot(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/instance/config_snapshots/" + enc(id), null, null, idempotencyKey, false, new TypeReference<InstanceDeleteConfigSnapshotResponse>() {
+        });
+    }
+
     /** {@code GET /v1/instance/config_snapshots/{id}} - One snapshot with its configuration (auth_config and allowed_origins). Secrets are never in it. Scope: {@code instance:read}. */
     public InstanceGetConfigSnapshotResponse getConfigSnapshot(String id) {
         return t.request("GET", "/v1/instance/config_snapshots/" + enc(id), null, null, null, false, new TypeReference<InstanceGetConfigSnapshotResponse>() {
@@ -145,9 +163,27 @@ public final class InstanceApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceDeleteCookieConsentResponse deleteCookieConsent(String idempotencyKey) {
+        return t.request("DELETE", "/v1/instance/cookie_consent", null, null, idempotencyKey, false, new TypeReference<InstanceDeleteCookieConsentResponse>() {
+        });
+    }
+
     /** {@code GET /v1/instance/cookie_consent} - Read the cookie-consent CMP injected into the hosted sign-in, sign-up and account pages (enabled:false when none) and where it comes from (source: a stored setting, an integration, or a consent manager's partner link), plus declared_cookies: every cookie and storage key Atlas writes for this instance, with the domain it lives on, ready to declare in the CMP as strictly necessary. Needs only cookie_consent:read (instance:read includes it), so a consent manager's privacy:* executor key can hold it. Without a key, the same declared_cookies are public: GET /v1/cookie_consent on the Frontend API host. Scope: {@code cookie_consent:read}. */
     public InstanceGetCookieConsentResponse getCookieConsent() {
         return t.request("GET", "/v1/instance/cookie_consent", null, null, null, false, new TypeReference<InstanceGetCookieConsentResponse>() {
+        });
+    }
+
+    /** {@code PATCH /v1/instance/cookie_consent} - Change part of the cookie-consent setting: the fields sent are merged over the stored setting and the rest is kept (PUT replaces the whole setting). `null` clears a field; sending site_id drops a stored site reference and the other way round. With no stored setting, script_url is required. The answer and warnings are those of PUT. Scope: {@code instance:write}. */
+    public InstanceUpdateCookieConsentResponse updateCookieConsent(InstanceUpdateCookieConsentBody body) {
+        return t.request("PATCH", "/v1/instance/cookie_consent", null, body, null, false, new TypeReference<InstanceUpdateCookieConsentResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceUpdateCookieConsentResponse updateCookieConsent(InstanceUpdateCookieConsentBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/instance/cookie_consent", null, body, idempotencyKey, false, new TypeReference<InstanceUpdateCookieConsentResponse>() {
         });
     }
 
@@ -157,9 +193,21 @@ public final class InstanceApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceSetCookieConsentResponse setCookieConsent(InstanceSetCookieConsentBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/instance/cookie_consent", null, body, idempotencyKey, false, new TypeReference<InstanceSetCookieConsentResponse>() {
+        });
+    }
+
     /** {@code DELETE /v1/instance/data_key_provider} - Remove customer-managed encryption by deleting the wrapped data keys. This crypto-shreds everything encrypted under them and cannot be undone; send &#123; "confirm": "shred" &#125;. Scope: {@code vault:manage}. */
     public Map<String, Object> deleteDataKeyProvider(InstanceDeleteDataKeyProviderBody body) {
         return t.request("DELETE", "/v1/instance/data_key_provider", null, body, null, false, new TypeReference<Map<String, Object>>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Map<String, Object> deleteDataKeyProvider(InstanceDeleteDataKeyProviderBody body, String idempotencyKey) {
+        return t.request("DELETE", "/v1/instance/data_key_provider", null, body, idempotencyKey, false, new TypeReference<Map<String, Object>>() {
         });
     }
 
@@ -184,6 +232,12 @@ public final class InstanceApi {
     /** {@code PUT /v1/instance/data_key_provider} - Set the cache window: how long Atlas may use a loaded data key without your KMS confirming it, which is how long a revoked key keeps working (60 to 3,600 seconds, default 300). Shorter revokes faster but depends on the KMS being reachable more tightly: Atlas re-confirms every 20 seconds, so a KMS outage longer than the window takes the instance down. Scope: {@code vault:manage}. */
     public Map<String, Object> setDataKeyProvider(InstanceSetDataKeyProviderBody body) {
         return t.request("PUT", "/v1/instance/data_key_provider", null, body, null, false, new TypeReference<Map<String, Object>>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Map<String, Object> setDataKeyProvider(InstanceSetDataKeyProviderBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/instance/data_key_provider", null, body, idempotencyKey, false, new TypeReference<Map<String, Object>>() {
         });
     }
 
@@ -305,9 +359,21 @@ public final class InstanceApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public DesignSettings updateDesign(InstanceUpdateDesignBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/instance/design", null, body, idempotencyKey, false, new TypeReference<DesignSettings>() {
+        });
+    }
+
     /** {@code PUT /v1/instance/design} - Replace the instance design (&#123; design: AtlasDesign &#125;), and/or import a brand document (&#123; brand: &#123;…&#125; &#125; or &#123; brand_url: "https://…/brand.json" &#125;; brand: null removes it). The brand maps onto its own layer under the stored design (precedence: brand &lt; design &lt; audience branding); logos are stored as design images, self-hosted fonts are mirrored to Atlas. The read-back shows brand.mapping, ignored[] with reasons, and each field's source. Unknown keys are refused with their path. Scope: {@code instance:write}. */
     public DesignSettings setDesign(InstanceSetDesignBody body) {
         return t.request("PUT", "/v1/instance/design", null, body, null, false, new TypeReference<DesignSettings>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public DesignSettings setDesign(InstanceSetDesignBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/instance/design", null, body, idempotencyKey, false, new TypeReference<DesignSettings>() {
         });
     }
 
@@ -385,6 +451,48 @@ public final class InstanceApi {
         });
     }
 
+    /** {@code DELETE /v1/instance/hooks/before_first_session} - Turn the hook off and clear its url and signing secret, the same as PATCH with &#123;enabled:false, url:null, signing_secret:null&#125;. Audited. Idempotent. Scope: {@code instance:write}. */
+    public InstanceDeleteBeforeFirstSessionResponse deleteBeforeFirstSession() {
+        return t.request("DELETE", "/v1/instance/hooks/before_first_session", null, null, null, false, new TypeReference<InstanceDeleteBeforeFirstSessionResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceDeleteBeforeFirstSessionResponse deleteBeforeFirstSession(String idempotencyKey) {
+        return t.request("DELETE", "/v1/instance/hooks/before_first_session", null, null, idempotencyKey, false, new TypeReference<InstanceDeleteBeforeFirstSessionResponse>() {
+        });
+    }
+
+    /** {@code GET /v1/instance/hooks/before_first_session} - Read the before_first_session hook: the endpoint Atlas calls once per user, after their email is verified and before their first session token, so your app can link the account and stamp its own external_id on that very token. The signing secret is reported as signing_secret_set only. Scope: {@code instance:read}. */
+    public InstanceGetBeforeFirstSessionResponse getBeforeFirstSession() {
+        return t.request("GET", "/v1/instance/hooks/before_first_session", null, null, null, false, new TypeReference<InstanceGetBeforeFirstSessionResponse>() {
+        });
+    }
+
+    /** {@code PATCH /v1/instance/hooks/before_first_session} - Update the before_first_session hook. Only the fields you send change; null clears. Atlas POSTs &#123;"type":"before_first_session","data":&#123;user_id,email,email_verified,provider,provider_user_id,name,external_id&#125;&#125; signed like a webhook (atlas-id, atlas-timestamp, atlas-signature). Answer 200 &#123;"external_id":"…"&#125; to set it: it is stored only when the user has none and no other user holds it (never overwritten). A timeout or failure never blocks the sign-in (it is audited and counted in failed_calls). Not called for impersonation or anonymous guests. Scope: {@code instance:write}. */
+    public InstanceUpdateBeforeFirstSessionResponse updateBeforeFirstSession(InstanceUpdateBeforeFirstSessionBody body) {
+        return t.request("PATCH", "/v1/instance/hooks/before_first_session", null, body, null, false, new TypeReference<InstanceUpdateBeforeFirstSessionResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceUpdateBeforeFirstSessionResponse updateBeforeFirstSession(InstanceUpdateBeforeFirstSessionBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/instance/hooks/before_first_session", null, body, idempotencyKey, false, new TypeReference<InstanceUpdateBeforeFirstSessionResponse>() {
+        });
+    }
+
+    /** {@code POST /v1/instance/hooks/before_first_session/test} - Send a signed sample call (a user that does not exist) to the hook and report its answer. Nothing is stored on any user. Scope: {@code instance:write}. */
+    public InstanceBeforeFirstSessionTestResponse beforeFirstSessionTest() {
+        return t.request("POST", "/v1/instance/hooks/before_first_session/test", null, null, null, false, new TypeReference<InstanceBeforeFirstSessionTestResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceBeforeFirstSessionTestResponse beforeFirstSessionTest(String idempotencyKey) {
+        return t.request("POST", "/v1/instance/hooks/before_first_session/test", null, null, idempotencyKey, false, new TypeReference<InstanceBeforeFirstSessionTestResponse>() {
+        });
+    }
+
     /** {@code DELETE /v1/instance/hooks/before_user_create} - Turn the before_user_create hook off and clear its url and signing secret, the same as PATCH with &#123;enabled:false, url:null, signing_secret:null&#125;. Audited. Idempotent: a hook that is already clear answers 200 the same way. timeout_ms and fail_closed are kept. Scope: {@code instance:write}. */
     public InstanceDeleteBeforeUserCreateResponse deleteBeforeUserCreate() {
         return t.request("DELETE", "/v1/instance/hooks/before_user_create", null, null, null, false, new TypeReference<InstanceDeleteBeforeUserCreateResponse>() {
@@ -403,7 +511,7 @@ public final class InstanceApi {
         });
     }
 
-    /** {@code PATCH /v1/instance/hooks/before_user_create} - Update the before_user_create hook. Only the fields you send change; null clears. The hook is called (signed like a webhook) after the user id is assigned and before user.created, the referral call and any session. It may answer &#123;external_id, public_metadata, private_metadata, unsafe_metadata&#125;, or deny the sign-up with &#123;"deny": true, "reason": "..."&#125; or HTTP 403: the person gets 403 SIGN_UP_DENIED with your reason, no user is kept and no user.created is sent. A slow or failing hook does not block the sign-up unless fail_closed is true. The body carries data.user, data.strategy, data.referral, data.request (&#123;client_id, app_context, login_hint&#125; of the authorize request, nulls when absent) and data.invitation (the pending instance invitation for the address, or null) and data.organization (&#123;id, external_id, role, role_mapped, via: sso | domain&#125; when the sign-up comes through an organization SSO connection or a captured auto-join domain, else null). Turning the hook on, or changing the url or signing_secret of a fail_closed enabled one (or turning fail_closed on for it), first sends the signed test call: unless it returns a valid answer (an answer object, possibly empty, or a deny) the change is refused with 409 HOOK_TEST_FAILED (meta: url, status, the first 200 bytes of the response body, outcome) and the hook stays as it was. ?force=true (or force in the body) skips the test and is audit-logged. enabled: "pending" stores the hook OFF without testing (sign-ups proceed and the hook is not called, fail_closed included) and Atlas turns it on in the background once the test passes (see GET: pending, pending_since, last_test_at, last_test_error). A dry run (?dry_run=true) makes the same test call and changes nothing: it answers would_return (the hook exactly as the PATCH would leave it, e.g. enabled: true) and changes [&#123;section, before, after&#125;] with would_return_status 200, or would_return_status 409 with the refusal. An enabled hook that is not fail_closed is not re-tested when its url or secret changes. Scope: {@code instance:write}. */
+    /** {@code PATCH /v1/instance/hooks/before_user_create} - Update the before_user_create hook. Only the fields you send change; null clears. The hook is called (signed like a webhook) after the user id is assigned and before user.created, the referral call and any session. It may answer &#123;external_id, public_metadata, private_metadata, unsafe_metadata&#125;, or deny the sign-up with &#123;"deny": true, "reason": "..."&#125; or HTTP 403: the person gets 403 SIGN_UP_DENIED with your reason, no user is kept and no user.created is sent. A slow or failing hook does not block the sign-up unless fail_closed is true. The body (schema BeforeUserCreateHookRequest; your answer is BeforeUserCreateHookResponse) carries data.user, data.strategy, data.referral, data.request (&#123;client_id, app_context, login_hint&#125; of the authorize request, nulls when absent) and data.invitation (the pending instance invitation for the address, or null) and data.organization (&#123;id, external_id, role, role_mapped, via: sso | domain&#125; when the sign-up comes through an organization SSO connection or a captured auto-join domain, else null). Turning the hook on, or changing the url or signing_secret of a fail_closed enabled one (or turning fail_closed on for it), first sends the signed test call: unless it returns a valid answer (an answer object, possibly empty, or a deny) the change is refused with 409 HOOK_TEST_FAILED (meta: url, status, the first 200 bytes of the response body, outcome) and the hook stays as it was. ?force=true (or force in the body) skips the test and is audit-logged. enabled: "pending" stores the hook OFF without testing (sign-ups proceed and the hook is not called, fail_closed included) and Atlas turns it on in the background once the test passes (see GET: pending, pending_since, last_test_at, last_test_error). A dry run (?dry_run=true) makes the same test call and changes nothing: it answers would_return (the hook exactly as the PATCH would leave it, e.g. enabled: true) and changes [&#123;section, before, after&#125;] with would_return_status 200, or would_return_status 409 with the refusal. An enabled hook that is not fail_closed is not re-tested when its url or secret changes. Scope: {@code instance:write}. */
     public InstanceUpdateBeforeUserCreateResponse updateBeforeUserCreate(InstanceUpdateBeforeUserCreateBody body) {
         return t.request("PATCH", "/v1/instance/hooks/before_user_create", null, body, null, false, new TypeReference<InstanceUpdateBeforeUserCreateResponse>() {
         });
@@ -471,6 +579,12 @@ public final class InstanceApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public HostedPagesSettings updateHostedPages(InstanceUpdateHostedPagesBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/instance/hosted_pages", null, body, idempotencyKey, false, new TypeReference<HostedPagesSettings>() {
+        });
+    }
+
     /** {@code GET /v1/instance/impersonation_policy} - The instance's staff impersonation policy: require_reason, reason_codes, max_duration_seconds, require_approval, read_only_default and notify_user. Scope: {@code instance:read}. */
     public InstanceGetImpersonationPolicyResponse getImpersonationPolicy() {
         return t.request("GET", "/v1/instance/impersonation_policy", null, null, null, false, new TypeReference<InstanceGetImpersonationPolicyResponse>() {
@@ -480,6 +594,12 @@ public final class InstanceApi {
     /** {@code PUT /v1/instance/impersonation_policy} - Change the staff impersonation policy. Send only the fields to change; unknown fields are refused. Audited. Scope: {@code instance:write}. */
     public void setImpersonationPolicy(InstanceSetImpersonationPolicyBody body) {
         t.request("PUT", "/v1/instance/impersonation_policy", null, body, null, false, new TypeReference<Object>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public void setImpersonationPolicy(InstanceSetImpersonationPolicyBody body, String idempotencyKey) {
+        t.request("PUT", "/v1/instance/impersonation_policy", null, body, idempotencyKey, false, new TypeReference<Object>() {
         });
     }
 
@@ -553,9 +673,71 @@ public final class InstanceApi {
         return listIntegrationsAll(null);
     }
 
+    /** {@code DELETE /v1/instance/integrations/forwarding/{destination}} - Stop forwarding sign-ups to a destination (removes its managed endpoint). Scope: {@code webhooks:write}. */
+    public void deleteForwarding(String destination) {
+        t.request("DELETE", "/v1/instance/integrations/forwarding/" + enc(destination), null, null, null, false, new TypeReference<Object>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public void deleteForwarding(String destination, String idempotencyKey) {
+        t.request("DELETE", "/v1/instance/integrations/forwarding/" + enc(destination), null, null, idempotencyKey, false, new TypeReference<Object>() {
+        });
+    }
+
+    /** {@code GET /v1/instance/integrations/forwarding/{destination}} - Read the stored sign-up forwarding for a destination: its managed endpoint, active flag and non-secret settings. The destination key is never returned. 404 when sign-ups are not forwarded there. Scope: {@code webhooks:read}. */
+    public InstanceGetForwardingResponse getForwarding(String destination) {
+        return t.request("GET", "/v1/instance/integrations/forwarding/" + enc(destination), null, null, null, false, new TypeReference<InstanceGetForwardingResponse>() {
+        });
+    }
+
+    /** {@code PUT /v1/instance/integrations/forwarding/{destination}} - Forward every sign-up (`user.created`) to Lucida, Hermetica or Seolyticize with your own server key, or to any HTTPS webhook. Scope: {@code webhooks:write}. */
+    public InstanceSetForwardingResponse setForwarding(String destination, InstanceSetForwardingBody body) {
+        return t.request("PUT", "/v1/instance/integrations/forwarding/" + enc(destination), null, body, null, false, new TypeReference<InstanceSetForwardingResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceSetForwardingResponse setForwarding(String destination, InstanceSetForwardingBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/instance/integrations/forwarding/" + enc(destination), null, body, idempotencyKey, false, new TypeReference<InstanceSetForwardingResponse>() {
+        });
+    }
+
+    /** {@code GET /v1/instance/integrations/health} - Every connected integration and receiver with its last delivery status and time, in one list. Scope: {@code instance:read}. */
+    public InstanceListHealthResponse listHealth() {
+        return t.request("GET", "/v1/instance/integrations/health", null, null, null, false, new TypeReference<InstanceListHealthResponse>() {
+        });
+    }
+
+    /** As above, with every optional parameter. */
+    public InstanceListHealthResponse listHealth(InstanceListHealthQuery query) {
+        return t.request("GET", "/v1/instance/integrations/health", query == null ? null : query.toMap(), null, null, false, new TypeReference<InstanceListHealthResponse>() {
+        });
+    }
+
+    /** Every item across every page of {@code GET /v1/instance/integrations/health}, fetched lazily (the cursor is followed for you). */
+    public Iterable<InstanceListHealthResponseDataItem> listHealthAll(InstanceListHealthQuery query) {
+        final InstanceListHealthQuery base = query == null ? new InstanceListHealthQuery() : query.copy();
+        return Pagination.iterate(cursor -> {
+            InstanceListHealthResponse r = listHealth(base.copy().startingAfter(cursor));
+            return new CursorPage<>(r.data(), Boolean.TRUE.equals(r.hasMore()), (r.data() == null || r.data().isEmpty() ? null : r.data().get(r.data().size() - 1).id()));
+        });
+    }
+
+    /** As above, with no query options. */
+    public Iterable<InstanceListHealthResponseDataItem> listHealthAll() {
+        return listHealthAll(null);
+    }
+
     /** {@code DELETE /v1/instance/integrations/{product}} - Remove an identity integration and its receivers; getToken(&#123; for &#125;) answers 404 for it from then on. Scope: {@code instance:write}. */
     public InstanceDeleteIntegrationResponse deleteIntegration(String product) {
         return t.request("DELETE", "/v1/instance/integrations/" + enc(product), null, null, null, false, new TypeReference<InstanceDeleteIntegrationResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceDeleteIntegrationResponse deleteIntegration(String product, String idempotencyKey) {
+        return t.request("DELETE", "/v1/instance/integrations/" + enc(product), null, null, idempotencyKey, false, new TypeReference<InstanceDeleteIntegrationResponse>() {
         });
     }
 
@@ -568,6 +750,12 @@ public final class InstanceApi {
     /** {@code PUT /v1/instance/integrations/{product}} - Connect (or replace) an identity integration: any service that verifies a user with a JWT. getToken(&#123; for: '&lt;id&gt;' &#125;) then mints a token of at most 120 s with aud = audience, sub (the Atlas user id), ext (external_id), principal (the branding audience the user signed in under), sid, email, email_verified, name and locale, verifiable against the instance JWKS. Atlas also delivers user.updated / user.banned / user.unbanned / user.deleted / session.revoked to events_url and an OIDC Back-Channel Logout token to backchannel_logout_url on every session end. ?dry_run=true validates in full and answers &#123; object: 'dry_run', changes, would_return &#125; without saving. Also accepts metadata tags and external_ref. The OAuth client the service signs users in with (oauth_client_id, else the client tagged product=&lt;integration id&gt;) gets its https redirect-URI origins added to allowed_origins (append only, recorded in the config changelog); the response lists them in added_origins. For forumulate, warnings says when Forumulate already sends readers elsewhere (existing_sign_in_url_overrides: an org-level signInUrl; atlas_reader_provider_missing), read from its public reader sign-in settings. With replace_existing: true and forumulate_api_key (a Forumulate org admin's API key, used for this call only and never stored) Atlas clears the org-level signInUrl and removes every non-Atlas reader provider in Forumulate, and answers replaced. forumulate_api_key alone also reads each space's reader addresses, so spaces[].redeem_url is on the host its readers read. The integration id: a preset (chatly, forumulate, cookiemunch, referalli) or a custom integration id (2-40 lowercase letters, digits, "_" or "-", starting with a letter). Scope: {@code instance:write}. */
     public InstanceSetIntegrationResponse setIntegration(String product, InstanceSetIntegrationBody body) {
         return t.request("PUT", "/v1/instance/integrations/" + enc(product), null, body, null, false, new TypeReference<InstanceSetIntegrationResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceSetIntegrationResponse setIntegration(String product, InstanceSetIntegrationBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/instance/integrations/" + enc(product), null, body, idempotencyKey, false, new TypeReference<InstanceSetIntegrationResponse>() {
         });
     }
 
@@ -613,6 +801,12 @@ public final class InstanceApi {
         });
     }
 
+    /** {@code GET /v1/instance/issuers} - The token issuers a verifier should accept: the active one, the planned one while a domain claim is pending, and earlier ones still in their overlap window. Scope: {@code instance:read}. */
+    public InstanceGetIssuersResponse getIssuers() {
+        return t.request("GET", "/v1/instance/issuers", null, null, null, false, new TypeReference<InstanceGetIssuersResponse>() {
+        });
+    }
+
     /** {@code POST /v1/instance/move_origin} - Move the instance from one origin to another in one call (a domain move). Rewrites every field that points at `from` (scheme + host + port) to `to`, keeping each URL's path: allowed_origins; the branding logo, font, background and legal URLs; every OAuth client's redirect_uris, post_logout_redirect_uris, backchannel_logout_uri, frontchannel_logout_uri, homepage_url, logo_url, jwks_uri and legal links; webhook endpoint URLs; the redirect-URL allowlist; and the same fields on the Sign in with Atlas apps this instance manages (apps the account registered itself are account resources: an instance key never lists or rewrites them; move those with POST /v1/platform/atlas_id_apps/&#123;id&#125;/move_origin). Returns the before → after diff. dry_run: true writes nothing. A rewritten value the field would refuse (e.g. a webhook moving to a loopback host) is listed in problems, and a real run then answers 422 without writing. A second run returns an empty diff. Each changed object gets a config-changelog entry (instance.origin_moved). The response lists moved_webhook_endpoints with the call that tests each; test_webhooks: true (on a real run) sends each one a webhook.test now and returns webhook_tests with each result. Scope: {@code instance:write}. */
     public OriginMove moveOrigin(OriginMoveRequest body) {
         return t.request("POST", "/v1/instance/move_origin", null, body, null, false, new TypeReference<OriginMove>() {
@@ -625,7 +819,7 @@ public final class InstanceApi {
         });
     }
 
-    /** {@code GET /v1/instance/notices} - Behaviour changes that affect THIS instance: each with its date, type (behavior_change | deprecation | new), tags (breaking | behaviour | security), what it changes, a sentence about this instance (`detail`, and `count` when countable), when it was first seen, when the owners were emailed and whether it was acknowledged. Deprecated routes or fields your integration still calls appear here as `deprecated:&lt;id&gt;` notices. ?all=true lists every recent notice, including ones that do not apply (applies: false). Scope: {@code instance:read}. */
+    /** {@code GET /v1/instance/notices} - Behaviour changes that affect THIS instance: each with its date, type (behavior_change | deprecation | new), tags (breaking | behaviour | security | type_widening: an exported SDK union or API enum gained a value, so exhaustive switches need a case), what it changes, a sentence about this instance (`detail`, and `count` when countable), when it was first seen, when the owners were emailed and whether it was acknowledged. Deprecated routes or fields your integration still calls appear here as `deprecated:&lt;id&gt;` notices. ?all=true lists every recent notice, including ones that do not apply (applies: false). Scope: {@code instance:read}. */
     public InstanceListNoticesResponse listNotices() {
         return t.request("GET", "/v1/instance/notices", null, null, null, false, new TypeReference<InstanceListNoticesResponse>() {
         });
@@ -699,6 +893,12 @@ public final class InstanceApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public void setOrgDeparturePolicy(InstanceSetOrgDeparturePolicyBody body, String idempotencyKey) {
+        t.request("PUT", "/v1/instance/org_departure_policy", null, body, idempotencyKey, false, new TypeReference<Object>() {
+        });
+    }
+
     /** {@code GET /v1/instance/org_role_entitlements} - The map of organization role key to the feature keys a seat in that role grants. Those features join the token's `fea` claim for a member whose active organization role matches, on top of (or without) a plan. Scope: {@code instance:read}. */
     public InstanceGetOrgRoleEntitlementsResponse getOrgRoleEntitlements() {
         return t.request("GET", "/v1/instance/org_role_entitlements", null, null, null, false, new TypeReference<InstanceGetOrgRoleEntitlementsResponse>() {
@@ -708,6 +908,12 @@ public final class InstanceApi {
     /** {@code PUT /v1/instance/org_role_entitlements} - Replace the role to features map. A role left out grants nothing. Takes effect on the next token. Scope: {@code instance:write}. */
     public void setOrgRoleEntitlements(InstanceSetOrgRoleEntitlementsBody body) {
         t.request("PUT", "/v1/instance/org_role_entitlements", null, body, null, false, new TypeReference<Object>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public void setOrgRoleEntitlements(InstanceSetOrgRoleEntitlementsBody body, String idempotencyKey) {
+        t.request("PUT", "/v1/instance/org_role_entitlements", null, body, idempotencyKey, false, new TypeReference<Object>() {
         });
     }
 
@@ -759,6 +965,12 @@ public final class InstanceApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public PrivacyOrchestrator deletePrivacyOrchestrator(String idempotencyKey) {
+        return t.request("DELETE", "/v1/instance/privacy_orchestrator", null, null, idempotencyKey, false, new TypeReference<PrivacyOrchestrator>() {
+        });
+    }
+
     /** {@code GET /v1/instance/privacy_orchestrator} - The instance's data-rights orchestrator: the provider (a preset or `custom`), where Atlas opens a closure case when an account deletion is scheduled (`case_url`, `cancel_url`), how it authenticates, the managed completion webhook, the last case and error, and the available presets. Never a secret. Scope: {@code instance:read}. */
     public PrivacyOrchestrator getPrivacyOrchestrator() {
         return t.request("GET", "/v1/instance/privacy_orchestrator", null, null, null, false, new TypeReference<PrivacyOrchestrator>() {
@@ -768,6 +980,12 @@ public final class InstanceApi {
     /** {@code PUT /v1/instance/privacy_orchestrator} - Connect or update the data-rights orchestrator. `provider` is a preset (`cookiemunch` fills in its URLs and auth, and opens cases with Cookie Munch's own `POST /v1/dsar/requests` body: `cbid`, `type`, `source: atlas`, `subject &#123; emails, identity &#125;`, `reason`) or your own id with `name` and `case_url` (the Atlas case format). `api_key` is write-only. `sign_requests: true` mints the secret Atlas signs case calls with (Atlas-Signature over id.timestamp.body); `completion_webhook_url` creates a webhook endpoint subscribed to `privacy_request.updated` / `privacy_request.completed`. New secrets are returned once. → 201 on create. Scope: {@code instance:write}. */
     public PrivacyOrchestrator setPrivacyOrchestrator(InstanceSetPrivacyOrchestratorBody body) {
         return t.request("PUT", "/v1/instance/privacy_orchestrator", null, body, null, false, new TypeReference<PrivacyOrchestrator>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public PrivacyOrchestrator setPrivacyOrchestrator(InstanceSetPrivacyOrchestratorBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/instance/privacy_orchestrator", null, body, idempotencyKey, false, new TypeReference<PrivacyOrchestrator>() {
         });
     }
 
@@ -917,9 +1135,21 @@ public final class InstanceApi {
         });
     }
 
-    /** {@code PUT /v1/instance/scopes} - Replace the scope catalogue. Each scope has a `name`, a `label` and a `description` per locale (&#123; "en": "…", "es": "…" &#125;), `sensitive`, and `requires_verified_client`. The consent screen shows the label and description in the user's language (falling back to its base language, then `en`). A scope with `requires_verified_client` is refused at /oauth2/authorize with `invalid_scope` unless the app's status is `approved` or that scope is in the client's `approved_scopes` (per-scope review). The owner and testers of a client still in development may request it too. A client still needs the scope in its allowed scopes to request it. Scope: {@code instance:write}. */
+    /** {@code PUT /v1/instance/scopes} - Replace the scope catalogue. Each scope has a `name`, a `label` and a `description` per locale (&#123; "en": "…", "es": "…" &#125;), `sensitive`, and `requires_verified_client`. The consent screen shows the label and description in the user's language (falling back to its base language, then `en`). A scope with `requires_verified_client` is refused at /oauth2/authorize with `invalid_scope` unless the app's status is `approved` or that scope is in the client's `approved_scopes` (per-scope review). The owner and testers of a client still in development may request it too. A client still needs the scope in its allowed scopes to request it. `requires_client_level` (`any`, `verified` or `certified`) sets the level a client needs (`requires_verified_client: true` means `verified`; the stricter wins); a `certified` client is an approved one the instance has certified (PATCH /v1/oauth_clients/&#123;id&#125; `certified`). `owner_exempt: true` lets the developer who owns a client request the scope with it on their own account whatever the client's level. A name ending `:*` (`listings:*`) is a wildcard entry: it covers every `listings:&lt;anything&gt;` for gating, consent text and released claims, and a client or grant that holds `listings:*` holds each of them. By default the whole list is checked and nothing is written if any entry is bad (422, one problem per field). `?mode=partial` applies the valid entries and answers 200 with `rejected: [&#123; index, name, errors &#125;]` (a rejected entry leaves the scope of that name as it was). `?too_long=truncate` cuts over-long labels and descriptions instead of refusing them and lists each cut in `warnings`. Scope: {@code instance:write}. */
     public void setScopes(InstanceSetScopesBody body) {
         t.request("PUT", "/v1/instance/scopes", null, body, null, false, new TypeReference<Object>() {
+        });
+    }
+
+    /** As above, with every optional parameter. */
+    public void setScopes(InstanceSetScopesBody body, InstanceSetScopesQuery query) {
+        t.request("PUT", "/v1/instance/scopes", query == null ? null : query.toMap(), body, null, false, new TypeReference<Object>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public void setScopes(InstanceSetScopesBody body, InstanceSetScopesQuery query, String idempotencyKey) {
+        t.request("PUT", "/v1/instance/scopes", query == null ? null : query.toMap(), body, idempotencyKey, false, new TypeReference<Object>() {
         });
     }
 
@@ -949,7 +1179,7 @@ public final class InstanceApi {
         return listSecretKeysAll(null);
     }
 
-    /** {@code POST /v1/instance/secret_keys} - Alias of POST /v1/secret_keys. Create a scoped secret key: `name`, `scopes[]` (refused when unknown, or when the calling key does not hold them; presets `read_only`, `privacy:execute`, `privacy:grants:revoke`; or `preset: "app-runtime"` for an app server runtime key), `expires_at` (at most a year; default one year; "never" is refused), `allowed_ips` (CIDRs), `allowed_origins` (browser origins; a request with another Origin gets 403 ORIGIN_NOT_ALLOWED), `owner` (default: the creating person or key), `external_ref` (idempotent create: a repeat returns the existing key, 200, idempotent_replay, no secret), `metadata` (tags; filter the list with ?metadata[key]=value) and `key_format` (`atlas`, the default `atlas_&lt;env&gt;_sk_…`, or `legacy` `sk_&lt;env&gt;_…`). The secret is returned once. Minting with an operator token needs multi-factor sign-in within 5 minutes (403 STEP_UP_REQUIRED). Send `X-Secret-Recipient: x25519:&lt;public key&gt;` to receive the secret sealed (libsodium sealed box) as `sealed_secret` instead of in plaintext. Example: a data-rights tool's key, &#123; "name": "DSAR executor", "scopes": ["privacy:execute", "privacy:grants:revoke"], "expires_at": "2027-04-01" &#125;. Scope: {@code secret_keys:write}. */
+    /** {@code POST /v1/instance/secret_keys} - Alias of POST /v1/secret_keys. Create a scoped secret key: `name`, `scopes[]` (refused when unknown, or when the calling key does not hold them; presets `read_only`, `privacy:execute`, `privacy:grants:revoke`; or `preset: "app-runtime"` for an app server runtime key, or `preset: "integrations"` for the key a connected platform (consent manager, referral or support platform) connects with, or `preset: "provisioning"` for a deploy-script key that configures the instance: instance settings, domains, messaging providers, integrations, webhooks, OAuth clients and providers, redirect URLs, branding and keys, with no user, session or organization-member access), `expires_at` (at most a year; default one year; "never" is refused), `allowed_ips` (CIDRs), `allowed_origins` (browser origins; a request with another Origin gets 403 ORIGIN_NOT_ALLOWED), `owner` (default: the creating person or key), `external_ref` (idempotent create: a repeat returns the existing key, 200, idempotent_replay, no secret), `metadata` (tags; filter the list with ?metadata[key]=value) and `key_format` (`atlas`, the default `atlas_&lt;env&gt;_sk_…`, or `legacy` `sk_&lt;env&gt;_…`). The secret is returned once. Minting with an operator token needs multi-factor sign-in within 5 minutes (403 STEP_UP_REQUIRED). Send `X-Secret-Recipient: x25519:&lt;public key&gt;` to receive the secret sealed (libsodium sealed box) as `sealed_secret` instead of in plaintext. Example: a data-rights tool's key, &#123; "name": "DSAR executor", "scopes": ["privacy:execute", "privacy:grants:revoke"], "expires_at": "2027-04-01" &#125;. Scope: {@code secret_keys:write}. */
     public InstanceCreateSecretKeyResponse createSecretKey(InstanceCreateSecretKeyBody body) {
         return t.request("POST", "/v1/instance/secret_keys", null, body, null, false, new TypeReference<InstanceCreateSecretKeyResponse>() {
         });
@@ -973,9 +1203,21 @@ public final class InstanceApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public SignInWithAtlasSettings updateSignInWithAtlas(InstanceUpdateSignInWithAtlasBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/instance/sign_in_with_atlas", null, body, idempotencyKey, false, new TypeReference<SignInWithAtlasSettings>() {
+        });
+    }
+
     /** {@code DELETE /v1/instance/signing_key_provider} - Stop using the key management service: rotate back to a new key Atlas holds (the KMS key stays published for `grace_period_seconds`, or not at all with `emergency`) and delete the saved settings and credentials. The KMS key itself is not deleted. Audited as signing_key.provider_removed. Scope: {@code instance:write}. */
     public InstanceDeleteSigningKeyProviderResponse deleteSigningKeyProvider(InstanceDeleteSigningKeyProviderBody body) {
         return t.request("DELETE", "/v1/instance/signing_key_provider", null, body, null, false, new TypeReference<InstanceDeleteSigningKeyProviderResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceDeleteSigningKeyProviderResponse deleteSigningKeyProvider(InstanceDeleteSigningKeyProviderBody body, String idempotencyKey) {
+        return t.request("DELETE", "/v1/instance/signing_key_provider", null, body, idempotencyKey, false, new TypeReference<InstanceDeleteSigningKeyProviderResponse>() {
         });
     }
 
@@ -991,9 +1233,21 @@ public final class InstanceApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceSetSigningKeyProviderResponse setSigningKeyProvider(InstanceSetSigningKeyProviderBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/instance/signing_key_provider", null, body, idempotencyKey, false, new TypeReference<InstanceSetSigningKeyProviderResponse>() {
+        });
+    }
+
     /** {@code DELETE /v1/instance/signing_key_schedule} - Turn scheduled rotation off. Keys already published stay as they are. Scope: {@code instance:write}. */
     public InstanceDeleteSigningKeyScheduleResponse deleteSigningKeySchedule() {
         return t.request("DELETE", "/v1/instance/signing_key_schedule", null, null, null, false, new TypeReference<InstanceDeleteSigningKeyScheduleResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceDeleteSigningKeyScheduleResponse deleteSigningKeySchedule(String idempotencyKey) {
+        return t.request("DELETE", "/v1/instance/signing_key_schedule", null, null, idempotencyKey, false, new TypeReference<InstanceDeleteSigningKeyScheduleResponse>() {
         });
     }
 
@@ -1006,6 +1260,12 @@ public final class InstanceApi {
     /** {@code PUT /v1/instance/signing_key_schedule} - Rotate the instance signing key automatically. Every interval_days the worker publishes a new key (prepublish_hours before it signs), switches to it, and keeps the previous key published until every token it signed has expired: at least the longest token lifetime the instance uses plus the key set cache, never under 24 hours, and never dropped while one of its tokens can still be presented. Keys in a cloud KMS rotate at the scheduled time (they cannot be held back) and are limited to RS256 and ES256. An earlier rotation still inside its grace window postpones the next one. Needs a recent MFA sign-in. Scope: {@code instance:write}. */
     public InstanceSetSigningKeyScheduleResponse setSigningKeySchedule(InstanceSetSigningKeyScheduleBody body) {
         return t.request("PUT", "/v1/instance/signing_key_schedule", null, body, null, false, new TypeReference<InstanceSetSigningKeyScheduleResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceSetSigningKeyScheduleResponse setSigningKeySchedule(InstanceSetSigningKeyScheduleBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/instance/signing_key_schedule", null, body, idempotencyKey, false, new TypeReference<InstanceSetSigningKeyScheduleResponse>() {
         });
     }
 
@@ -1030,6 +1290,74 @@ public final class InstanceApi {
     /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
     public InstanceSigningKeysRotateResponse signingKeysRotate(InstanceSigningKeysRotateBody body, String idempotencyKey) {
         return t.request("POST", "/v1/instance/signing_keys/rotate", null, body, idempotencyKey, false, new TypeReference<InstanceSigningKeysRotateResponse>() {
+        });
+    }
+
+    /** {@code GET /v1/instance/staging_copies} - The staging copies and previews of this instance, newest first (deleted ones are left out). Scope: {@code instance:read}. */
+    public InstanceListStagingCopiesResponse listStagingCopies() {
+        return t.request("GET", "/v1/instance/staging_copies", null, null, null, false, new TypeReference<InstanceListStagingCopiesResponse>() {
+        });
+    }
+
+    /** As above, with every optional parameter. */
+    public InstanceListStagingCopiesResponse listStagingCopies(InstanceListStagingCopiesQuery query) {
+        return t.request("GET", "/v1/instance/staging_copies", query == null ? null : query.toMap(), null, null, false, new TypeReference<InstanceListStagingCopiesResponse>() {
+        });
+    }
+
+    /** Every item across every page of {@code GET /v1/instance/staging_copies}, fetched lazily (the cursor is followed for you). */
+    public Iterable<InstanceListStagingCopiesResponseDataItem> listStagingCopiesAll(InstanceListStagingCopiesQuery query) {
+        final InstanceListStagingCopiesQuery base = query == null ? new InstanceListStagingCopiesQuery() : query.copy();
+        return Pagination.iterate(cursor -> {
+            InstanceListStagingCopiesResponse r = listStagingCopies(base.copy().startingAfter(cursor));
+            return new CursorPage<>(r.data(), Boolean.TRUE.equals(r.hasMore()), r.nextCursor());
+        });
+    }
+
+    /** As above, with no query options. */
+    public Iterable<InstanceListStagingCopiesResponseDataItem> listStagingCopiesAll() {
+        return listStagingCopiesAll(null);
+    }
+
+    /** {@code POST /v1/instance/staging_copies} - Make a staging copy of this instance with its own secret key: a new development-mode instance of the same app, with or without data (same body and rules as the platform clone route, without secret_key_preset: the key it answers with holds the app-runtime preset). For an instance that is not provisioned under a platform app. The copy never carries secrets (configuration secrets are removed; API keys and provider connections are not copied), private metadata of users and organizations, webhook endpoints, signing keys, passwords or second factors. The new instance is in development mode: no email or SMS is sent until it has its own provider keys. Needs instance:write (and users:read when include has users). Honours Idempotency-Key; a repeat for a live ref returns it (200, no secret). Audited. Scope: {@code instance:write}. */
+    public InstanceCreateStagingCopyResponse createStagingCopy(InstanceCreateStagingCopyBody body) {
+        return t.request("POST", "/v1/instance/staging_copies", null, body, null, false, new TypeReference<InstanceCreateStagingCopyResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceCreateStagingCopyResponse createStagingCopy(InstanceCreateStagingCopyBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/instance/staging_copies", null, body, idempotencyKey, false, new TypeReference<InstanceCreateStagingCopyResponse>() {
+        });
+    }
+
+    /** {@code DELETE /v1/instance/staging_copies/{id}} - Delete a staging copy together with its instance and everything in it. Only an instance a copy created can be removed this way. Audited. Scope: {@code instance:write}. */
+    public InstanceDeleteStagingCopyResponse deleteStagingCopy(String id) {
+        return t.request("DELETE", "/v1/instance/staging_copies/" + enc(id), null, null, null, false, new TypeReference<InstanceDeleteStagingCopyResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceDeleteStagingCopyResponse deleteStagingCopy(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/instance/staging_copies/" + enc(id), null, null, idempotencyKey, false, new TypeReference<InstanceDeleteStagingCopyResponse>() {
+        });
+    }
+
+    /** {@code GET /v1/instance/staging_copies/{id}} - One staging copy: status, what was copied, what could not be placed. Scope: {@code instance:read}. */
+    public InstanceGetStagingCopyResponse getStagingCopy(String id) {
+        return t.request("GET", "/v1/instance/staging_copies/" + enc(id), null, null, null, false, new TypeReference<InstanceGetStagingCopyResponse>() {
+        });
+    }
+
+    /** {@code POST /v1/instance/staging_copies/{id}/refresh} - Bring a completed staging copy up to date in place: the same instance, keys and host, with this instance's configuration merged in again (and the data sections asked for, at most the ones it was made with, up to 2000 rows each). synthetic_users &#123; count (1-500), seed &#125; adds seeded test users (example.com addresses, the same seed gives the same users, so repeating it adds none twice). ttl_hours extends a preview. Emails stay masked consistently, so a refresh does not duplicate users. Audited. Scope: {@code instance:write}. */
+    public InstanceStagingCopiesRefreshResponse stagingCopiesRefresh(String id, InstanceStagingCopiesRefreshBody body) {
+        return t.request("POST", "/v1/instance/staging_copies/" + enc(id) + "/refresh", null, body, null, false, new TypeReference<InstanceStagingCopiesRefreshResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceStagingCopiesRefreshResponse stagingCopiesRefresh(String id, InstanceStagingCopiesRefreshBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/instance/staging_copies/" + enc(id) + "/refresh", null, body, idempotencyKey, false, new TypeReference<InstanceStagingCopiesRefreshResponse>() {
         });
     }
 
@@ -1069,6 +1397,12 @@ public final class InstanceApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceUpdateStatusDependencyResponse updateStatusDependency(String id, InstanceUpdateStatusDependencyBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/instance/status_dependencies/" + enc(id), null, body, idempotencyKey, false, new TypeReference<InstanceUpdateStatusDependencyResponse>() {
+        });
+    }
+
     /** {@code POST /v1/instance/status_dependencies/{id}/refresh} - Read the dependency status page now and answer with the result. Scope: {@code instance:write}. */
     public InstanceRefreshResponse refresh(String id) {
         return t.request("POST", "/v1/instance/status_dependencies/" + enc(id) + "/refresh", null, null, null, false, new TypeReference<InstanceRefreshResponse>() {
@@ -1099,6 +1433,12 @@ public final class InstanceApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceDeleteStatusSubscriptionResponse deleteStatusSubscription(String idempotencyKey) {
+        return t.request("DELETE", "/v1/instance/status_subscription", null, null, idempotencyKey, false, new TypeReference<InstanceDeleteStatusSubscriptionResponse>() {
+        });
+    }
+
     /** {@code GET /v1/instance/status_subscription} - Which Atlas incidents notify this instance: regions, components, minimum impact, maintenance, channels (owner email, status_incident.* webhooks) and the private RSS / Atom URLs. Also lists the regions and components that can be chosen. Scope: {@code instance:read}. */
     public InstanceGetStatusSubscriptionResponse getStatusSubscription() {
         return t.request("GET", "/v1/instance/status_subscription", null, null, null, false, new TypeReference<InstanceGetStatusSubscriptionResponse>() {
@@ -1108,6 +1448,12 @@ public final class InstanceApi {
     /** {@code PUT /v1/instance/status_subscription} - Create or change the status subscription. Only the fields sent change. Unknown regions or components are a 400 naming the known ones. Creating it issues the private feed URL. Scope: {@code instance:write}. */
     public InstanceSetStatusSubscriptionResponse setStatusSubscription(InstanceSetStatusSubscriptionBody body) {
         return t.request("PUT", "/v1/instance/status_subscription", null, body, null, false, new TypeReference<InstanceSetStatusSubscriptionResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceSetStatusSubscriptionResponse setStatusSubscription(InstanceSetStatusSubscriptionBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/instance/status_subscription", null, body, idempotencyKey, false, new TypeReference<InstanceSetStatusSubscriptionResponse>() {
         });
     }
 
@@ -1165,9 +1511,21 @@ public final class InstanceApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public UserTraitsSchema setUserTraitsSchema(InstanceSetUserTraitsSchemaBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/instance/user_traits_schema", null, body, idempotencyKey, false, new TypeReference<UserTraitsSchema>() {
+        });
+    }
+
     /** {@code DELETE /v1/instance/write_budget} - Back to the platform defaults in observe mode. Scope: {@code instance:write}. */
     public InstanceDeleteWriteBudgetResponse deleteWriteBudget() {
         return t.request("DELETE", "/v1/instance/write_budget", null, null, null, false, new TypeReference<InstanceDeleteWriteBudgetResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceDeleteWriteBudgetResponse deleteWriteBudget(String idempotencyKey) {
+        return t.request("DELETE", "/v1/instance/write_budget", null, null, idempotencyKey, false, new TypeReference<InstanceDeleteWriteBudgetResponse>() {
         });
     }
 
@@ -1180,6 +1538,12 @@ public final class InstanceApi {
     /** {@code PUT /v1/instance/write_budget} - Set the write-budget mode and any limit. A limit is an integer from 1 to 10,000,000 per minute; null returns one to its default. Unknown fields are refused. Scope: {@code instance:write}. */
     public InstanceSetWriteBudgetResponse setWriteBudget(InstanceSetWriteBudgetBody body) {
         return t.request("PUT", "/v1/instance/write_budget", null, body, null, false, new TypeReference<InstanceSetWriteBudgetResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public InstanceSetWriteBudgetResponse setWriteBudget(InstanceSetWriteBudgetBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/instance/write_budget", null, body, idempotencyKey, false, new TypeReference<InstanceSetWriteBudgetResponse>() {
         });
     }
 }

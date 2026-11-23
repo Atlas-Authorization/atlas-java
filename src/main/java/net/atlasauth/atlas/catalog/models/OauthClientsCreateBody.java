@@ -67,6 +67,18 @@ public final class OauthClientsCreateBody {
     /** Gated scopes (requires_verified_client) approved for this client alone, so it may request them before the whole app is approved. Only the instance sets this; changes are audited. The owner and testers of a client in development may request gated scopes without it. */
     @JsonProperty("approved_scopes")
     public List<String> approvedScopes;
+    /** The scopes an authorization or device request without `scope` gets (each must be one the client may request; include `openid` unless require_openid is false). Including offline_access here makes every sign-in a long-lived grant: a refresh token with offline_access already outlives the browser session. null clears. */
+    @JsonProperty("default_scopes")
+    public List<String> defaultScopes;
+    /** The identifier of the API (resource server) an authorization or device request without `resource` or `audience` is made for. Must be a registered API. null clears. */
+    @JsonProperty("default_resource")
+    public String defaultResource;
+    /** Default true. false makes this a pure-API client: /oauth2/authorize accepts a request without `openid` and the token response carries an access token and no ID token. Confidential clients without the implicit grant only; PKCE rules are unchanged. */
+    @JsonProperty("require_openid")
+    public Boolean requireOpenid;
+    /** The instance certifies (true) or withdraws certification of an approved client: the level above verified, for scopes whose requires_client_level is certified. Update only; an unapproved client cannot be certified. */
+    @JsonProperty("certified")
+    public Boolean certified;
     /** Most token endpoint requests per minute this client may make; over it the endpoint answers 429 with Retry-After. null removes the limit. */
     @JsonProperty("rate_limit_per_minute")
     public Long rateLimitPerMinute;
@@ -76,12 +88,21 @@ public final class OauthClientsCreateBody {
     /** https URL of your own consent page (consent_challenge). null clears (update). */
     @JsonProperty("consent_url")
     public String consentUrl;
+    /** 'always': a first-party client's consent is also sent to its consent_url instead of being granted silently. Needs the client's own consent_url. null clears (update). One of: always. */
+    @JsonProperty("delegate_consent")
+    public String delegateConsent;
+    /** https URL of your own device-approval page; /oauth2/device then sends the signed-in user there with a device_challenge. null clears (update). */
+    @JsonProperty("device_url")
+    public String deviceUrl;
     /** How long the issued client secret authenticates, in seconds (reported as client_secret_expires_at). Omit for a secret that does not expire. Ignored for a public client. */
     @JsonProperty("secret_expires_in_seconds")
     public Long secretExpiresInSeconds;
-    /** OpenID Connect `sub` for this client. `public` (default): the user id. `pairwise`: a per-sector identifier, the same in the id_token, access token, userinfo, introspection and back-channel logout tokens, that clients on other sectors cannot correlate. Changing it changes the `sub` of every user of the client. One of: public, pairwise. */
+    /** OpenID Connect `sub` for this client. `public` (default): the user id. `pairwise`: a per-sector identifier, the same in the id_token, access token, userinfo, introspection and back-channel logout tokens, that clients on other sectors cannot correlate. `external_id`: the user's external_id, in all of those places (a user without one follows subject_fallback). Changing it changes the `sub` of every user of the client. One of: public, pairwise, external_id. */
     @JsonProperty("subject_type")
     public String subjectType;
+    /** With subject_type external_id, for a user who has no external_id: `atlas_user_id` (default) uses the Atlas user id as `sub`; `refuse` fails the authorization with access_denied. One of: atlas_user_id, refuse. */
+    @JsonProperty("subject_fallback")
+    public String subjectFallback;
     /** An https URL serving a JSON array that lists every redirect_uri of the client. Its host is the pairwise sector. Required for a pairwise client whose redirect_uris span more than one host; null clears it. */
     @JsonProperty("sector_identifier_uri")
     public String sectorIdentifierUri;
@@ -166,6 +187,18 @@ public final class OauthClientsCreateBody {
     public OauthClientsCreateBody approvedScopes(List<String> v) { this.approvedScopes = v; clearedFields.remove("approved_scopes"); return this; }
     /** Send {@code "approved_scopes": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public OauthClientsCreateBody clearApprovedScopes() { this.approvedScopes = null; clearedFields.add("approved_scopes"); return this; }
+    public OauthClientsCreateBody defaultScopes(List<String> v) { this.defaultScopes = v; clearedFields.remove("default_scopes"); return this; }
+    /** Send {@code "default_scopes": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsCreateBody clearDefaultScopes() { this.defaultScopes = null; clearedFields.add("default_scopes"); return this; }
+    public OauthClientsCreateBody defaultResource(String v) { this.defaultResource = v; clearedFields.remove("default_resource"); return this; }
+    /** Send {@code "default_resource": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsCreateBody clearDefaultResource() { this.defaultResource = null; clearedFields.add("default_resource"); return this; }
+    public OauthClientsCreateBody requireOpenid(Boolean v) { this.requireOpenid = v; clearedFields.remove("require_openid"); return this; }
+    /** Send {@code "require_openid": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsCreateBody clearRequireOpenid() { this.requireOpenid = null; clearedFields.add("require_openid"); return this; }
+    public OauthClientsCreateBody certified(Boolean v) { this.certified = v; clearedFields.remove("certified"); return this; }
+    /** Send {@code "certified": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsCreateBody clearCertified() { this.certified = null; clearedFields.add("certified"); return this; }
     public OauthClientsCreateBody rateLimitPerMinute(Long v) { this.rateLimitPerMinute = v; clearedFields.remove("rate_limit_per_minute"); return this; }
     /** Send {@code "rate_limit_per_minute": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public OauthClientsCreateBody clearRateLimitPerMinute() { this.rateLimitPerMinute = null; clearedFields.add("rate_limit_per_minute"); return this; }
@@ -175,12 +208,21 @@ public final class OauthClientsCreateBody {
     public OauthClientsCreateBody consentUrl(String v) { this.consentUrl = v; clearedFields.remove("consent_url"); return this; }
     /** Send {@code "consent_url": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public OauthClientsCreateBody clearConsentUrl() { this.consentUrl = null; clearedFields.add("consent_url"); return this; }
+    public OauthClientsCreateBody delegateConsent(String v) { this.delegateConsent = v; clearedFields.remove("delegate_consent"); return this; }
+    /** Send {@code "delegate_consent": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsCreateBody clearDelegateConsent() { this.delegateConsent = null; clearedFields.add("delegate_consent"); return this; }
+    public OauthClientsCreateBody deviceUrl(String v) { this.deviceUrl = v; clearedFields.remove("device_url"); return this; }
+    /** Send {@code "device_url": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsCreateBody clearDeviceUrl() { this.deviceUrl = null; clearedFields.add("device_url"); return this; }
     public OauthClientsCreateBody secretExpiresInSeconds(Long v) { this.secretExpiresInSeconds = v; clearedFields.remove("secret_expires_in_seconds"); return this; }
     /** Send {@code "secret_expires_in_seconds": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public OauthClientsCreateBody clearSecretExpiresInSeconds() { this.secretExpiresInSeconds = null; clearedFields.add("secret_expires_in_seconds"); return this; }
     public OauthClientsCreateBody subjectType(String v) { this.subjectType = v; clearedFields.remove("subject_type"); return this; }
     /** Send {@code "subject_type": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public OauthClientsCreateBody clearSubjectType() { this.subjectType = null; clearedFields.add("subject_type"); return this; }
+    public OauthClientsCreateBody subjectFallback(String v) { this.subjectFallback = v; clearedFields.remove("subject_fallback"); return this; }
+    /** Send {@code "subject_fallback": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsCreateBody clearSubjectFallback() { this.subjectFallback = null; clearedFields.add("subject_fallback"); return this; }
     public OauthClientsCreateBody sectorIdentifierUri(String v) { this.sectorIdentifierUri = v; clearedFields.remove("sector_identifier_uri"); return this; }
     /** Send {@code "sector_identifier_uri": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public OauthClientsCreateBody clearSectorIdentifierUri() { this.sectorIdentifierUri = null; clearedFields.add("sector_identifier_uri"); return this; }

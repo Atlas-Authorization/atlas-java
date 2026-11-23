@@ -65,6 +65,12 @@ public final class MachineTrustPoliciesApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public MachineTrustPoliciesDeleteResponse delete(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/machine_trust_policies/" + enc(id), null, null, idempotencyKey, false, new TypeReference<MachineTrustPoliciesDeleteResponse>() {
+        });
+    }
+
     /** {@code GET /v1/machine_trust_policies/{id}} - Fetch one trust policy. Scope: {@code machines:read}. */
     public MachineTrustPoliciesGetResponse get(String id) {
         return t.request("GET", "/v1/machine_trust_policies/" + enc(id), null, null, null, false, new TypeReference<MachineTrustPoliciesGetResponse>() {
@@ -74,6 +80,12 @@ public final class MachineTrustPoliciesApi {
     /** {@code PATCH /v1/machine_trust_policies/{id}} - Change a trust policy. kind and machine_id cannot change. Needs a recent MFA sign-in. Scope: {@code machines:write}. */
     public MachineTrustPoliciesUpdateResponse update(String id, MachineTrustPoliciesUpdateBody body) {
         return t.request("PATCH", "/v1/machine_trust_policies/" + enc(id), null, body, null, false, new TypeReference<MachineTrustPoliciesUpdateResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public MachineTrustPoliciesUpdateResponse update(String id, MachineTrustPoliciesUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/machine_trust_policies/" + enc(id), null, body, idempotencyKey, false, new TypeReference<MachineTrustPoliciesUpdateResponse>() {
         });
     }
 

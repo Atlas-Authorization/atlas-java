@@ -65,6 +65,12 @@ public final class SuppressionsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public SuppressionsDeleteResponse delete(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/suppressions/" + enc(id), null, null, idempotencyKey, false, new TypeReference<SuppressionsDeleteResponse>() {
+        });
+    }
+
     /** {@code GET /v1/suppressions/{id}} - Read one suppressed address and why it is suppressed. Scope: {@code messaging:read}. */
     public SuppressionsGetResponse get(String id) {
         return t.request("GET", "/v1/suppressions/" + enc(id), null, null, null, false, new TypeReference<SuppressionsGetResponse>() {

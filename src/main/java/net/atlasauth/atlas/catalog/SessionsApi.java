@@ -121,9 +121,27 @@ public final class SessionsApi {
         });
     }
 
+    /** {@code PUT /v1/sessions/{id}/active_organization} - Set (or clear, with organization_id null) the active organization of a session from your backend. The user must hold a seat in it (or in an ancestor with role inheritance on) and meet its second-factor policy, as for their own switch: an organization they are not in is 404, a policy that needs a second factor is 403 STEP_UP_REQUIRED. The next token minted for the session (refresh or getToken) carries that organization claims. An ended session is 409; an unknown id, or one of another instance, is 404. Returns the session with last_active_organization_id. Scope: {@code sessions:write}. */
+    public Session setActiveOrganization(String id, SessionsSetActiveOrganizationBody body) {
+        return t.request("PUT", "/v1/sessions/" + enc(id) + "/active_organization", null, body, null, false, new TypeReference<Session>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Session setActiveOrganization(String id, SessionsSetActiveOrganizationBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/sessions/" + enc(id) + "/active_organization", null, body, idempotencyKey, false, new TypeReference<Session>() {
+        });
+    }
+
     /** {@code DELETE /v1/sessions/{id}/binding} - Remove a session's DPoP binding so it can bind a new key (a user who lost their device key). Audited. Scope: {@code sessions:write}. */
     public SessionsDeleteBindingResponse deleteBinding(String id) {
         return t.request("DELETE", "/v1/sessions/" + enc(id) + "/binding", null, null, null, false, new TypeReference<SessionsDeleteBindingResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public SessionsDeleteBindingResponse deleteBinding(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/sessions/" + enc(id) + "/binding", null, null, idempotencyKey, false, new TypeReference<SessionsDeleteBindingResponse>() {
         });
     }
 
@@ -139,9 +157,21 @@ public final class SessionsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Session updateCustomData(String id, SessionsUpdateCustomDataBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/sessions/" + enc(id) + "/custom_data", null, body, idempotencyKey, false, new TypeReference<Session>() {
+        });
+    }
+
     /** {@code PUT /v1/sessions/{id}/custom_data} - Replace the session's custom data with `custom_data` (a JSON object of at most 2 KB; null clears it). Only an active session can be changed (409 SESSION_REVOKED otherwise). The data is returned on the session object and on the Frontend API client session, and — when the instance sets session.customData.inToken — in the next session token under session.customData.claim, so it never shadows a reserved claim. Not for secrets: the signed-in user can read it. Scope: {@code sessions:write}. */
     public Session setCustomData(String id, SessionsSetCustomDataBody body) {
         return t.request("PUT", "/v1/sessions/" + enc(id) + "/custom_data", null, body, null, false, new TypeReference<Session>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Session setCustomData(String id, SessionsSetCustomDataBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/sessions/" + enc(id) + "/custom_data", null, body, idempotencyKey, false, new TypeReference<Session>() {
         });
     }
 

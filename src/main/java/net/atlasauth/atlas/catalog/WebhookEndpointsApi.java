@@ -83,6 +83,12 @@ public final class WebhookEndpointsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public WebhookEndpoint update(String id, WebhookEndpointsUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/webhook_endpoints/" + enc(id), null, body, idempotencyKey, false, new TypeReference<WebhookEndpoint>() {
+        });
+    }
+
     /** {@code GET /v1/webhook_endpoints/{id}/dlq} - The dead-letter queue of an endpoint: deliveries that used every attempt, newest first, each with the payload that was sent, the last response and the error. `depth` counts what nobody has acknowledged yet. Pull a page, handle it (or fix the receiver and requeue), then acknowledge, so a consumer that cannot take pushes can work failures off as a queue. Cursor: `starting_after` with the `next_cursor` of the previous page. Scope: {@code webhooks:read}. */
     public WebhookEndpointsListDlqResponse listDlq(String id) {
         return t.request("GET", "/v1/webhook_endpoints/" + enc(id) + "/dlq", null, null, null, false, new TypeReference<WebhookEndpointsListDlqResponse>() {

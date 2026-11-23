@@ -478,6 +478,9 @@ class Op: pass
 ops = []
 used_names = {}      # ns -> set(method names)
 type_used = set()
+for m, p, o in selected:   # reserve published names first: a new op visited earlier must not take one
+    if f'{m} {p}' in PINS['method_names']:
+        used_names.setdefault(split_path(p)[0], set()).add(PINS['method_names'][f'{m} {p}'])
 for m, p, o in selected:
     ns, rest = split_path(p)
     op = Op()

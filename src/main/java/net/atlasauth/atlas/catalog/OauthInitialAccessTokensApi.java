@@ -64,4 +64,10 @@ public final class OauthInitialAccessTokensApi {
         return t.request("DELETE", "/v1/oauth_initial_access_tokens/" + enc(id), null, null, null, false, new TypeReference<OauthInitialAccessTokensDeleteResponse>() {
         });
     }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OauthInitialAccessTokensDeleteResponse delete(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/oauth_initial_access_tokens/" + enc(id), null, null, idempotencyKey, false, new TypeReference<OauthInitialAccessTokensDeleteResponse>() {
+        });
+    }
 }

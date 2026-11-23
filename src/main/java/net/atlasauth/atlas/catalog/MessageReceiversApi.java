@@ -53,9 +53,21 @@ public final class MessageReceiversApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public MessageReceiversDeleteResponse delete(String provider, String idempotencyKey) {
+        return t.request("DELETE", "/v1/message_receivers/" + enc(provider), null, null, idempotencyKey, false, new TypeReference<MessageReceiversDeleteResponse>() {
+        });
+    }
+
     /** {@code PUT /v1/message_receivers/{provider}} - Store the secret Atlas verifies this provider's callbacks with (your Mailgun webhook signing key, SendGrid public key, Resend webhook secret, Vonage signature secret, MessageBird signing key, or the SNS topic ARNs to accept). Write-only: it is never returned. Twilio needs none (it uses the auth token of your SMS provider). Scope: {@code messaging:write}. */
     public MessageReceiversSetResponse set(String provider, MessageReceiversSetBody body) {
         return t.request("PUT", "/v1/message_receivers/" + enc(provider), null, body, null, false, new TypeReference<MessageReceiversSetResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public MessageReceiversSetResponse set(String provider, MessageReceiversSetBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/message_receivers/" + enc(provider), null, body, idempotencyKey, false, new TypeReference<MessageReceiversSetResponse>() {
         });
     }
 }

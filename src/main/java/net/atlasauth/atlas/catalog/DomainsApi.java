@@ -21,6 +21,48 @@ public final class DomainsApi {
         this.t = t;
     }
 
+    /** {@code GET /v1/domains} - List custom domains with DNS/ACME/cookie-domain status and setup instructions. Scope: {@code domains:read}. */
+    public DomainsListResponse list() {
+        return t.request("GET", "/v1/domains", null, null, null, false, new TypeReference<DomainsListResponse>() {
+        });
+    }
+
+    /** As above, with every optional parameter. */
+    public DomainsListResponse list(DomainsListQuery query) {
+        return t.request("GET", "/v1/domains", query == null ? null : query.toMap(), null, null, false, new TypeReference<DomainsListResponse>() {
+        });
+    }
+
+    /** {@code POST /v1/domains} - Claim a custom domain (fapi or accounts). Returns 201 with the full custom_domain object — including its `id` (dom_…), which you pass to POST /v1/domains/&#123;id&#125;/verify once DNS is published — plus the CNAME `instructions` to follow (a subdomain of the Atlas platform domain is refused with 403: those are assigned by Atlas only). Pass `dns: &#123;provider: "cloudflare", api_token&#125;` and Atlas writes the CNAME itself: it finds the zone, creates the record DNS-only (never proxied; `dns.proxied: true` is refused), waits briefly for it to resolve and verifies, so the domain can go from nothing to active in one call (`verified` in the response; otherwise call verify later). The token is stored encrypted and is never readable back (the response shows only `dns.provider` and `token_set`). An existing record that points elsewhere is not overwritten unless `dns.overwrite` is true (409 DNS_RECORD_CONFLICT); a rejected token is 422 DNS_TOKEN_REJECTED; no visible zone is 422 DNS_ZONE_NOT_FOUND. Scope: {@code domains:write}. */
+    public DomainsCreateResponse create(DomainsCreateBody body) {
+        return t.request("POST", "/v1/domains", null, body, null, false, new TypeReference<DomainsCreateResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public DomainsCreateResponse create(DomainsCreateBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/domains", null, body, idempotencyKey, false, new TypeReference<DomainsCreateResponse>() {
+        });
+    }
+
+    /** {@code GET /v1/domains/{id}} - Read one custom domain: the same object as a list item, including a path mount's verification file and what the last failed check observed. Scope: {@code domains:read}. */
+    public CustomDomain get(String id) {
+        return t.request("GET", "/v1/domains/" + enc(id), null, null, null, false, new TypeReference<CustomDomain>() {
+        });
+    }
+
+    /** {@code POST /v1/domains/{id}/verification/rotate} - Issue a new random verification token for a path-mounted domain and return the domain with the new `verification.token` and `url`. The previous token keeps verifying for 24 hours (`verification.previous_url`, `previous_valid_until`). Use it when a CDN cache has stored a wrong answer for the old URL: the new URL has never been requested, so nothing is cached for it. A CNAME domain has no token (400). Scope: {@code domains:write}. */
+    public CustomDomain rotate(String id, Map<String, Object> body) {
+        return t.request("POST", "/v1/domains/" + enc(id) + "/verification/rotate", null, body, null, false, new TypeReference<CustomDomain>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public CustomDomain rotate(String id, Map<String, Object> body, String idempotencyKey) {
+        return t.request("POST", "/v1/domains/" + enc(id) + "/verification/rotate", null, body, idempotencyKey, false, new TypeReference<CustomDomain>() {
+        });
+    }
+
     /** {@code POST /v1/domains/{id}/verify} - Check the domain's CNAME now (a path mount: fetch its https verification file); a verified fapi host is written onto the instance. With DNS automation, a missing record is written again first. ?dry_run=true changes nothing and checks no DNS record or file (validated: false): it answers what a passing verify would do to the issuer, as issuer_before, issuer_after (equal when the issuer would not move: the domain is already live, is not the instance's own fapi host, or is a platform subdomain) and previous_issuers_kept_until (Unix seconds; null when the issuer would not move). Scope: {@code domains:write}. */
     public DomainsVerifyResponse verify(String id) {
         return t.request("POST", "/v1/domains/" + enc(id) + "/verify", null, null, null, false, new TypeReference<DomainsVerifyResponse>() {

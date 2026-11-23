@@ -133,6 +133,12 @@ public final class FlowsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public void deleteExperiment(String id, String experimentId, String idempotencyKey) {
+        t.request("DELETE", "/v1/flows/" + enc(id) + "/experiments/" + enc(experimentId), null, null, idempotencyKey, false, new TypeReference<Object>() {
+        });
+    }
+
     /** {@code GET /v1/flows/{id}/experiments/{experimentId}} - Get one journey experiment with its variants and results. Scope: {@code actions:read}. */
     public FlowsGetExperimentResponse getExperiment(String id, String experimentId) {
         return t.request("GET", "/v1/flows/" + enc(id) + "/experiments/" + enc(experimentId), null, null, null, false, new TypeReference<FlowsGetExperimentResponse>() {

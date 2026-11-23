@@ -65,6 +65,12 @@ public final class AppCatalogApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public void deleteCustomPreset(String id, String idempotencyKey) {
+        t.request("DELETE", "/v1/app_catalog/custom_presets/" + enc(id), null, null, idempotencyKey, false, new TypeReference<Object>() {
+        });
+    }
+
     /** {@code GET /v1/app_catalog/requests} - The queue of apps people asked for, most wanted first. Filter with status (open, building, available, declined). Scope: {@code app_catalog:read}. */
     public AppCatalogListRequestsResponse listRequests() {
         return t.request("GET", "/v1/app_catalog/requests", null, null, null, false, new TypeReference<AppCatalogListRequestsResponse>() {
@@ -109,9 +115,21 @@ public final class AppCatalogApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public void deleteRequest(String id, String idempotencyKey) {
+        t.request("DELETE", "/v1/app_catalog/requests/" + enc(id), null, null, idempotencyKey, false, new TypeReference<Object>() {
+        });
+    }
+
     /** {@code PATCH /v1/app_catalog/requests/{id}} - Move a request along: status open, building, available or declined, and a note. Scope: {@code app_catalog:write}. */
     public void updateRequest(String id, AppCatalogUpdateRequestBody body) {
         t.request("PATCH", "/v1/app_catalog/requests/" + enc(id), null, body, null, false, new TypeReference<Object>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public void updateRequest(String id, AppCatalogUpdateRequestBody body, String idempotencyKey) {
+        t.request("PATCH", "/v1/app_catalog/requests/" + enc(id), null, body, idempotencyKey, false, new TypeReference<Object>() {
         });
     }
 

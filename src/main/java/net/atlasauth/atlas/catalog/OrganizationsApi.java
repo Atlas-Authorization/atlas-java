@@ -33,6 +33,12 @@ public final class OrganizationsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OrganizationsDeleteAppWebhookEndpointResponse deleteAppWebhookEndpoint(String id, String endpointId, String idempotencyKey) {
+        return t.request("DELETE", "/v1/organizations/" + enc(id) + "/app_webhook_endpoints/" + enc(endpointId), null, null, idempotencyKey, false, new TypeReference<OrganizationsDeleteAppWebhookEndpointResponse>() {
+        });
+    }
+
     /** {@code GET /v1/organizations/{id}/app_webhook_endpoints/{endpointId}} - Retrieve one of the organization's application webhook endpoints, with its delivery health (failing_since, disabled_at, auto_disable rule). Scope: {@code webhooks:read}. */
     public WebhookEndpoint getAppWebhookEndpoint(String id, String endpointId) {
         return t.request("GET", "/v1/organizations/" + enc(id) + "/app_webhook_endpoints/" + enc(endpointId), null, null, null, false, new TypeReference<WebhookEndpoint>() {
@@ -42,6 +48,12 @@ public final class OrganizationsApi {
     /** {@code PATCH /v1/organizations/{id}/app_webhook_endpoints/{endpointId}} - Update the url, subscribed app event types, description or active flag. Setting active: true on an auto-disabled endpoint re-enables it; replay then re-sends what it missed. Scope: {@code webhooks:write}. */
     public WebhookEndpoint updateAppWebhookEndpoint(String id, String endpointId, OrganizationsUpdateAppWebhookEndpointBody body) {
         return t.request("PATCH", "/v1/organizations/" + enc(id) + "/app_webhook_endpoints/" + enc(endpointId), null, body, null, false, new TypeReference<WebhookEndpoint>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public WebhookEndpoint updateAppWebhookEndpoint(String id, String endpointId, OrganizationsUpdateAppWebhookEndpointBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/organizations/" + enc(id) + "/app_webhook_endpoints/" + enc(endpointId), null, body, idempotencyKey, false, new TypeReference<WebhookEndpoint>() {
         });
     }
 
@@ -175,9 +187,21 @@ public final class OrganizationsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OrganizationsDeleteApplicationResponse deleteApplication(String id, String clientId, String idempotencyKey) {
+        return t.request("DELETE", "/v1/organizations/" + enc(id) + "/applications/" + enc(clientId), null, null, idempotencyKey, false, new TypeReference<OrganizationsDeleteApplicationResponse>() {
+        });
+    }
+
     /** {@code PUT /v1/organizations/{id}/applications/{clientId}} - Give an organization access to an application (by client id or id), optionally limited to some organization roles. Idempotent; send `enabled: false` to pause access without removing it. Only matters while the application is `restricted`. Scope: {@code organizations:write}. */
     public OrganizationsSetApplicationResponse setApplication(String id, String clientId, OrganizationsSetApplicationBody body) {
         return t.request("PUT", "/v1/organizations/" + enc(id) + "/applications/" + enc(clientId), null, body, null, false, new TypeReference<OrganizationsSetApplicationResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OrganizationsSetApplicationResponse setApplication(String id, String clientId, OrganizationsSetApplicationBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/organizations/" + enc(id) + "/applications/" + enc(clientId), null, body, idempotencyKey, false, new TypeReference<OrganizationsSetApplicationResponse>() {
         });
     }
 
@@ -257,9 +281,21 @@ public final class OrganizationsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public DesignSettings updateDesign(String id, OrganizationsUpdateDesignBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/organizations/" + enc(id) + "/design", null, body, idempotencyKey, false, new TypeReference<DesignSettings>() {
+        });
+    }
+
     /** {@code PUT /v1/organizations/{id}/design} - Replace an organization's design override (&#123; design: AtlasDesign &#125;); &#123; design: &#123;&#125; &#125; removes it. Image ids must be design assets uploaded to this instance. Scope: {@code organizations:write}. */
     public DesignSettings setDesign(String id, OrganizationsSetDesignBody body) {
         return t.request("PUT", "/v1/organizations/" + enc(id) + "/design", null, body, null, false, new TypeReference<DesignSettings>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public DesignSettings setDesign(String id, OrganizationsSetDesignBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/organizations/" + enc(id) + "/design", null, body, idempotencyKey, false, new TypeReference<DesignSettings>() {
         });
     }
 
@@ -445,15 +481,33 @@ public final class OrganizationsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OrganizationsDeleteMembershipResponse deleteMembership(String id, String userId, OrganizationsDeleteMembershipQuery query, String idempotencyKey) {
+        return t.request("DELETE", "/v1/organizations/" + enc(id) + "/memberships/" + enc(userId), query == null ? null : query.toMap(), null, idempotencyKey, false, new TypeReference<OrganizationsDeleteMembershipResponse>() {
+        });
+    }
+
     /** {@code PATCH /v1/organizations/{id}/memberships/{userId}} - Change a member's role, who manages it (`role_source`), their administrator `scope`, and/or the seat's own `public_metadata`, `private_metadata`, `permissions` and `allowed_sign_in_methods` (only the fields you send change; `permissions: []` and `allowed_sign_in_methods: null` clear them; emits organizationMembership.updated). A role set here is `manual`: directory re-sync (SCIM groups, SSO claims, LDAP groups) leaves it alone until you send `role_source` naming a source of this organization again. A scope (`groups`, `teams`, `units`) limits where that member's admin permissions apply to members inside it, so an administrator can run part of an organization; `null` makes them organization-wide. A scoped administrator cannot invite, change settings, manage roles or assign a management role. Demoting the last admin returns LAST_ADMIN. Scope: {@code organizations:write}. */
     public OrganizationsUpdateMembershipResponse updateMembership(String id, String userId, OrganizationsUpdateMembershipBody body) {
         return t.request("PATCH", "/v1/organizations/" + enc(id) + "/memberships/" + enc(userId), null, body, null, false, new TypeReference<OrganizationsUpdateMembershipResponse>() {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OrganizationsUpdateMembershipResponse updateMembership(String id, String userId, OrganizationsUpdateMembershipBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/organizations/" + enc(id) + "/memberships/" + enc(userId), null, body, idempotencyKey, false, new TypeReference<OrganizationsUpdateMembershipResponse>() {
+        });
+    }
+
     /** {@code PUT /v1/organizations/{id}/memberships/{userId}} - Create or update a membership. Body: `role` (required), `role_source` (optional, as on PATCH), and the seat's own `public_metadata`, `private_metadata`, `permissions` (extra permission keys that join org_permissions in the session token) and `allowed_sign_in_methods` (a session signed in another way mints without this organization's claims). 201 when it adds the member, 200 when it changes the role. When a directory (SCIM, SSO or LDAP) manages the existing role and `role_source` does not name that same source, nothing changes and the answer is 200 with `unchanged: true` and the current `role_source`. Emits organizationMembership.created or organizationMembership.updated. Accepts Idempotency-Key. Scope: {@code organizations:write}. */
     public OrganizationsSetMembershipResponse setMembership(String id, String userId, OrganizationsSetMembershipBody body) {
         return t.request("PUT", "/v1/organizations/" + enc(id) + "/memberships/" + enc(userId), null, body, null, false, new TypeReference<OrganizationsSetMembershipResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OrganizationsSetMembershipResponse setMembership(String id, String userId, OrganizationsSetMembershipBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/organizations/" + enc(id) + "/memberships/" + enc(userId), null, body, idempotencyKey, false, new TypeReference<OrganizationsSetMembershipResponse>() {
         });
     }
 
@@ -475,6 +529,12 @@ public final class OrganizationsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OrganizationsUpdatePolicyResponse updatePolicy(String id, OrgPolicyPatch body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/organizations/" + enc(id) + "/policy", null, body, idempotencyKey, false, new TypeReference<OrganizationsUpdatePolicyResponse>() {
+        });
+    }
+
     /** {@code GET /v1/organizations/{id}/role_policy} - The roles an organization may assign and the role a new seat gets by default. Scope: {@code organizations:read}. */
     public OrganizationsGetRolePolicyResponse getRolePolicy(String id) {
         return t.request("GET", "/v1/organizations/" + enc(id) + "/role_policy", null, null, null, false, new TypeReference<OrganizationsGetRolePolicyResponse>() {
@@ -484,6 +544,12 @@ public final class OrganizationsApi {
     /** {@code PUT /v1/organizations/{id}/role_policy} - Point an organization at a role set and/or give it its own default role (null clears either). Adding a member, accepting an invitation or changing a role to one outside the set is refused with 422 ROLE_NOT_IN_ROLE_SET; org:admin and the organization's own custom roles are always allowed, and directory syncs report what the directory says. Existing members are not changed. Scope: {@code organizations:write}. */
     public OrganizationsSetRolePolicyResponse setRolePolicy(String id, OrganizationsSetRolePolicyBody body) {
         return t.request("PUT", "/v1/organizations/" + enc(id) + "/role_policy", null, body, null, false, new TypeReference<OrganizationsSetRolePolicyResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OrganizationsSetRolePolicyResponse setRolePolicy(String id, OrganizationsSetRolePolicyBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/organizations/" + enc(id) + "/role_policy", null, body, idempotencyKey, false, new TypeReference<OrganizationsSetRolePolicyResponse>() {
         });
     }
 
@@ -499,9 +565,21 @@ public final class OrganizationsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OrganizationsDeleteRoleResponse deleteRole(String id, String roleId, OrganizationsDeleteRoleQuery query, String idempotencyKey) {
+        return t.request("DELETE", "/v1/organizations/" + enc(id) + "/roles/" + enc(roleId), query == null ? null : query.toMap(), null, idempotencyKey, false, new TypeReference<OrganizationsDeleteRoleResponse>() {
+        });
+    }
+
     /** {@code PATCH /v1/organizations/{id}/roles/{roleId}} - Rename one of the organization's own roles or replace its permissions. Emits role.updated. Scope: {@code organizations:write}. */
     public OrganizationsUpdateRoleResponse updateRole(String id, String roleId, OrganizationsUpdateRoleBody body) {
         return t.request("PATCH", "/v1/organizations/" + enc(id) + "/roles/" + enc(roleId), null, body, null, false, new TypeReference<OrganizationsUpdateRoleResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OrganizationsUpdateRoleResponse updateRole(String id, String roleId, OrganizationsUpdateRoleBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/organizations/" + enc(id) + "/roles/" + enc(roleId), null, body, idempotencyKey, false, new TypeReference<OrganizationsUpdateRoleResponse>() {
         });
     }
 
@@ -543,9 +621,21 @@ public final class OrganizationsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OrganizationsSetSeatsResponse setSeats(String id, OrganizationsSetSeatsBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/organizations/" + enc(id) + "/seats", null, body, idempotencyKey, false, new TypeReference<OrganizationsSetSeatsResponse>() {
+        });
+    }
+
     /** {@code DELETE /v1/organizations/{id}/teams/{teamId}} - Delete a team (its memberships go with it; the organization memberships stay). Emits team.deleted. Scope: {@code organizations:write}. */
     public OrganizationsDeleteTeamResponse deleteTeam(String id, String teamId) {
         return t.request("DELETE", "/v1/organizations/" + enc(id) + "/teams/" + enc(teamId), null, null, null, false, new TypeReference<OrganizationsDeleteTeamResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OrganizationsDeleteTeamResponse deleteTeam(String id, String teamId, String idempotencyKey) {
+        return t.request("DELETE", "/v1/organizations/" + enc(id) + "/teams/" + enc(teamId), null, null, idempotencyKey, false, new TypeReference<OrganizationsDeleteTeamResponse>() {
         });
     }
 
@@ -558,6 +648,12 @@ public final class OrganizationsApi {
     /** {@code PATCH /v1/organizations/{id}/teams/{teamId}} - Rename a team or change its description. Emits team.updated. Scope: {@code organizations:write}. */
     public OrganizationsUpdateTeamResponse updateTeam(String id, String teamId, OrganizationsUpdateTeamBody body) {
         return t.request("PATCH", "/v1/organizations/" + enc(id) + "/teams/" + enc(teamId), null, body, null, false, new TypeReference<OrganizationsUpdateTeamResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OrganizationsUpdateTeamResponse updateTeam(String id, String teamId, OrganizationsUpdateTeamBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/organizations/" + enc(id) + "/teams/" + enc(teamId), null, body, idempotencyKey, false, new TypeReference<OrganizationsUpdateTeamResponse>() {
         });
     }
 
@@ -602,6 +698,12 @@ public final class OrganizationsApi {
     /** {@code DELETE /v1/organizations/{id}/teams/{teamId}/members/{userId}} - Remove a user from the team. Scope: {@code organizations:write}. */
     public OrganizationsDeleteMemberResponse deleteMember(String id, String teamId, String userId) {
         return t.request("DELETE", "/v1/organizations/" + enc(id) + "/teams/" + enc(teamId) + "/members/" + enc(userId), null, null, null, false, new TypeReference<OrganizationsDeleteMemberResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OrganizationsDeleteMemberResponse deleteMember(String id, String teamId, String userId, String idempotencyKey) {
+        return t.request("DELETE", "/v1/organizations/" + enc(id) + "/teams/" + enc(teamId) + "/members/" + enc(userId), null, null, idempotencyKey, false, new TypeReference<OrganizationsDeleteMemberResponse>() {
         });
     }
 
@@ -652,6 +754,12 @@ public final class OrganizationsApi {
     /** {@code PATCH /v1/organizations/{id}/webhook_endpoints/{endpointId}} - Update the url, subscribed events, description or active flag of one of the organization's endpoints. Never re-reveals the secret. Scope: {@code webhooks:write}. */
     public WebhookEndpoint updateWebhookEndpoint(String id, String endpointId, OrganizationsUpdateWebhookEndpointBody body) {
         return t.request("PATCH", "/v1/organizations/" + enc(id) + "/webhook_endpoints/" + enc(endpointId), null, body, null, false, new TypeReference<WebhookEndpoint>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public WebhookEndpoint updateWebhookEndpoint(String id, String endpointId, OrganizationsUpdateWebhookEndpointBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/organizations/" + enc(id) + "/webhook_endpoints/" + enc(endpointId), null, body, idempotencyKey, false, new TypeReference<WebhookEndpoint>() {
         });
     }
 

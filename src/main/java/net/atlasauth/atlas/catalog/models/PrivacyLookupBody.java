@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-/** Provide `emails` or `atlas.sub` / `atlas.ext`. */
+/** Provide `emails` or `atlas.sub` / `atlas.ext`. `identity` is an alias of `atlas`; send either, or both with identical values (differing values are a 400 on `identity`). An identity match wins over an email match. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class PrivacyLookupBody {
     @JsonProperty("emails")
@@ -17,6 +17,9 @@ public final class PrivacyLookupBody {
     /** The person as the suite knows them. `sub` (with `iss`) is matched ALONE when present — never an email fallback. `iss` may be this instance's issuer (current or previous) or, with Sign in with Atlas on, the Sign in with Atlas issuer. */
     @JsonProperty("atlas")
     public PrivacyLookupBodyAtlas atlas;
+    /** Alias of `atlas`: same object, same validation and lookup order. */
+    @JsonProperty("identity")
+    public PrivacyLookupBodyIdentity identity;
     /** Wire names sent as an explicit JSON null (see the clear methods); unset fields are omitted. */
     @JsonIgnore
     private final java.util.Set<String> clearedFields = new java.util.LinkedHashSet<>();
@@ -30,6 +33,9 @@ public final class PrivacyLookupBody {
     public PrivacyLookupBody atlas(PrivacyLookupBodyAtlas v) { this.atlas = v; clearedFields.remove("atlas"); return this; }
     /** Send {@code "atlas": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public PrivacyLookupBody clearAtlas() { this.atlas = null; clearedFields.add("atlas"); return this; }
+    public PrivacyLookupBody identity(PrivacyLookupBodyIdentity v) { this.identity = v; clearedFields.remove("identity"); return this; }
+    /** Send {@code "identity": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public PrivacyLookupBody clearIdentity() { this.identity = null; clearedFields.add("identity"); return this; }
 
     @JsonAnyGetter
     Map<String, Object> clearedAsNull() {

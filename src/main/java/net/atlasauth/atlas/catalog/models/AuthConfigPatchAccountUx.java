@@ -23,10 +23,14 @@ public final class AuthConfigPatchAccountUx {
     public AuthConfigPatchAccountUxImpersonation impersonation;
     @JsonProperty("lastSignInMethod")
     public AuthConfigPatchAccountUxLastSignInMethod lastSignInMethod;
+    @JsonProperty("linking")
+    public AuthConfigPatchAccountUxLinking linking;
     @JsonProperty("passkeyAdoption")
     public AuthConfigPatchAccountUxPasskeyAdoption passkeyAdoption;
     @JsonProperty("passkeySignUp")
     public AuthConfigPatchAccountUxPasskeySignUp passkeySignUp;
+    @JsonProperty("passwordImport")
+    public AuthConfigPatchAccountUxPasswordImport passwordImport;
     /** One of: both, code, link. */
     @JsonProperty("passwordReset")
     public String passwordReset;
@@ -56,12 +60,18 @@ public final class AuthConfigPatchAccountUx {
     public AuthConfigPatchAccountUx lastSignInMethod(AuthConfigPatchAccountUxLastSignInMethod v) { this.lastSignInMethod = v; clearedFields.remove("lastSignInMethod"); return this; }
     /** Send {@code "lastSignInMethod": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchAccountUx clearLastSignInMethod() { this.lastSignInMethod = null; clearedFields.add("lastSignInMethod"); return this; }
+    public AuthConfigPatchAccountUx linking(AuthConfigPatchAccountUxLinking v) { this.linking = v; clearedFields.remove("linking"); return this; }
+    /** Send {@code "linking": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchAccountUx clearLinking() { this.linking = null; clearedFields.add("linking"); return this; }
     public AuthConfigPatchAccountUx passkeyAdoption(AuthConfigPatchAccountUxPasskeyAdoption v) { this.passkeyAdoption = v; clearedFields.remove("passkeyAdoption"); return this; }
     /** Send {@code "passkeyAdoption": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchAccountUx clearPasskeyAdoption() { this.passkeyAdoption = null; clearedFields.add("passkeyAdoption"); return this; }
     public AuthConfigPatchAccountUx passkeySignUp(AuthConfigPatchAccountUxPasskeySignUp v) { this.passkeySignUp = v; clearedFields.remove("passkeySignUp"); return this; }
     /** Send {@code "passkeySignUp": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchAccountUx clearPasskeySignUp() { this.passkeySignUp = null; clearedFields.add("passkeySignUp"); return this; }
+    public AuthConfigPatchAccountUx passwordImport(AuthConfigPatchAccountUxPasswordImport v) { this.passwordImport = v; clearedFields.remove("passwordImport"); return this; }
+    /** Send {@code "passwordImport": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchAccountUx clearPasswordImport() { this.passwordImport = null; clearedFields.add("passwordImport"); return this; }
     public AuthConfigPatchAccountUx passwordReset(String v) { this.passwordReset = v; clearedFields.remove("passwordReset"); return this; }
     /** Send {@code "passwordReset": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchAccountUx clearPasswordReset() { this.passwordReset = null; clearedFields.add("passwordReset"); return this; }

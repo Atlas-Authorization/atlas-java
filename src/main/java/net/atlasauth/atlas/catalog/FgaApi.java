@@ -45,6 +45,12 @@ public final class FgaApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public FgaSettings setSettings(FgaSetSettingsBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/fga/settings", null, body, idempotencyKey, false, new TypeReference<FgaSettings>() {
+        });
+    }
+
     /** {@code POST /v1/fga/stores/{id}/authorization-models} - Write a new immutable authorization-model version (OpenFGA-shaped type_definitions with this/computedUserset/tupleToUserset and union/intersection/difference). Unknown relation or type references are rejected. Scope: {@code fga:write}. */
     public FgaAuthorizationModel createAuthorizationModel(String id, FgaCreateAuthorizationModelBody body) {
         return t.request("POST", "/v1/fga/stores/" + enc(id) + "/authorization-models", null, body, null, false, new TypeReference<FgaAuthorizationModel>() {
@@ -153,6 +159,12 @@ public final class FgaApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Map<String, Object> deleteMaterialization(String id, String mid, String idempotencyKey) {
+        return t.request("DELETE", "/v1/fga/stores/" + enc(id) + "/materializations/" + enc(mid), null, null, idempotencyKey, false, new TypeReference<Map<String, Object>>() {
+        });
+    }
+
     /** {@code POST /v1/fga/stores/{id}/materializations/{mid}/rebuild} - Rebuild one materialization now. Scope: {@code fga:write}. */
     public Map<String, Object> rebuild(String id, String mid) {
         return t.request("POST", "/v1/fga/stores/" + enc(id) + "/materializations/" + enc(mid) + "/rebuild", null, null, null, false, new TypeReference<Map<String, Object>>() {
@@ -222,6 +234,12 @@ public final class FgaApi {
     /** {@code PUT /v1/fga/sync} - Configure the managed sync that turns organization memberships, org roles and groups into FGA tuples, so a model can say `viewer: member from organization` without mirroring anything by hand. Opt-in per instance; nothing is written until `enabled` is true with a `store_id`. Enabling starts from the current end of the change feed and queues a backfill. The sync only ever removes tuples it wrote; a tuple that existed first is left alone. Tuples the store's model has no relation for are skipped and counted. A store or a tuple name cannot change while the sync owns tuples (409): disable it and `POST /v1/fga/sync/purge` first. Emits nothing itself; its writes emit fga.tuple_written and fga.tuple_deleted. Scope: {@code fga:write}. */
     public FgaSetSyncResponse setSync(FgaSetSyncBody body) {
         return t.request("PUT", "/v1/fga/sync", null, body, null, false, new TypeReference<FgaSetSyncResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public FgaSetSyncResponse setSync(FgaSetSyncBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/fga/sync", null, body, idempotencyKey, false, new TypeReference<FgaSetSyncResponse>() {
         });
     }
 

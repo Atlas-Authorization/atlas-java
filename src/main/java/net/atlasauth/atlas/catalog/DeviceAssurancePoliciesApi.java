@@ -77,6 +77,12 @@ public final class DeviceAssurancePoliciesApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public DeviceAssurancePoliciesDeleteResponse delete(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/device_assurance_policies/" + enc(id), null, null, idempotencyKey, false, new TypeReference<DeviceAssurancePoliciesDeleteResponse>() {
+        });
+    }
+
     /** {@code GET /v1/device_assurance_policies/{id}} - Read one device assurance policy. Scope: {@code device_assurance:read}. */
     public DeviceAssurancePoliciesGetResponse get(String id) {
         return t.request("GET", "/v1/device_assurance_policies/" + enc(id), null, null, null, false, new TypeReference<DeviceAssurancePoliciesGetResponse>() {
@@ -86,6 +92,12 @@ public final class DeviceAssurancePoliciesApi {
     /** {@code PATCH /v1/device_assurance_policies/{id}} - Update a device assurance policy. Devices are re-evaluated. Scope: {@code device_assurance:write}. */
     public DeviceAssurancePoliciesUpdateResponse update(String id, DeviceAssurancePoliciesUpdateBody body) {
         return t.request("PATCH", "/v1/device_assurance_policies/" + enc(id), null, body, null, false, new TypeReference<DeviceAssurancePoliciesUpdateResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public DeviceAssurancePoliciesUpdateResponse update(String id, DeviceAssurancePoliciesUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/device_assurance_policies/" + enc(id), null, body, idempotencyKey, false, new TypeReference<DeviceAssurancePoliciesUpdateResponse>() {
         });
     }
 }

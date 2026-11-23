@@ -13,5 +13,7 @@ public record UsersApprovalRequestsCancelResponseApprovers(
         @JsonProperty("user_ids") List<String> userIds,
         @JsonProperty("organization_id") String organizationId,
         @JsonProperty("role") String role,
+        @JsonProperty("roles") List<String> roles,
+        @JsonProperty("group_id") String groupId,
         @JsonProperty("required") Long required) {
 }

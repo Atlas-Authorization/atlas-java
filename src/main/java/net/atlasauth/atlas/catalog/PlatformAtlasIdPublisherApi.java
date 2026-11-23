@@ -33,9 +33,21 @@ public final class PlatformAtlasIdPublisherApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public PlatformAtlasIdPublisherUpdateResponse update(PlatformAtlasIdPublisherUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/platform/atlas_id_publisher", null, body, idempotencyKey, false, new TypeReference<PlatformAtlasIdPublisherUpdateResponse>() {
+        });
+    }
+
     /** {@code PUT /v1/platform/atlas_id_publisher} - Claim a publisher name and domain for the account's Sign in with Atlas apps. Returns the TXT record (record_name `_atlas-publisher.&lt;domain&gt;`) to publish; then call verify. Changing the domain resets verification. Once verified, the consent screen of each app whose homepage_url is on that domain shows "Published by &lt;name&gt; · verified". Scope: {@code platform:atlas_id_apps:write}. */
     public PlatformAtlasIdPublisherSetResponse set(PlatformAtlasIdPublisherSetBody body) {
         return t.request("PUT", "/v1/platform/atlas_id_publisher", null, body, null, false, new TypeReference<PlatformAtlasIdPublisherSetResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public PlatformAtlasIdPublisherSetResponse set(PlatformAtlasIdPublisherSetBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/platform/atlas_id_publisher", null, body, idempotencyKey, false, new TypeReference<PlatformAtlasIdPublisherSetResponse>() {
         });
     }
 

@@ -14,6 +14,8 @@ import java.util.Map;
 public final class ApiKeysVerifyBody {
     @JsonProperty("secret")
     public String secret;
+    @JsonProperty("token")
+    public String token;
     @JsonProperty("required_scopes")
     public List<String> requiredScopes;
     @JsonProperty("client_ip")
@@ -28,6 +30,9 @@ public final class ApiKeysVerifyBody {
     public ApiKeysVerifyBody secret(String v) { this.secret = v; clearedFields.remove("secret"); return this; }
     /** Send {@code "secret": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public ApiKeysVerifyBody clearSecret() { this.secret = null; clearedFields.add("secret"); return this; }
+    public ApiKeysVerifyBody token(String v) { this.token = v; clearedFields.remove("token"); return this; }
+    /** Send {@code "token": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public ApiKeysVerifyBody clearToken() { this.token = null; clearedFields.add("token"); return this; }
     public ApiKeysVerifyBody requiredScopes(List<String> v) { this.requiredScopes = v; clearedFields.remove("required_scopes"); return this; }
     /** Send {@code "required_scopes": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public ApiKeysVerifyBody clearRequiredScopes() { this.requiredScopes = null; clearedFields.add("required_scopes"); return this; }

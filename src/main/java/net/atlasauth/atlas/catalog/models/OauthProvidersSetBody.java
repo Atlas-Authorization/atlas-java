@@ -25,6 +25,9 @@ public final class OauthProvidersSetBody {
     public Map<String, Object> settings;
     @JsonProperty("custom_redirect_uri")
     public String customRedirectUri;
+    /** The extra audiences a native app id_token may carry (an iOS bundle or Android client id), as GET returns them: an array, or a comma-separated string. The provider's own client_id is always accepted. Same as settings.native_client_ids; an empty array or "" clears the list. */
+    @JsonProperty("native_client_ids")
+    public Object nativeClientIds;
     @JsonProperty("native")
     public Boolean native_;
     /** Force the sign-in mode; "" clears the override. Applied together with credentials in one call. One of: native, redirect, . */
@@ -36,6 +39,9 @@ public final class OauthProvidersSetBody {
     /** An http(s) or data:image icon URL for the button; empty clears. */
     @JsonProperty("icon_url")
     public String iconUrl;
+    /** The built-in atlas_test provider only (development instances): its whole configuration. Other providers are enabled with POST /v1/oauth_providers/&#123;provider&#125;/enabled. */
+    @JsonProperty("enabled")
+    public Boolean enabled;
     /** Wire names sent as an explicit JSON null (see the clear methods); unset fields are omitted. */
     @JsonIgnore
     private final java.util.Set<String> clearedFields = new java.util.LinkedHashSet<>();
@@ -61,6 +67,9 @@ public final class OauthProvidersSetBody {
     public OauthProvidersSetBody customRedirectUri(String v) { this.customRedirectUri = v; clearedFields.remove("custom_redirect_uri"); return this; }
     /** Send {@code "custom_redirect_uri": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public OauthProvidersSetBody clearCustomRedirectUri() { this.customRedirectUri = null; clearedFields.add("custom_redirect_uri"); return this; }
+    public OauthProvidersSetBody nativeClientIds(Object v) { this.nativeClientIds = v; clearedFields.remove("native_client_ids"); return this; }
+    /** Send {@code "native_client_ids": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthProvidersSetBody clearNativeClientIds() { this.nativeClientIds = null; clearedFields.add("native_client_ids"); return this; }
     public OauthProvidersSetBody native_(Boolean v) { this.native_ = v; clearedFields.remove("native"); return this; }
     /** Send {@code "native": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public OauthProvidersSetBody clearNative() { this.native_ = null; clearedFields.add("native"); return this; }
@@ -73,6 +82,9 @@ public final class OauthProvidersSetBody {
     public OauthProvidersSetBody iconUrl(String v) { this.iconUrl = v; clearedFields.remove("icon_url"); return this; }
     /** Send {@code "icon_url": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public OauthProvidersSetBody clearIconUrl() { this.iconUrl = null; clearedFields.add("icon_url"); return this; }
+    public OauthProvidersSetBody enabled(Boolean v) { this.enabled = v; clearedFields.remove("enabled"); return this; }
+    /** Send {@code "enabled": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthProvidersSetBody clearEnabled() { this.enabled = null; clearedFields.add("enabled"); return this; }
 
     @JsonAnyGetter
     Map<String, Object> clearedAsNull() {

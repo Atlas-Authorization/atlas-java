@@ -115,6 +115,12 @@ public final class AuthzApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public AuthzDeleteWhatIfResponse deleteWhatIf(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/authz/what_if/" + enc(id), null, null, idempotencyKey, false, new TypeReference<AuthzDeleteWhatIfResponse>() {
+        });
+    }
+
     /** {@code GET /v1/authz/what_if/{id}} - One saved what-if run with its full result. Scope: {@code authz_decisions:read}. */
     public AuthzGetWhatIfResponse getWhatIf(String id) {
         return t.request("GET", "/v1/authz/what_if/" + enc(id), null, null, null, false, new TypeReference<AuthzGetWhatIfResponse>() {

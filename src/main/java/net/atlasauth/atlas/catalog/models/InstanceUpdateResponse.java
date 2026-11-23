@@ -25,5 +25,7 @@ public record InstanceUpdateResponse(
         @JsonProperty("warnings") List<InstanceUpdateResponseWarningsItem> warnings,
         @JsonProperty("inactive_methods") List<InstanceUpdateResponseInactiveMethodsItem> inactiveMethods,
         @JsonProperty("limited_methods") List<InstanceUpdateResponseLimitedMethodsItem> limitedMethods,
+        @JsonProperty("signup_usable") Boolean signupUsable,
+        @JsonProperty("signup_unusable_reason") String signupUnusableReason,
         @JsonProperty("created_at") Long createdAt) {
 }

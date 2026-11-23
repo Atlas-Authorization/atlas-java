@@ -71,6 +71,12 @@ public final class ScimProvisioningTargetsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public ScimProvisioningTargetsUpdateResponse update(String id, ScimProvisioningTargetsUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/scim_provisioning_targets/" + enc(id), null, body, idempotencyKey, false, new TypeReference<ScimProvisioningTargetsUpdateResponse>() {
+        });
+    }
+
     /** {@code GET /v1/scim_provisioning_targets/{id}/failures} - The failed-provision inbox: users and organizations whose last push to this target failed, with the error and the number of consecutive attempts. Scope: {@code scim_provisioning:read}. */
     public ScimProvisioningTargetsListFailuresResponse listFailures(String id) {
         return t.request("GET", "/v1/scim_provisioning_targets/" + enc(id) + "/failures", null, null, null, false, new TypeReference<ScimProvisioningTargetsListFailuresResponse>() {

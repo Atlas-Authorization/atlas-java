@@ -45,6 +45,12 @@ public final class FraudApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public FraudSetSettingsResponse setSettings(FraudSetSettingsBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/fraud/email_risk/settings", null, body, idempotencyKey, false, new TypeReference<FraudSetSettingsResponse>() {
+        });
+    }
+
     /** {@code POST /v1/fraud/lookup} - Fraud decision for a sign-up, sign-in or checkout. Send the client IP, user agent, the SDK `device_id`, optional device features and email; get back signals (country, ASN, datacenter, Tor, headless/automation, client class human/crawler/ai_agent/automation, bot score, disposable email, hourly IP/device/email velocity) and an allow / challenge / block verdict with reason codes from your `fraud.rules` and `fraud.sanctioned_countries` on /v1/risk_based_mfa. Every call counts toward the velocity signals. Scope: {@code risk_based_mfa:read}. */
     public FraudLookup lookup(FraudLookupBody body) {
         return t.request("POST", "/v1/fraud/lookup", null, body, null, false, new TypeReference<FraudLookup>() {

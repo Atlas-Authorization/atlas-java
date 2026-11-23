@@ -14,6 +14,8 @@ import java.util.Map;
 public final class AuthConfigPatchAppApproval {
     @JsonProperty("firstFactor")
     public Boolean firstFactor;
+    @JsonProperty("revealNoAccount")
+    public Boolean revealNoAccount;
     @JsonProperty("stepUp")
     public Boolean stepUp;
     @JsonProperty("ttlSeconds")
@@ -28,6 +30,9 @@ public final class AuthConfigPatchAppApproval {
     public AuthConfigPatchAppApproval firstFactor(Boolean v) { this.firstFactor = v; clearedFields.remove("firstFactor"); return this; }
     /** Send {@code "firstFactor": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchAppApproval clearFirstFactor() { this.firstFactor = null; clearedFields.add("firstFactor"); return this; }
+    public AuthConfigPatchAppApproval revealNoAccount(Boolean v) { this.revealNoAccount = v; clearedFields.remove("revealNoAccount"); return this; }
+    /** Send {@code "revealNoAccount": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchAppApproval clearRevealNoAccount() { this.revealNoAccount = null; clearedFields.add("revealNoAccount"); return this; }
     public AuthConfigPatchAppApproval stepUp(Boolean v) { this.stepUp = v; clearedFields.remove("stepUp"); return this; }
     /** Send {@code "stepUp": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchAppApproval clearStepUp() { this.stepUp = null; clearedFields.add("stepUp"); return this; }

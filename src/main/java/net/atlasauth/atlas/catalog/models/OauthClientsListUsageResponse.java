@@ -15,5 +15,6 @@ public record OauthClientsListUsageResponse(
         @JsonProperty("since") String since,
         @JsonProperty("until") String until,
         @JsonProperty("totals") OauthClientsListUsageResponseTotals totals,
+        @JsonProperty("latest_error") OauthClientsListUsageResponseLatestError latestError,
         @JsonProperty("data") List<OauthClientsListUsageResponseDataItem> data) {
 }

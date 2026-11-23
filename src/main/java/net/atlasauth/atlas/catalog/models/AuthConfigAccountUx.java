@@ -14,8 +14,10 @@ public record AuthConfigAccountUx(
         @JsonProperty("emailVerification") String emailVerification,
         @JsonProperty("impersonation") AuthConfigAccountUxImpersonation impersonation,
         @JsonProperty("lastSignInMethod") AuthConfigAccountUxLastSignInMethod lastSignInMethod,
+        @JsonProperty("linking") AuthConfigAccountUxLinking linking,
         @JsonProperty("passkeyAdoption") AuthConfigAccountUxPasskeyAdoption passkeyAdoption,
         @JsonProperty("passkeySignUp") AuthConfigAccountUxPasskeySignUp passkeySignUp,
+        @JsonProperty("passwordImport") AuthConfigAccountUxPasswordImport passwordImport,
         @JsonProperty("passwordReset") String passwordReset,
         @JsonProperty("securityNotifications") AuthConfigAccountUxSecurityNotifications securityNotifications,
         @JsonProperty("username") AuthConfigAccountUxUsername username) {

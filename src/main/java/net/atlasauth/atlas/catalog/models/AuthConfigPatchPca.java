@@ -12,12 +12,25 @@ import java.util.Map;
 /** The AuthConfigPatchPca object. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AuthConfigPatchPca {
+    @JsonProperty("allowedSuites")
+    public List<String> allowedSuites;
+    /** One of: both, operator, principal. */
+    @JsonProperty("beacons")
+    public String beacons;
     @JsonProperty("enabled")
     public Boolean enabled;
     @JsonProperty("maxPlanNodes")
     public Double maxPlanNodes;
+    @JsonProperty("objectiveRisk")
+    public AuthConfigPatchPcaObjectiveRisk objectiveRisk;
+    @JsonProperty("optimistic")
+    public Boolean optimistic;
     @JsonProperty("publicRateLimitPerMin")
     public Double publicRateLimitPerMin;
+    @JsonProperty("quotas")
+    public AuthConfigPatchPcaQuotas quotas;
+    @JsonProperty("undoSigner")
+    public String undoSigner;
     /** Wire names sent as an explicit JSON null (see the clear methods); unset fields are omitted. */
     @JsonIgnore
     private final java.util.Set<String> clearedFields = new java.util.LinkedHashSet<>();
@@ -25,15 +38,33 @@ public final class AuthConfigPatchPca {
     public AuthConfigPatchPca() {
     }
 
+    public AuthConfigPatchPca allowedSuites(List<String> v) { this.allowedSuites = v; clearedFields.remove("allowedSuites"); return this; }
+    /** Send {@code "allowedSuites": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchPca clearAllowedSuites() { this.allowedSuites = null; clearedFields.add("allowedSuites"); return this; }
+    public AuthConfigPatchPca beacons(String v) { this.beacons = v; clearedFields.remove("beacons"); return this; }
+    /** Send {@code "beacons": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchPca clearBeacons() { this.beacons = null; clearedFields.add("beacons"); return this; }
     public AuthConfigPatchPca enabled(Boolean v) { this.enabled = v; clearedFields.remove("enabled"); return this; }
     /** Send {@code "enabled": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchPca clearEnabled() { this.enabled = null; clearedFields.add("enabled"); return this; }
     public AuthConfigPatchPca maxPlanNodes(Double v) { this.maxPlanNodes = v; clearedFields.remove("maxPlanNodes"); return this; }
     /** Send {@code "maxPlanNodes": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchPca clearMaxPlanNodes() { this.maxPlanNodes = null; clearedFields.add("maxPlanNodes"); return this; }
+    public AuthConfigPatchPca objectiveRisk(AuthConfigPatchPcaObjectiveRisk v) { this.objectiveRisk = v; clearedFields.remove("objectiveRisk"); return this; }
+    /** Send {@code "objectiveRisk": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchPca clearObjectiveRisk() { this.objectiveRisk = null; clearedFields.add("objectiveRisk"); return this; }
+    public AuthConfigPatchPca optimistic(Boolean v) { this.optimistic = v; clearedFields.remove("optimistic"); return this; }
+    /** Send {@code "optimistic": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchPca clearOptimistic() { this.optimistic = null; clearedFields.add("optimistic"); return this; }
     public AuthConfigPatchPca publicRateLimitPerMin(Double v) { this.publicRateLimitPerMin = v; clearedFields.remove("publicRateLimitPerMin"); return this; }
     /** Send {@code "publicRateLimitPerMin": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchPca clearPublicRateLimitPerMin() { this.publicRateLimitPerMin = null; clearedFields.add("publicRateLimitPerMin"); return this; }
+    public AuthConfigPatchPca quotas(AuthConfigPatchPcaQuotas v) { this.quotas = v; clearedFields.remove("quotas"); return this; }
+    /** Send {@code "quotas": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchPca clearQuotas() { this.quotas = null; clearedFields.add("quotas"); return this; }
+    public AuthConfigPatchPca undoSigner(String v) { this.undoSigner = v; clearedFields.remove("undoSigner"); return this; }
+    /** Send {@code "undoSigner": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchPca clearUndoSigner() { this.undoSigner = null; clearedFields.add("undoSigner"); return this; }
 
     @JsonAnyGetter
     Map<String, Object> clearedAsNull() {

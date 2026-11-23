@@ -53,6 +53,12 @@ public final class RateLimitOverridesApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public RateLimitOverridesDeleteResponse delete(String subjectType, String subjectId, String idempotencyKey) {
+        return t.request("DELETE", "/v1/rate_limit_overrides/" + enc(subjectType) + "/" + enc(subjectId), null, null, idempotencyKey, false, new TypeReference<RateLimitOverridesDeleteResponse>() {
+        });
+    }
+
     /** {@code GET /v1/rate_limit_overrides/{subject_type}/{subject_id}} - The override for one subject, or 404. Scope: {@code rate_limit:read}. */
     public RateLimitOverridesGetResponse get(String subjectType, String subjectId) {
         return t.request("GET", "/v1/rate_limit_overrides/" + enc(subjectType) + "/" + enc(subjectId), null, null, null, false, new TypeReference<RateLimitOverridesGetResponse>() {
@@ -62,6 +68,12 @@ public final class RateLimitOverridesApi {
     /** {@code PUT /v1/rate_limit_overrides/{subject_type}/{subject_id}} - Pin one subject (an API key, user, organization or machine of this instance, or one IP address) to a policy of its kind (policy_id) or to an inline limit (limit with window_seconds, optional burst). An override beats every other rule, including the key's own rate_limit. Replaces any earlier override for the subject; the same content again changes nothing. expires_at ends it on its own. An override pointing at a disabled policy does not apply. Emits rate_limit_policy.updated. Scope: {@code rate_limit:write}. */
     public RateLimitOverridesSetResponse set(String subjectType, String subjectId, RateLimitOverridesSetBody body) {
         return t.request("PUT", "/v1/rate_limit_overrides/" + enc(subjectType) + "/" + enc(subjectId), null, body, null, false, new TypeReference<RateLimitOverridesSetResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public RateLimitOverridesSetResponse set(String subjectType, String subjectId, RateLimitOverridesSetBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/rate_limit_overrides/" + enc(subjectType) + "/" + enc(subjectId), null, body, idempotencyKey, false, new TypeReference<RateLimitOverridesSetResponse>() {
         });
     }
 }

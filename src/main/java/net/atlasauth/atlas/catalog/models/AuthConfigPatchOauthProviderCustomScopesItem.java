@@ -25,8 +25,13 @@ public final class AuthConfigPatchOauthProviderCustomScopesItem {
     /** Required. */
     @JsonProperty("name")
     public String name;
+    @JsonProperty("ownerExempt")
+    public Boolean ownerExempt;
     @JsonProperty("parameters")
     public List<String> parameters;
+    /** One of: any, certified, verified. */
+    @JsonProperty("requiresClientLevel")
+    public String requiresClientLevel;
     @JsonProperty("requiresVerifiedClient")
     public Boolean requiresVerifiedClient;
     @JsonProperty("sensitive")
@@ -47,9 +52,15 @@ public final class AuthConfigPatchOauthProviderCustomScopesItem {
     /** Send {@code "labels": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchOauthProviderCustomScopesItem clearLabels() { this.labels = null; clearedFields.add("labels"); return this; }
     public AuthConfigPatchOauthProviderCustomScopesItem name(String v) { this.name = v; clearedFields.remove("name"); return this; }
+    public AuthConfigPatchOauthProviderCustomScopesItem ownerExempt(Boolean v) { this.ownerExempt = v; clearedFields.remove("ownerExempt"); return this; }
+    /** Send {@code "ownerExempt": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchOauthProviderCustomScopesItem clearOwnerExempt() { this.ownerExempt = null; clearedFields.add("ownerExempt"); return this; }
     public AuthConfigPatchOauthProviderCustomScopesItem parameters(List<String> v) { this.parameters = v; clearedFields.remove("parameters"); return this; }
     /** Send {@code "parameters": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchOauthProviderCustomScopesItem clearParameters() { this.parameters = null; clearedFields.add("parameters"); return this; }
+    public AuthConfigPatchOauthProviderCustomScopesItem requiresClientLevel(String v) { this.requiresClientLevel = v; clearedFields.remove("requiresClientLevel"); return this; }
+    /** Send {@code "requiresClientLevel": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchOauthProviderCustomScopesItem clearRequiresClientLevel() { this.requiresClientLevel = null; clearedFields.add("requiresClientLevel"); return this; }
     public AuthConfigPatchOauthProviderCustomScopesItem requiresVerifiedClient(Boolean v) { this.requiresVerifiedClient = v; clearedFields.remove("requiresVerifiedClient"); return this; }
     /** Send {@code "requiresVerifiedClient": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchOauthProviderCustomScopesItem clearRequiresVerifiedClient() { this.requiresVerifiedClient = null; clearedFields.add("requiresVerifiedClient"); return this; }

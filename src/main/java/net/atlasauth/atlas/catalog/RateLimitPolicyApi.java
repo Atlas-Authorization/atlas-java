@@ -32,4 +32,10 @@ public final class RateLimitPolicyApi {
         return t.request("PATCH", "/v1/rate_limit_policy", null, body, null, false, new TypeReference<RateLimitPolicy>() {
         });
     }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public RateLimitPolicy update(RateLimitPolicyUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/rate_limit_policy", null, body, idempotencyKey, false, new TypeReference<RateLimitPolicy>() {
+        });
+    }
 }

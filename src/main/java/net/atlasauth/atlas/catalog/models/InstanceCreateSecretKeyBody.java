@@ -16,7 +16,7 @@ public final class InstanceCreateSecretKeyBody {
     public String name;
     @JsonProperty("scopes")
     public List<String> scopes;
-    /** A named scope set instead of `scopes[]`. `app-runtime`: what an app server needs to run: read users, read and write sessions, organizations (memberships and policy) and SSO connections, read preflight. No webhook secret reveal or rotation, no instance settings writes, no key management. Send either preset or scopes. One of: app-runtime. */
+    /** A named scope set instead of `scopes[]`. `app-runtime`: what an app server needs to run: read users, read and write sessions, organizations (memberships and policy) and SSO connections, read preflight. No webhook secret reveal or rotation, no instance settings writes, no key management. `web-app`: a web app's server: read and delete users, read and revoke sessions, privacy requests. `provisioning`: a deploy script's key (instance settings, domains, messaging, webhooks, OAuth, branding, keys). `integrations`: the key a connected platform's connect flow needs: instance settings, webhook endpoints, OAuth clients, keys, and the executor scopes `privacy:execute` and `privacy:grants:revoke` it mints its narrower key from. Send either preset or scopes. One of: app-runtime, web-app, provisioning, integrations. */
     @JsonProperty("preset")
     public String preset;
     /** Unix ms or ISO 8601; at most one year away. Default one year from now. */

@@ -12,18 +12,22 @@ public final class WebhookEndpointsListDlqQuery {
     public Long limit;
     /** Cursor: return only items after this id. Pass the `next_cursor` (or the last item id) of the previous page. */
     public String startingAfter;
+    /** Only deliveries of this event type (comma-separated for several). */
+    public String eventType;
 
     public WebhookEndpointsListDlqQuery() {
     }
 
     public WebhookEndpointsListDlqQuery limit(Long v) { this.limit = v; return this; }
     public WebhookEndpointsListDlqQuery startingAfter(String v) { this.startingAfter = v; return this; }
+    public WebhookEndpointsListDlqQuery eventType(String v) { this.eventType = v; return this; }
 
     /** A shallow copy. */
     public WebhookEndpointsListDlqQuery copy() {
         WebhookEndpointsListDlqQuery c = new WebhookEndpointsListDlqQuery();
         c.limit = this.limit;
         c.startingAfter = this.startingAfter;
+        c.eventType = this.eventType;
         return c;
     }
 
@@ -32,6 +36,7 @@ public final class WebhookEndpointsListDlqQuery {
         Params p = Params.of();
         p.set("limit", limit);
         p.set("starting_after", startingAfter);
+        p.set("event_type", eventType);
         Map<String, Object> m = p.map();
         return m;
     }

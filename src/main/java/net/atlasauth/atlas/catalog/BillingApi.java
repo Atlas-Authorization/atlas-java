@@ -189,6 +189,12 @@ public final class BillingApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public BillingDeleteCouponResponse deleteCoupon(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/billing/coupons/" + enc(id), null, null, idempotencyKey, false, new TypeReference<BillingDeleteCouponResponse>() {
+        });
+    }
+
     /** {@code GET /v1/billing/coupons/{id}} - Read one discount code. Scope: {@code billing:read}. */
     public BillingGetCouponResponse getCoupon(String id) {
         return t.request("GET", "/v1/billing/coupons/" + enc(id), null, null, null, false, new TypeReference<BillingGetCouponResponse>() {
@@ -198,6 +204,12 @@ public final class BillingApi {
     /** {@code PATCH /v1/billing/coupons/{id}} - Deactivate or reactivate a code, rename it, or change its redemption cap, expiry (`expires_at`, null removes it), eligible plans (`plan_ids`, null means every plan) or first-time-only rule. The discount itself cannot change; create a new code for that. Atlas enforces these when it validates a code at checkout; the promotion code on your payment provider keeps the limits it was created with, so the provider's own hosted page is still bound by those. Scope: {@code billing:write}. */
     public BillingUpdateCouponResponse updateCoupon(String id, BillingUpdateCouponBody body) {
         return t.request("PATCH", "/v1/billing/coupons/" + enc(id), null, body, null, false, new TypeReference<BillingUpdateCouponResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public BillingUpdateCouponResponse updateCoupon(String id, BillingUpdateCouponBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/billing/coupons/" + enc(id), null, body, idempotencyKey, false, new TypeReference<BillingUpdateCouponResponse>() {
         });
     }
 
@@ -319,6 +331,12 @@ public final class BillingApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public BillingPlan updatePlan(String id, BillingUpdatePlanBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/billing/plans/" + enc(id), null, body, idempotencyKey, false, new TypeReference<BillingPlan>() {
+        });
+    }
+
     /** {@code POST /v1/billing/plans/{id}/sync_entitlements} - Mirror a plan's features and numeric limits from its provider (an Autumn plan's items, a Commet plan's features), replacing the plan's own, so the pla/fea/ent claims match what the provider sells. 422 for a provider without feature definitions. Scope: {@code billing:write}. */
     public BillingPlan createSyncEntitlement(String id) {
         return t.request("POST", "/v1/billing/plans/" + enc(id) + "/sync_entitlements", null, null, null, false, new TypeReference<BillingPlan>() {
@@ -366,6 +384,12 @@ public final class BillingApi {
     /** {@code PUT /v1/billing/providers/{provider}} - Set the instance's own credentials for a billing provider (merged onto what is stored; secrets are write-only and encrypted at rest). Stripe: secret_key (sk_/rk_), webhook_secret (whsec_), publishable_key. Polar: access_token, webhook_secret. Dodo Payments and Creem: api_key, webhook_secret. Chargebee: api_key, site (the site name), webhook_username + webhook_password (the Basic credentials set on the Chargebee webhook). Autumn: secret_key (am_sk_), webhook_secret (whsec_). Commet: api_key, webhook_secret, optional seat_feature_code. Paddle: api_key, webhook_secret. Lemon Squeezy: api_key, webhook_secret, store_id. RevenueCat: api_key (a v2 secret key), webhook_secret (the Authorization value RevenueCat sends), project_id. App Store: private_key (the App Store Connect API key, .p8), key_id, issuer_id, bundle_id. Google Play: service_account_json, package_name, push_audience (the audience of the Pub/Sub push subscription), push_service_account (the service account it authenticates as). Stripe's environment follows the key's mode. Scope: {@code billing:write}. */
     public BillingSetProviderResponse setProvider(String provider, BillingSetProviderBody body) {
         return t.request("PUT", "/v1/billing/providers/" + enc(provider), null, body, null, false, new TypeReference<BillingSetProviderResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public BillingSetProviderResponse setProvider(String provider, BillingSetProviderBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/billing/providers/" + enc(provider), null, body, idempotencyKey, false, new TypeReference<BillingSetProviderResponse>() {
         });
     }
 

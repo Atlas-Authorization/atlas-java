@@ -71,6 +71,12 @@ public final class AuditExportsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public AuditExportsUpdateResponse update(String id, AuditExportsUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/audit_exports/" + enc(id), null, body, idempotencyKey, false, new TypeReference<AuditExportsUpdateResponse>() {
+        });
+    }
+
     /** {@code POST /v1/audit_exports/{id}/rotate_secret} - Rotate a webhook export's signing secret. The new secret is in this response only; the old one stops signing at once. Scope: {@code audit:write}. */
     public AuditExportsRotateSecretResponse rotateSecret(String id) {
         return t.request("POST", "/v1/audit_exports/" + enc(id) + "/rotate_secret", null, null, null, false, new TypeReference<AuditExportsRotateSecretResponse>() {

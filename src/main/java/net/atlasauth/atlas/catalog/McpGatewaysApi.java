@@ -77,6 +77,12 @@ public final class McpGatewaysApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public McpGatewaysDeletePackResponse deletePack(String id, String packId, String idempotencyKey) {
+        return t.request("DELETE", "/v1/mcp_gateways/" + enc(id) + "/packs/" + enc(packId), null, null, idempotencyKey, false, new TypeReference<McpGatewaysDeletePackResponse>() {
+        });
+    }
+
     /** {@code GET /v1/mcp_gateways/{id}/packs/{packId}} - Read one tool pack of an MCP gateway. Scope: {@code machines:read}. */
     public McpGatewaysGetPackResponse getPack(String id, String packId) {
         return t.request("GET", "/v1/mcp_gateways/" + enc(id) + "/packs/" + enc(packId), null, null, null, false, new TypeReference<McpGatewaysGetPackResponse>() {
@@ -86,6 +92,12 @@ public final class McpGatewaysApi {
     /** {@code PATCH /v1/mcp_gateways/{id}/packs/{packId}} - Change a tool pack; omitted fields keep their value. Scope: {@code machines:write}. */
     public McpGatewaysUpdatePackResponse updatePack(String id, String packId, McpGatewaysUpdatePackBody body) {
         return t.request("PATCH", "/v1/mcp_gateways/" + enc(id) + "/packs/" + enc(packId), null, body, null, false, new TypeReference<McpGatewaysUpdatePackResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public McpGatewaysUpdatePackResponse updatePack(String id, String packId, McpGatewaysUpdatePackBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/mcp_gateways/" + enc(id) + "/packs/" + enc(packId), null, body, idempotencyKey, false, new TypeReference<McpGatewaysUpdatePackResponse>() {
         });
     }
 
@@ -104,6 +116,12 @@ public final class McpGatewaysApi {
     /** {@code DELETE /v1/mcp_gateways/{id}/pins/{tool}} - Forget a pin; the next tools/list pins whatever the upstream serves then. Scope: {@code machines:write}. */
     public Map<String, Object> deletePin(String id, String tool) {
         return t.request("DELETE", "/v1/mcp_gateways/" + enc(id) + "/pins/" + enc(tool), null, null, null, false, new TypeReference<Map<String, Object>>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Map<String, Object> deletePin(String id, String tool, String idempotencyKey) {
+        return t.request("DELETE", "/v1/mcp_gateways/" + enc(id) + "/pins/" + enc(tool), null, null, idempotencyKey, false, new TypeReference<Map<String, Object>>() {
         });
     }
 
@@ -163,6 +181,12 @@ public final class McpGatewaysApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public McpGatewaysDeleteUpstreamResponse deleteUpstream(String id, String upstreamId, String idempotencyKey) {
+        return t.request("DELETE", "/v1/mcp_gateways/" + enc(id) + "/upstreams/" + enc(upstreamId), null, null, idempotencyKey, false, new TypeReference<McpGatewaysDeleteUpstreamResponse>() {
+        });
+    }
+
     /** {@code GET /v1/mcp_gateways/{id}/upstreams/{upstreamId}} - Read one upstream of an MCP gateway. Scope: {@code machines:read}. */
     public McpGatewaysGetUpstreamResponse getUpstream(String id, String upstreamId) {
         return t.request("GET", "/v1/mcp_gateways/" + enc(id) + "/upstreams/" + enc(upstreamId), null, null, null, false, new TypeReference<McpGatewaysGetUpstreamResponse>() {
@@ -172,6 +196,12 @@ public final class McpGatewaysApi {
     /** {@code PATCH /v1/mcp_gateways/{id}/upstreams/{upstreamId}} - Change an upstream. Omitted fields keep their value; sending `openapi` recompiles the tools. Scope: {@code machines:write}. */
     public McpGatewaysUpdateUpstreamResponse updateUpstream(String id, String upstreamId, McpGatewaysUpdateUpstreamBody body) {
         return t.request("PATCH", "/v1/mcp_gateways/" + enc(id) + "/upstreams/" + enc(upstreamId), null, body, null, false, new TypeReference<McpGatewaysUpdateUpstreamResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public McpGatewaysUpdateUpstreamResponse updateUpstream(String id, String upstreamId, McpGatewaysUpdateUpstreamBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/mcp_gateways/" + enc(id) + "/upstreams/" + enc(upstreamId), null, body, idempotencyKey, false, new TypeReference<McpGatewaysUpdateUpstreamResponse>() {
         });
     }
 

@@ -23,6 +23,8 @@ public record Session(
         @JsonProperty("custom_data") Map<String, Object> customData,
         @JsonProperty("sign_in_method") String signInMethod,
         @JsonProperty("provider") String provider,
+        @JsonProperty("native_client") SessionNativeClient nativeClient,
+        @JsonProperty("device_label") String deviceLabel,
         @JsonProperty("amr") List<String> amr,
         @JsonProperty("user_agent") String userAgent,
         @JsonProperty("ip_address") String ipAddress,

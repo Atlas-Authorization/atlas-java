@@ -22,6 +22,9 @@ public record ApiKey(
         @JsonProperty("max_token_lifetime_seconds") Long maxTokenLifetimeSeconds,
         @JsonProperty("public_key") String publicKey,
         @JsonProperty("public_key_jkt") String publicKeyJkt,
+        @JsonProperty("credential") String credential,
+        @JsonProperty("audience") String audience,
+        @JsonProperty("key_id") String keyId,
         @JsonProperty("limits") List<ApiKeyLimit> limits,
         @JsonProperty("usage") List<ApiKeyLimitState> usage,
         @JsonProperty("enabled") Boolean enabled,
@@ -34,5 +37,10 @@ public record ApiKey(
         @JsonProperty("revoked_reason") String revokedReason,
         @JsonProperty("organization_id") String organizationId,
         @JsonProperty("created_by_user_id") String createdByUserId,
+        @JsonProperty("end_reason") String endReason,
+        @JsonProperty("ended_at") Long endedAt,
+        @JsonProperty("revoked_by") ApiKeyRevokedBy revokedBy,
+        @JsonProperty("dies_with") String diesWith,
+        @JsonProperty("metadata") Map<String, Object> metadata,
         @JsonProperty("created_at") Long createdAt) {
 }

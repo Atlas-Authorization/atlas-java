@@ -65,6 +65,12 @@ public final class OrgRoleSetsApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OrgRoleSetsDeleteResponse delete(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/org_role_sets/" + enc(id), null, null, idempotencyKey, false, new TypeReference<OrgRoleSetsDeleteResponse>() {
+        });
+    }
+
     /** {@code GET /v1/org_role_sets/{id}} - One role set, by id or key. Scope: {@code organizations:read}. */
     public OrgRoleSetsGetResponse get(String id) {
         return t.request("GET", "/v1/org_role_sets/" + enc(id), null, null, null, false, new TypeReference<OrgRoleSetsGetResponse>() {
@@ -74,6 +80,12 @@ public final class OrgRoleSetsApi {
     /** {@code PATCH /v1/org_role_sets/{id}} - Change a role set. Members already holding a role the set no longer lists keep it; only new assignments are checked. Scope: {@code organizations:write}. */
     public OrgRoleSetsUpdateResponse update(String id, OrgRoleSetsUpdateBody body) {
         return t.request("PATCH", "/v1/org_role_sets/" + enc(id), null, body, null, false, new TypeReference<OrgRoleSetsUpdateResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OrgRoleSetsUpdateResponse update(String id, OrgRoleSetsUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/org_role_sets/" + enc(id), null, body, idempotencyKey, false, new TypeReference<OrgRoleSetsUpdateResponse>() {
         });
     }
 }

@@ -24,12 +24,18 @@ public final class ApprovalRequestsCreateBody {
     /** How long the request stays open: 10 to 604800 seconds. Default 120. */
     @JsonProperty("ttl_seconds")
     public Long ttlSeconds;
-    /** Who decides. Leave out for the v1 flow (the user answers on their own device with number matching). Name `user_ids` (1 to 20) or an `organization_id` with a `role`; `required` of them must approve (default 1, at most the number of user ids). Any one denial ends the request. A role with fewer holders than `required` is refused with 422 (`meta.reason` = `approvers_insufficient`). A request with approvers always needs signed approvals. */
+    /** Who decides. Leave out for the v1 flow (the user answers on their own device with number matching). Name `user_ids` (1 to 20), a `group_id` (every member of the group may decide), or an `organization_id` with a `role` (or up to 10 `roles`; a holder of any of them may decide). A role or group is the way to name a big set: "any 2 of ops" is the role `ops` with `required: 2`. `required` of them must approve (default 1; at most the number of user ids, and at most 50 for a role or group). Membership is read when someone decides, so leaving the group or role ends the right to decide. Any one denial ends the request. A role or group with fewer members than `required` is refused with 422 (`meta.reason` = `approvers_insufficient`). A request with approvers always needs signed approvals. */
     @JsonProperty("approvers")
     public ApprovalRequestsCreateBodyApprovers approvers;
     /** Demand a signature over the canonical request even from the user themselves. Default false. */
     @JsonProperty("require_signature")
     public Boolean requireSignature;
+    /** The user the request is about can never approve or reject it, even holding the approver role (403 with `meta.reason` = `requester_excluded`). Needs `approvers`; refused with 422 when too few other approvers remain to reach `required`. Default false. */
+    @JsonProperty("exclude_requester")
+    public Boolean excludeRequester;
+    /** Name of a step-up policy. An approver may then approve from a signed-in session that has just met that policy (within its max age) instead of signing with a device key or passkey; the receipt records the method as `step_up`. Device-signature approvals keep working. Refused with 400 when the policy does not exist or is disabled. */
+    @JsonProperty("step_up_policy")
+    public String stepUpPolicy;
     /** Only an approval from a device the approver trusted (a signing key, passkey or push device marked trusted) counts; a denial never needs one. Refused with 422 (`meta.reason` = `no_trusted_device`) when too few approvers have a trusted device. The instance setting approvals.requireTrustedDevice makes this the rule for every request. Default false. */
     @JsonProperty("require_trusted_device")
     public Boolean requireTrustedDevice;
@@ -60,6 +66,12 @@ public final class ApprovalRequestsCreateBody {
     public ApprovalRequestsCreateBody requireSignature(Boolean v) { this.requireSignature = v; clearedFields.remove("require_signature"); return this; }
     /** Send {@code "require_signature": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public ApprovalRequestsCreateBody clearRequireSignature() { this.requireSignature = null; clearedFields.add("require_signature"); return this; }
+    public ApprovalRequestsCreateBody excludeRequester(Boolean v) { this.excludeRequester = v; clearedFields.remove("exclude_requester"); return this; }
+    /** Send {@code "exclude_requester": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public ApprovalRequestsCreateBody clearExcludeRequester() { this.excludeRequester = null; clearedFields.add("exclude_requester"); return this; }
+    public ApprovalRequestsCreateBody stepUpPolicy(String v) { this.stepUpPolicy = v; clearedFields.remove("step_up_policy"); return this; }
+    /** Send {@code "step_up_policy": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public ApprovalRequestsCreateBody clearStepUpPolicy() { this.stepUpPolicy = null; clearedFields.add("step_up_policy"); return this; }
     public ApprovalRequestsCreateBody requireTrustedDevice(Boolean v) { this.requireTrustedDevice = v; clearedFields.remove("require_trusted_device"); return this; }
     /** Send {@code "require_trusted_device": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public ApprovalRequestsCreateBody clearRequireTrustedDevice() { this.requireTrustedDevice = null; clearedFields.add("require_trusted_device"); return this; }

@@ -70,4 +70,10 @@ public final class RadiusClientsApi {
         return t.request("PATCH", "/v1/radius_clients/" + enc(id), null, body, null, false, new TypeReference<RadiusClient>() {
         });
     }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public RadiusClient update(String id, RadiusClientsUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/radius_clients/" + enc(id), null, body, idempotencyKey, false, new TypeReference<RadiusClient>() {
+        });
+    }
 }

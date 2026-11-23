@@ -77,6 +77,12 @@ public final class RateLimitPoliciesApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public RateLimitPoliciesDeleteResponse delete(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/rate_limit_policies/" + enc(id), null, null, idempotencyKey, false, new TypeReference<RateLimitPoliciesDeleteResponse>() {
+        });
+    }
+
     /** {@code GET /v1/rate_limit_policies/{id}} - One rate-limit policy. Scope: {@code rate_limit:read}. */
     public RateLimitPoliciesGetResponse get(String id) {
         return t.request("GET", "/v1/rate_limit_policies/" + enc(id), null, null, null, false, new TypeReference<RateLimitPoliciesGetResponse>() {
@@ -86,6 +92,12 @@ public final class RateLimitPoliciesApi {
     /** {@code PATCH /v1/rate_limit_policies/{id}} - Change a policy. Send only the fields to change; the version goes up by one. Sending the same values again changes nothing. subject cannot change. Emits rate_limit_policy.updated with the before and after. Scope: {@code rate_limit:write}. */
     public RateLimitPoliciesUpdateResponse update(String id, RateLimitPoliciesUpdateBody body) {
         return t.request("PATCH", "/v1/rate_limit_policies/" + enc(id), null, body, null, false, new TypeReference<RateLimitPoliciesUpdateResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public RateLimitPoliciesUpdateResponse update(String id, RateLimitPoliciesUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/rate_limit_policies/" + enc(id), null, body, idempotencyKey, false, new TypeReference<RateLimitPoliciesUpdateResponse>() {
         });
     }
 }

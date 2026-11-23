@@ -70,4 +70,10 @@ public final class AppRolesApi {
         return t.request("PATCH", "/v1/app_roles/" + enc(id), null, body, null, false, new TypeReference<AppRolesUpdateResponse>() {
         });
     }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public AppRolesUpdateResponse update(String id, AppRolesUpdateBody body, String idempotencyKey) {
+        return t.request("PATCH", "/v1/app_roles/" + enc(id), null, body, idempotencyKey, false, new TypeReference<AppRolesUpdateResponse>() {
+        });
+    }
 }

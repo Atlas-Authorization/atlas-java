@@ -65,6 +65,12 @@ public final class McpRegistryApi {
         });
     }
 
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public McpRegistryDeleteResponse delete(String id, String idempotencyKey) {
+        return t.request("DELETE", "/v1/mcp_registry/" + enc(id), null, null, idempotencyKey, false, new TypeReference<McpRegistryDeleteResponse>() {
+        });
+    }
+
     /** {@code POST /v1/mcp_registry/{id}/decide} - Approve or reject a registry entry. Scope: {@code machines:write}. */
     public McpRegistryDecideResponse decide(String id, McpRegistryDecideBody body) {
         return t.request("POST", "/v1/mcp_registry/" + enc(id) + "/decide", null, body, null, false, new TypeReference<McpRegistryDecideResponse>() {

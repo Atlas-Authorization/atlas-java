@@ -51,9 +51,13 @@ agents	AgentsApi	listActivity	GET	/v1/agents/{id}/activity	java.lang.String,net.
 agents	AgentsApi	getLifecycle	GET	/v1/agents/{id}/lifecycle	java.lang.String	
 agents	AgentsApi	setLifecycle	PUT	/v1/agents/{id}/lifecycle	java.lang.String,net.atlasauth.atlas.catalog.models.AgentsSetLifecycleBody	
 agents	AgentsApi	renew	POST	/v1/agents/{id}/renew	java.lang.String,net.atlasauth.atlas.catalog.models.AgentsRenewBody	
+analytics	AnalyticsApi	listCaptcha	GET	/v1/analytics/captcha	net.atlasauth.atlas.catalog.models.AnalyticsListCaptchaQuery	
+analytics	AnalyticsApi	listSms	GET	/v1/analytics/sms	net.atlasauth.atlas.catalog.models.AnalyticsListSmsQuery	
 api_keys	ApiKeysApi	list	GET	/v1/api_keys	net.atlasauth.atlas.catalog.models.ApiKeysListQuery	
 api_keys	ApiKeysApi	create	POST	/v1/api_keys	net.atlasauth.atlas.catalog.models.ApiKeysCreateBody	
 api_keys	ApiKeysApi	listPosture	GET	/v1/api_keys/posture	net.atlasauth.atlas.catalog.models.ApiKeysListPostureQuery	
+api_keys	ApiKeysApi	listRevoked	GET	/v1/api_keys/revoked	net.atlasauth.atlas.catalog.models.ApiKeysListRevokedQuery	
+api_keys	ApiKeysApi	token	POST	/v1/api_keys/token	net.atlasauth.atlas.catalog.models.ApiKeysTokenBody	
 api_keys	ApiKeysApi	verify	POST	/v1/api_keys/verify	net.atlasauth.atlas.catalog.models.ApiKeysVerifyBody	
 api_keys	ApiKeysApi	get	GET	/v1/api_keys/{id}	java.lang.String	
 api_keys	ApiKeysApi	update	PATCH	/v1/api_keys/{id}	java.lang.String,net.atlasauth.atlas.catalog.models.ApiKeysUpdateBody	
@@ -186,19 +190,24 @@ connection_provider_changes	ConnectionProviderChangesApi	resolve	POST	/v1/connec
 connection_provider_event_log	ConnectionProviderEventLogApi	list	GET	/v1/connection_provider_event_log	net.atlasauth.atlas.catalog.models.ConnectionProviderEventLogListQuery	
 connection_provider_topics	ConnectionProviderTopicsApi	get	GET	/v1/connection_provider_topics		
 connection_provider_topics	ConnectionProviderTopicsApi	set	PUT	/v1/connection_provider_topics	net.atlasauth.atlas.catalog.models.ConnectionProviderTopicsSetBody	
+connection_providers	ConnectionProvidersApi	listPolicies	GET	/v1/connection_providers/policies	net.atlasauth.atlas.catalog.models.ConnectionProvidersListPoliciesQuery	
 connection_providers	ConnectionProvidersApi	deletePolicy	DELETE	/v1/connection_providers/{provider}/policy	java.lang.String	
 connection_providers	ConnectionProvidersApi	getPolicy	GET	/v1/connection_providers/{provider}/policy	java.lang.String	
 connection_providers	ConnectionProvidersApi	setPolicy	PUT	/v1/connection_providers/{provider}/policy	java.lang.String,net.atlasauth.atlas.catalog.models.ConnectionProvidersSetPolicyBody	
 connection_reconnect_settings	ConnectionReconnectSettingsApi	get	GET	/v1/connection_reconnect_settings		
 connection_reconnect_settings	ConnectionReconnectSettingsApi	set	PUT	/v1/connection_reconnect_settings	net.atlasauth.atlas.catalog.models.ConnectionReconnectSettingsSetBody	
+connection_templates	ConnectionTemplatesApi	list	GET	/v1/connection_templates	net.atlasauth.atlas.catalog.models.ConnectionTemplatesListQuery	
 connections	ConnectionsApi	list	GET	/v1/connections	net.atlasauth.atlas.catalog.models.ConnectionsListQuery	
 connections	ConnectionsApi	create	POST	/v1/connections	net.atlasauth.atlas.catalog.models.ConnectionsCreateBody	
+connections	ConnectionsApi	export	POST	/v1/connections/export	net.atlasauth.atlas.catalog.models.ConnectionsExportBody	
 connections	ConnectionsApi	importBy	POST	/v1/connections/import	net.atlasauth.atlas.catalog.models.ConnectionsImportByBody,net.atlasauth.atlas.catalog.models.ConnectionsImportByQuery	
 connections	ConnectionsApi	complete	POST	/v1/connections/oauth/complete	net.atlasauth.atlas.catalog.models.ConnectionsCompleteBody	
 connections	ConnectionsApi	listOauthClients	GET	/v1/connections/oauth_clients	net.atlasauth.atlas.catalog.models.ConnectionsListOauthClientsQuery	
 connections	ConnectionsApi	setOauthClients	PUT	/v1/connections/oauth_clients	net.atlasauth.atlas.catalog.models.ConnectionsSetOauthClientsBody	
 connections	ConnectionsApi	register	POST	/v1/connections/oauth_clients/register	net.atlasauth.atlas.catalog.models.ConnectionsRegisterBody	
+connections	ConnectionsApi	deleteOauthClient	DELETE	/v1/connections/oauth_clients/{id}	java.lang.String,net.atlasauth.atlas.catalog.models.ConnectionsDeleteOauthClientQuery	
 connections	ConnectionsApi	getOauthClient	GET	/v1/connections/oauth_clients/{id}	java.lang.String	
+connections	ConnectionsApi	rehome	POST	/v1/connections/rehome	net.atlasauth.atlas.catalog.models.ConnectionsRehomeBody	
 connections	ConnectionsApi	getRelayLimits	GET	/v1/connections/relay_limits		
 connections	ConnectionsApi	setRelayLimits	PUT	/v1/connections/relay_limits	net.atlasauth.atlas.catalog.models.ConnectionsSetRelayLimitsBody	
 connections	ConnectionsApi	getTokenLimits	GET	/v1/connections/token_limits		
@@ -285,6 +294,10 @@ devices	DevicesApi	set	PUT	/v1/devices	net.atlasauth.atlas.catalog.models.Device
 devices	DevicesApi	listComplianceHistory	GET	/v1/devices/{id}/compliance_history	java.lang.String,net.atlasauth.atlas.catalog.models.DevicesListComplianceHistoryQuery	
 diagnostics	DiagnosticsApi	listTraces	GET	/v1/diagnostics/traces	net.atlasauth.atlas.catalog.models.DiagnosticsListTracesQuery	
 diagnostics	DiagnosticsApi	getTrace	GET	/v1/diagnostics/traces/{id}	java.lang.String	
+domains	DomainsApi	list	GET	/v1/domains	net.atlasauth.atlas.catalog.models.DomainsListQuery	
+domains	DomainsApi	create	POST	/v1/domains	net.atlasauth.atlas.catalog.models.DomainsCreateBody	
+domains	DomainsApi	get	GET	/v1/domains/{id}	java.lang.String	
+domains	DomainsApi	rotate	POST	/v1/domains/{id}/verification/rotate	java.lang.String,Map&lt;String, Object>	
 domains	DomainsApi	verify	POST	/v1/domains/{id}/verify	java.lang.String	
 dsr_console	DsrConsoleApi	listRequests	GET	/v1/dsr_console/requests	net.atlasauth.atlas.catalog.models.DsrConsoleListRequestsQuery	
 dsr_console	DsrConsoleApi	getSummary	GET	/v1/dsr_console/summary		
@@ -346,10 +359,13 @@ fraud	FraudApi	emailRisk	POST	/v1/fraud/email_risk	net.atlasauth.atlas.catalog.m
 fraud	FraudApi	getSettings	GET	/v1/fraud/email_risk/settings		
 fraud	FraudApi	setSettings	PUT	/v1/fraud/email_risk/settings	net.atlasauth.atlas.catalog.models.FraudSetSettingsBody	
 fraud	FraudApi	lookup	POST	/v1/fraud/lookup	net.atlasauth.atlas.catalog.models.FraudLookupBody	
+grants	GrantsApi	list	GET	/v1/grants	net.atlasauth.atlas.catalog.models.GrantsListQuery	
 grants	GrantsApi	consume	POST	/v1/grants/{grantType}/{id}/consume	java.lang.String,java.lang.String,net.atlasauth.atlas.catalog.models.GrantsConsumeBody	
 grants	GrantsApi	release	POST	/v1/grants/{grantType}/{id}/leases/{leaseId}/release	java.lang.String,java.lang.String,java.lang.String,net.atlasauth.atlas.catalog.models.GrantsReleaseBody	
 grants	GrantsApi	refund	POST	/v1/grants/{grantType}/{id}/refund	java.lang.String,java.lang.String,net.atlasauth.atlas.catalog.models.GrantsRefundBody	
 grants	GrantsApi	getUsage	GET	/v1/grants/{grantType}/{id}/usage	java.lang.String,java.lang.String	
+grants	GrantsApi	get	GET	/v1/grants/{id}	java.lang.String	
+grants	GrantsApi	update	PATCH	/v1/grants/{id}	java.lang.String,net.atlasauth.atlas.catalog.models.GrantsUpdateBody	
 identity_verification	IdentityVerificationApi	getSettings	GET	/v1/identity_verification/settings		
 identity_verification	IdentityVerificationApi	setSettings	PUT	/v1/identity_verification/settings	net.atlasauth.atlas.catalog.models.IdentityVerificationSetSettingsBody	
 identity_verifications	IdentityVerificationsApi	list	GET	/v1/identity_verifications	net.atlasauth.atlas.catalog.models.IdentityVerificationsListQuery	
@@ -415,6 +431,7 @@ instance	InstanceApi	getConfigSnapshot	GET	/v1/instance/config_snapshots/{id}	ja
 instance	InstanceApi	restore	POST	/v1/instance/config_snapshots/{id}/restore	java.lang.String,net.atlasauth.atlas.catalog.models.InstanceRestoreBody	
 instance	InstanceApi	deleteCookieConsent	DELETE	/v1/instance/cookie_consent		
 instance	InstanceApi	getCookieConsent	GET	/v1/instance/cookie_consent		
+instance	InstanceApi	updateCookieConsent	PATCH	/v1/instance/cookie_consent	net.atlasauth.atlas.catalog.models.InstanceUpdateCookieConsentBody	
 instance	InstanceApi	setCookieConsent	PUT	/v1/instance/cookie_consent	net.atlasauth.atlas.catalog.models.InstanceSetCookieConsentBody	
 instance	InstanceApi	deleteDataKeyProvider	DELETE	/v1/instance/data_key_provider	net.atlasauth.atlas.catalog.models.InstanceDeleteDataKeyProviderBody	
 instance	InstanceApi	getDataKeyProvider	GET	/v1/instance/data_key_provider		
@@ -436,6 +453,10 @@ instance	InstanceApi	getExport	GET	/v1/instance/exports/{id}	java.lang.String
 instance	InstanceApi	getBundle	GET	/v1/instance/exports/{id}/bundle	java.lang.String	
 instance	InstanceApi	downloadUrl	POST	/v1/instance/exports/{id}/download_url	java.lang.String	
 instance	InstanceApi	createRevokeLink	POST	/v1/instance/exports/{id}/revoke_links	java.lang.String	
+instance	InstanceApi	deleteBeforeFirstSession	DELETE	/v1/instance/hooks/before_first_session		
+instance	InstanceApi	getBeforeFirstSession	GET	/v1/instance/hooks/before_first_session		
+instance	InstanceApi	updateBeforeFirstSession	PATCH	/v1/instance/hooks/before_first_session	net.atlasauth.atlas.catalog.models.InstanceUpdateBeforeFirstSessionBody	
+instance	InstanceApi	beforeFirstSessionTest	POST	/v1/instance/hooks/before_first_session/test		
 instance	InstanceApi	deleteBeforeUserCreate	DELETE	/v1/instance/hooks/before_user_create		
 instance	InstanceApi	getBeforeUserCreate	GET	/v1/instance/hooks/before_user_create		
 instance	InstanceApi	updateBeforeUserCreate	PATCH	/v1/instance/hooks/before_user_create	net.atlasauth.atlas.catalog.models.InstanceUpdateBeforeUserCreateBody,net.atlasauth.atlas.catalog.models.InstanceUpdateBeforeUserCreateQuery	
@@ -449,12 +470,17 @@ instance	InstanceApi	listImports	GET	/v1/instance/imports	net.atlasauth.atlas.ca
 instance	InstanceApi	createImport	POST	/v1/instance/imports	net.atlasauth.atlas.catalog.models.InstanceCreateImportBody	
 instance	InstanceApi	getImport	GET	/v1/instance/imports/{id}	java.lang.String	
 instance	InstanceApi	listIntegrations	GET	/v1/instance/integrations	net.atlasauth.atlas.catalog.models.InstanceListIntegrationsQuery	
+instance	InstanceApi	deleteForwarding	DELETE	/v1/instance/integrations/forwarding/{destination}	java.lang.String	
+instance	InstanceApi	getForwarding	GET	/v1/instance/integrations/forwarding/{destination}	java.lang.String	
+instance	InstanceApi	setForwarding	PUT	/v1/instance/integrations/forwarding/{destination}	java.lang.String,net.atlasauth.atlas.catalog.models.InstanceSetForwardingBody	
+instance	InstanceApi	listHealth	GET	/v1/instance/integrations/health	net.atlasauth.atlas.catalog.models.InstanceListHealthQuery	
 instance	InstanceApi	deleteIntegration	DELETE	/v1/instance/integrations/{product}	java.lang.String	
 instance	InstanceApi	getIntegration	GET	/v1/instance/integrations/{product}	java.lang.String	
 instance	InstanceApi	setIntegration	PUT	/v1/instance/integrations/{product}	java.lang.String,net.atlasauth.atlas.catalog.models.InstanceSetIntegrationBody	
 instance	InstanceApi	redeliver	POST	/v1/instance/integrations/{product}/deliveries/redeliver	java.lang.String,net.atlasauth.atlas.catalog.models.InstanceRedeliverBody	
 instance	InstanceApi	listMints	GET	/v1/instance/integrations/{product}/mints	java.lang.String,net.atlasauth.atlas.catalog.models.InstanceListMintsQuery	
 instance	InstanceApi	integrationsTest	POST	/v1/instance/integrations/{product}/test	java.lang.String,net.atlasauth.atlas.catalog.models.InstanceIntegrationsTestQuery	
+instance	InstanceApi	getIssuers	GET	/v1/instance/issuers		
 instance	InstanceApi	moveOrigin	POST	/v1/instance/move_origin	net.atlasauth.atlas.catalog.models.OriginMoveRequest	
 instance	InstanceApi	listNotices	GET	/v1/instance/notices	net.atlasauth.atlas.catalog.models.InstanceListNoticesQuery	
 instance	InstanceApi	acknowledge	POST	/v1/instance/notices/{id}/acknowledge	java.lang.String	
@@ -483,7 +509,7 @@ instance	InstanceApi	getBackfill	GET	/v1/instance/referrals/backfill/{id}	java.l
 instance	InstanceApi	simulate	POST	/v1/instance/referrals/simulate	net.atlasauth.atlas.catalog.models.InstanceSimulateBody	
 instance	InstanceApi	referralsTest	POST	/v1/instance/referrals/test		
 instance	InstanceApi	listScopes	GET	/v1/instance/scopes	net.atlasauth.atlas.catalog.models.InstanceListScopesQuery	
-instance	InstanceApi	setScopes	PUT	/v1/instance/scopes	net.atlasauth.atlas.catalog.models.InstanceSetScopesBody	
+instance	InstanceApi	setScopes	PUT	/v1/instance/scopes	net.atlasauth.atlas.catalog.models.InstanceSetScopesBody,net.atlasauth.atlas.catalog.models.InstanceSetScopesQuery	
 instance	InstanceApi	listSecretKeys	GET	/v1/instance/secret_keys	net.atlasauth.atlas.catalog.models.InstanceListSecretKeysQuery	
 instance	InstanceApi	createSecretKey	POST	/v1/instance/secret_keys	net.atlasauth.atlas.catalog.models.InstanceCreateSecretKeyBody	
 instance	InstanceApi	getSignInWithAtlas	GET	/v1/instance/sign_in_with_atlas		
@@ -496,6 +522,11 @@ instance	InstanceApi	getSigningKeySchedule	GET	/v1/instance/signing_key_schedule
 instance	InstanceApi	setSigningKeySchedule	PUT	/v1/instance/signing_key_schedule	net.atlasauth.atlas.catalog.models.InstanceSetSigningKeyScheduleBody	
 instance	InstanceApi	listSigningKeys	GET	/v1/instance/signing_keys	net.atlasauth.atlas.catalog.models.InstanceListSigningKeysQuery	
 instance	InstanceApi	signingKeysRotate	POST	/v1/instance/signing_keys/rotate	net.atlasauth.atlas.catalog.models.InstanceSigningKeysRotateBody	
+instance	InstanceApi	listStagingCopies	GET	/v1/instance/staging_copies	net.atlasauth.atlas.catalog.models.InstanceListStagingCopiesQuery	
+instance	InstanceApi	createStagingCopy	POST	/v1/instance/staging_copies	net.atlasauth.atlas.catalog.models.InstanceCreateStagingCopyBody	
+instance	InstanceApi	deleteStagingCopy	DELETE	/v1/instance/staging_copies/{id}	java.lang.String	
+instance	InstanceApi	getStagingCopy	GET	/v1/instance/staging_copies/{id}	java.lang.String	
+instance	InstanceApi	stagingCopiesRefresh	POST	/v1/instance/staging_copies/{id}/refresh	java.lang.String,net.atlasauth.atlas.catalog.models.InstanceStagingCopiesRefreshBody	
 instance	InstanceApi	listStatusDependencies	GET	/v1/instance/status_dependencies	net.atlasauth.atlas.catalog.models.InstanceListStatusDependenciesQuery	
 instance	InstanceApi	createStatusDependency	POST	/v1/instance/status_dependencies	net.atlasauth.atlas.catalog.models.InstanceCreateStatusDependencyBody	
 instance	InstanceApi	getStatusDependency	GET	/v1/instance/status_dependencies/{id}	java.lang.String	
@@ -533,9 +564,12 @@ machine_trust_policies	MachineTrustPoliciesApi	update	PATCH	/v1/machine_trust_po
 machine_trust_policies	MachineTrustPoliciesApi	test	POST	/v1/machine_trust_policies/{id}/test	java.lang.String,net.atlasauth.atlas.catalog.models.MachineTrustPoliciesTestBody	
 machines	MachinesApi	list	GET	/v1/machines	net.atlasauth.atlas.catalog.models.MachinesListQuery	
 machines	MachinesApi	create	POST	/v1/machines	net.atlasauth.atlas.catalog.models.MachinesCreateBody	
+machines	MachinesApi	listRevoked	GET	/v1/machines/revoked	net.atlasauth.atlas.catalog.models.MachinesListRevokedQuery	
 machines	MachinesApi	get	GET	/v1/machines/{id}	java.lang.String	
 machines	MachinesApi	update	PATCH	/v1/machines/{id}	java.lang.String,net.atlasauth.atlas.catalog.models.MachinesUpdateBody	
 machines	MachinesApi	approve	POST	/v1/machines/{id}/approve	java.lang.String	
+machines	MachinesApi	listGrants	GET	/v1/machines/{id}/grants	java.lang.String,net.atlasauth.atlas.catalog.models.MachinesListGrantsQuery	
+machines	MachinesApi	createGrant	POST	/v1/machines/{id}/grants	java.lang.String,net.atlasauth.atlas.catalog.models.MachinesCreateGrantBody	
 machines	MachinesApi	updateGrant	PATCH	/v1/machines/{id}/grants/{grantId}	java.lang.String,java.lang.String,net.atlasauth.atlas.catalog.models.MachinesUpdateGrantBody	
 machines	MachinesApi	updateMetadata	PATCH	/v1/machines/{id}/metadata	java.lang.String,net.atlasauth.atlas.catalog.models.MachinesUpdateMetadataBody	
 machines	MachinesApi	revoke	POST	/v1/machines/{id}/revoke	java.lang.String	
@@ -561,10 +595,12 @@ mcp_registry	McpRegistryApi	list	GET	/v1/mcp_registry	net.atlasauth.atlas.catalo
 mcp_registry	McpRegistryApi	create	POST	/v1/mcp_registry	net.atlasauth.atlas.catalog.models.McpRegistryCreateBody	
 mcp_registry	McpRegistryApi	delete	DELETE	/v1/mcp_registry/{id}	java.lang.String	
 mcp_registry	McpRegistryApi	decide	POST	/v1/mcp_registry/{id}/decide	java.lang.String,net.atlasauth.atlas.catalog.models.McpRegistryDecideBody	
+message_links	MessageLinksApi	create	POST	/v1/message_links	net.atlasauth.atlas.catalog.models.MessageLinksCreateBody	
 message_receivers	MessageReceiversApi	list	GET	/v1/message_receivers	net.atlasauth.atlas.catalog.models.MessageReceiversListQuery	
 message_receivers	MessageReceiversApi	delete	DELETE	/v1/message_receivers/{provider}	java.lang.String	
 message_receivers	MessageReceiversApi	set	PUT	/v1/message_receivers/{provider}	java.lang.String,net.atlasauth.atlas.catalog.models.MessageReceiversSetBody	
 messages	MessagesApi	list	GET	/v1/messages	net.atlasauth.atlas.catalog.models.MessagesListQuery	
+messages	MessagesApi	create	POST	/v1/messages	net.atlasauth.atlas.catalog.models.MessagesCreateBody	
 messages	MessagesApi	getSummary	GET	/v1/messages/summary	net.atlasauth.atlas.catalog.models.MessagesGetSummaryQuery	
 messages	MessagesApi	get	GET	/v1/messages/{id}	java.lang.String	
 messaging	MessagingApi	listCountryRoutes	GET	/v1/messaging/country_routes	net.atlasauth.atlas.catalog.models.MessagingListCountryRoutesQuery	
@@ -575,8 +611,11 @@ messaging	MessagingApi	setSettings	PUT	/v1/messaging/settings	net.atlasauth.atla
 messaging	MessagingApi	listSuppressions	GET	/v1/messaging/suppressions	net.atlasauth.atlas.catalog.models.MessagingListSuppressionsQuery	
 messaging	MessagingApi	createSuppression	POST	/v1/messaging/suppressions	net.atlasauth.atlas.catalog.models.MessagingCreateSuppressionBody	
 messaging	MessagingApi	deleteSuppression	DELETE	/v1/messaging/suppressions/{email}	java.lang.String	
+messaging_providers	MessagingProvidersApi	get	GET	/v1/messaging_providers		
+messaging_providers	MessagingProvidersApi	setEmail	PUT	/v1/messaging_providers/email	net.atlasauth.atlas.catalog.models.MessagingProvidersSetEmailBody	
 messaging_providers	MessagingProvidersApi	setPush	PUT	/v1/messaging_providers/push	net.atlasauth.atlas.catalog.models.MessagingProvidersSetPushBody	
 messaging_providers	MessagingProvidersApi	setSms	PUT	/v1/messaging_providers/sms	net.atlasauth.atlas.catalog.models.MessagingProvidersSetSmsBody	
+messaging_providers	MessagingProvidersApi	getByChannel	GET	/v1/messaging_providers/{channel}	java.lang.String	
 messaging_providers	MessagingProvidersApi	listFallbacks	GET	/v1/messaging_providers/{channel}/fallbacks	java.lang.String,net.atlasauth.atlas.catalog.models.MessagingProvidersListFallbacksQuery	
 messaging_providers	MessagingProvidersApi	createFallback	POST	/v1/messaging_providers/{channel}/fallbacks	java.lang.String,net.atlasauth.atlas.catalog.models.MessagingProvidersCreateFallbackBody	
 messaging_providers	MessagingProvidersApi	setOrder	PUT	/v1/messaging_providers/{channel}/fallbacks/order	java.lang.String,net.atlasauth.atlas.catalog.models.MessagingProvidersSetOrderBody	
@@ -599,13 +638,28 @@ migrations	MigrationsApi	getBridge	GET	/v1/migrations/{source}/bridge	java.lang.
 migrations	MigrationsApi	setBridge	PUT	/v1/migrations/{source}/bridge	java.lang.String,net.atlasauth.atlas.catalog.models.MigrationsSetBridgeBody	
 migrations	MigrationsApi	createImport	POST	/v1/migrations/{source}/imports	java.lang.String,net.atlasauth.atlas.catalog.models.MigrationsCreateImportBody	
 migrations	MigrationsApi	dryRun	POST	/v1/migrations/{source}/imports/{id}/dry_run	java.lang.String,java.lang.String,net.atlasauth.atlas.catalog.models.MigrationsDryRunBody	
+migrations	MigrationsApi	createSession	POST	/v1/migrations/{source}/sessions	java.lang.String,net.atlasauth.atlas.catalog.models.MigrationsCreateSessionBody	
 migrations	MigrationsApi	verify	POST	/v1/migrations/{source}/verify	java.lang.String,net.atlasauth.atlas.catalog.models.MigrationsVerifyBody	
+native_apps	NativeAppsApi	list	GET	/v1/native_apps	net.atlasauth.atlas.catalog.models.NativeAppsListQuery	
+native_apps	NativeAppsApi	create	POST	/v1/native_apps	net.atlasauth.atlas.catalog.models.NativeAppsCreateBody	
+native_apps	NativeAppsApi	getPublishableKey	GET	/v1/native_apps/publishable_key		
+native_apps	NativeAppsApi	setPublishableKey	PUT	/v1/native_apps/publishable_key	net.atlasauth.atlas.catalog.models.NativeAppsSetPublishableKeyBody	
+native_apps	NativeAppsApi	delete	DELETE	/v1/native_apps/{id}	java.lang.String	
+native_apps	NativeAppsApi	get	GET	/v1/native_apps/{id}	java.lang.String	
+native_apps	NativeAppsApi	update	PATCH	/v1/native_apps/{id}	java.lang.String,net.atlasauth.atlas.catalog.models.NativeAppsUpdateBody	
+notification_templates	NotificationTemplatesApi	list	GET	/v1/notification_templates	net.atlasauth.atlas.catalog.models.NotificationTemplatesListQuery	
+notification_templates	NotificationTemplatesApi	create	POST	/v1/notification_templates	net.atlasauth.atlas.catalog.models.NotificationTemplatesCreateBody	
+notification_templates	NotificationTemplatesApi	get	GET	/v1/notification_templates/{name}	java.lang.String	
+notification_templates	NotificationTemplatesApi	set	PUT	/v1/notification_templates/{name}	java.lang.String,net.atlasauth.atlas.catalog.models.NotificationTemplatesSetBody	
 oauth_application_types	OauthApplicationTypesApi	list	GET	/v1/oauth_application_types	net.atlasauth.atlas.catalog.models.OauthApplicationTypesListQuery	
 oauth_clients	OauthClientsApi	list	GET	/v1/oauth_clients	net.atlasauth.atlas.catalog.models.OauthClientsListQuery	
 oauth_clients	OauthClientsApi	create	POST	/v1/oauth_clients	net.atlasauth.atlas.catalog.models.OauthClientsCreateBody	
 oauth_clients	OauthClientsApi	importBy	POST	/v1/oauth_clients/import	net.atlasauth.atlas.catalog.models.OauthClientsImportByBody	
 oauth_clients	OauthClientsApi	get	GET	/v1/oauth_clients/{id}	java.lang.String	
 oauth_clients	OauthClientsApi	update	PATCH	/v1/oauth_clients/{id}	java.lang.String,net.atlasauth.atlas.catalog.models.OauthClientsUpdateBody	
+oauth_clients	OauthClientsApi	listConsents	GET	/v1/oauth_clients/{id}/consents	java.lang.String,net.atlasauth.atlas.catalog.models.OauthClientsListConsentsQuery	
+oauth_clients	OauthClientsApi	revoke	POST	/v1/oauth_clients/{id}/consents/revoke	java.lang.String,net.atlasauth.atlas.catalog.models.OauthClientsRevokeBody	
+oauth_clients	OauthClientsApi	setDelegatedUi	PUT	/v1/oauth_clients/{id}/delegated_ui	java.lang.String,net.atlasauth.atlas.catalog.models.OauthClientsSetDelegatedUiBody	
 oauth_clients	OauthClientsApi	setOrganizationAccess	PUT	/v1/oauth_clients/{id}/organization_access	java.lang.String,net.atlasauth.atlas.catalog.models.OauthClientsSetOrganizationAccessBody	
 oauth_clients	OauthClientsApi	listOrganizations	GET	/v1/oauth_clients/{id}/organizations	java.lang.String,net.atlasauth.atlas.catalog.models.OauthClientsListOrganizationsQuery	
 oauth_clients	OauthClientsApi	rotateSecret	POST	/v1/oauth_clients/{id}/rotate_secret	java.lang.String,net.atlasauth.atlas.catalog.models.OauthClientsRotateSecretBody	
@@ -617,10 +671,16 @@ oauth_clients	OauthClientsApi	listUsage	GET	/v1/oauth_clients/{id}/usage	java.la
 oauth_clients	OauthClientsApi	deleteWebhook	DELETE	/v1/oauth_clients/{id}/webhook	java.lang.String	
 oauth_clients	OauthClientsApi	getWebhook	GET	/v1/oauth_clients/{id}/webhook	java.lang.String	
 oauth_clients	OauthClientsApi	setWebhook	PUT	/v1/oauth_clients/{id}/webhook	java.lang.String,net.atlasauth.atlas.catalog.models.OauthClientsSetWebhookBody	
+oauth_consent_requests	OauthConsentRequestsApi	get	GET	/v1/oauth_consent_requests	net.atlasauth.atlas.catalog.models.OauthConsentRequestsGetQuery	
+oauth_consent_requests	OauthConsentRequestsApi	setSwitchAccount	PUT	/v1/oauth_consent_requests/switch_account	net.atlasauth.atlas.catalog.models.OauthConsentRequestsSetSwitchAccountQuery	
+oauth_device_requests	OauthDeviceRequestsApi	get	GET	/v1/oauth_device_requests	net.atlasauth.atlas.catalog.models.OauthDeviceRequestsGetQuery	
+oauth_device_requests	OauthDeviceRequestsApi	setAccept	PUT	/v1/oauth_device_requests/accept	net.atlasauth.atlas.catalog.models.OauthDeviceRequestsSetAcceptQuery	
+oauth_device_requests	OauthDeviceRequestsApi	setReject	PUT	/v1/oauth_device_requests/reject	net.atlasauth.atlas.catalog.models.OauthDeviceRequestsSetRejectQuery	
 oauth_grants	OauthGrantsApi	importBy	POST	/v1/oauth_grants/import	net.atlasauth.atlas.catalog.models.OauthGrantsImportByBody	
 oauth_initial_access_tokens	OauthInitialAccessTokensApi	list	GET	/v1/oauth_initial_access_tokens	net.atlasauth.atlas.catalog.models.OauthInitialAccessTokensListQuery	
 oauth_initial_access_tokens	OauthInitialAccessTokensApi	create	POST	/v1/oauth_initial_access_tokens	net.atlasauth.atlas.catalog.models.OauthInitialAccessTokensCreateBody	
 oauth_initial_access_tokens	OauthInitialAccessTokensApi	delete	DELETE	/v1/oauth_initial_access_tokens/{id}	java.lang.String	
+oauth_login_requests	OauthLoginRequestsApi	get	GET	/v1/oauth_login_requests	net.atlasauth.atlas.catalog.models.OauthLoginRequestsGetQuery	
 oauth_providers	OauthProvidersApi	list	GET	/v1/oauth_providers	net.atlasauth.atlas.catalog.models.OauthProvidersListQuery	
 oauth_providers	OauthProvidersApi	get	GET	/v1/oauth_providers/{provider}	java.lang.String	
 oauth_providers	OauthProvidersApi	set	PUT	/v1/oauth_providers/{provider}	java.lang.String,net.atlasauth.atlas.catalog.models.OauthProvidersSetBody	
@@ -660,6 +720,7 @@ organization_connections	OrganizationConnectionsApi	list	GET	/v1/organization_co
 organization_connections	OrganizationConnectionsApi	create	POST	/v1/organization_connections	net.atlasauth.atlas.catalog.models.OrganizationConnectionsCreateBody	
 organization_connections	OrganizationConnectionsApi	delete	DELETE	/v1/organization_connections/{id}	java.lang.String	
 organization_connections	OrganizationConnectionsApi	accept	POST	/v1/organization_connections/{id}/accept	java.lang.String,net.atlasauth.atlas.catalog.models.OrganizationConnectionsAcceptBody	
+organization_invitations	OrganizationInvitationsApi	list	GET	/v1/organization_invitations	net.atlasauth.atlas.catalog.models.OrganizationInvitationsListQuery	
 organizations	OrganizationsApi	get	GET	/v1/organizations/{id}	java.lang.String	
 organizations	OrganizationsApi	deleteAppWebhookEndpoint	DELETE	/v1/organizations/{id}/app_webhook_endpoints/{endpointId}	java.lang.String,java.lang.String	
 organizations	OrganizationsApi	getAppWebhookEndpoint	GET	/v1/organizations/{id}/app_webhook_endpoints/{endpointId}	java.lang.String,java.lang.String	
@@ -729,6 +790,76 @@ passkey_campaigns	PasskeyCampaignsApi	list	GET	/v1/passkey_campaigns	net.atlasau
 passkey_campaigns	PasskeyCampaignsApi	create	POST	/v1/passkey_campaigns	net.atlasauth.atlas.catalog.models.PasskeyCampaignsCreateBody	
 passkey_campaigns	PasskeyCampaignsApi	delete	DELETE	/v1/passkey_campaigns/{id}	java.lang.String	
 passkey_campaigns	PasskeyCampaignsApi	get	GET	/v1/passkey_campaigns/{id}	java.lang.String	
+pca	PcaApi	getActionRegistry	GET	/v1/pca/action-registry		
+pca	PcaApi	listActions	GET	/v1/pca/action-registry/actions	net.atlasauth.atlas.catalog.models.PcaListActionsQuery	
+pca	PcaApi	getAction	GET	/v1/pca/action-registry/actions/{verb}	java.lang.String	
+pca	PcaApi	review	POST	/v1/pca/action-registry/actions/{verb}/review	java.lang.String,Map&lt;String, Object>	
+pca	PcaApi	listDrafts	GET	/v1/pca/action-registry/drafts	net.atlasauth.atlas.catalog.models.PcaListDraftsQuery	
+pca	PcaApi	deleteDraft	DELETE	/v1/pca/action-registry/drafts/{verb}	java.lang.String	
+pca	PcaApi	getDraft	GET	/v1/pca/action-registry/drafts/{verb}	java.lang.String	
+pca	PcaApi	updateDraft	PATCH	/v1/pca/action-registry/drafts/{verb}	java.lang.String,net.atlasauth.atlas.catalog.models.PcaUpdateDraftBody	
+pca	PcaApi	confirm	POST	/v1/pca/action-registry/drafts/{verb}/confirm	java.lang.String,net.atlasauth.atlas.catalog.models.PcaConfirmBody	
+pca	PcaApi	createImport	POST	/v1/pca/action-registry/imports	net.atlasauth.atlas.catalog.models.PcaCreateImportBody	
+pca	PcaApi	getDiff	GET	/v1/pca/action-registry/namespaces/{ns}/diff	java.lang.String,net.atlasauth.atlas.catalog.models.PcaGetDiffQuery	
+pca	PcaApi	deletePin	DELETE	/v1/pca/action-registry/namespaces/{ns}/pin	java.lang.String	
+pca	PcaApi	setPin	PUT	/v1/pca/action-registry/namespaces/{ns}/pin	java.lang.String,net.atlasauth.atlas.catalog.models.PcaSetPinBody	
+pca	PcaApi	listVersions	GET	/v1/pca/action-registry/namespaces/{ns}/versions	java.lang.String,net.atlasauth.atlas.catalog.models.PcaListVersionsQuery	
+pca	PcaApi	getVersion	GET	/v1/pca/action-registry/namespaces/{ns}/versions/{version}	java.lang.String,java.lang.String	
+pca	PcaApi	createPack	POST	/v1/pca/action-registry/packs	net.atlasauth.atlas.catalog.models.PcaCreatePackBody	
+pca	PcaApi	publish	POST	/v1/pca/action-registry/publish	net.atlasauth.atlas.catalog.models.PcaPublishBody	
+pca	PcaApi	createPublisherKey	POST	/v1/pca/action-registry/publisher-keys	net.atlasauth.atlas.catalog.models.PcaCreatePublisherKeyBody	
+pca	PcaApi	deletePublisherKey	DELETE	/v1/pca/action-registry/publisher-keys/{kid}	java.lang.String	
+pca	PcaApi	listReviewers	GET	/v1/pca/action-registry/reviewers	net.atlasauth.atlas.catalog.models.PcaListReviewersQuery	
+pca	PcaApi	createEnrolment	POST	/v1/pca/action-registry/reviewers/enrolments	net.atlasauth.atlas.catalog.models.PcaCreateEnrolmentBody	
+pca	PcaApi	deleteReviewer	DELETE	/v1/pca/action-registry/reviewers/{id}	java.lang.String	
+pca	PcaApi	listSources	GET	/v1/pca/action-registry/sources	net.atlasauth.atlas.catalog.models.PcaListSourcesQuery	
+pca	PcaApi	createSource	POST	/v1/pca/action-registry/sources	net.atlasauth.atlas.catalog.models.PcaCreateSourceBody	
+pca	PcaApi	deleteSource	DELETE	/v1/pca/action-registry/sources/{id}	java.lang.String	
+pca	PcaApi	updateSource	PATCH	/v1/pca/action-registry/sources/{id}	java.lang.String,net.atlasauth.atlas.catalog.models.PcaUpdateSourceBody	
+pca	PcaApi	sync	POST	/v1/pca/action-registry/sources/{id}/sync	java.lang.String,Map&lt;String, Object>	
+pca	PcaApi	listTemplates	GET	/v1/pca/action-registry/templates	net.atlasauth.atlas.catalog.models.PcaListTemplatesQuery	
+pca	PcaApi	apply	POST	/v1/pca/action-registry/templates/{id}/apply	java.lang.String,net.atlasauth.atlas.catalog.models.PcaApplyBody	
+pca	PcaApi	getSettings	GET	/v1/pca/approvals/settings		
+pca	PcaApi	setSettings	PUT	/v1/pca/approvals/settings	net.atlasauth.atlas.catalog.models.PcaSetSettingsBody	
+pca	PcaApi	listApprovers	GET	/v1/pca/approvers	net.atlasauth.atlas.catalog.models.PcaListApproversQuery	
+pca	PcaApi	createApproversEnrolment	POST	/v1/pca/approvers/enrolments	net.atlasauth.atlas.catalog.models.PcaCreateApproversEnrolmentBody	
+pca	PcaApi	getApprover	GET	/v1/pca/approvers/{id}	java.lang.String	
+pca	PcaApi	updateApprover	PATCH	/v1/pca/approvers/{id}	java.lang.String,net.atlasauth.atlas.catalog.models.PcaUpdateApproverBody	
+pca	PcaApi	deleteCredential	DELETE	/v1/pca/approvers/{id}/credentials/{credentialId}	java.lang.String,java.lang.String	
+pca	PcaApi	updateMember	PATCH	/v1/pca/approvers/{id}/members/{memberId}	java.lang.String,java.lang.String,net.atlasauth.atlas.catalog.models.PcaUpdateMemberBody	
+pca	PcaApi	createBeacon	POST	/v1/pca/beacons	net.atlasauth.atlas.catalog.models.PcaCreateBeaconBody	
+pca	PcaApi	getBondAccounts	GET	/v1/pca/bond-accounts	net.atlasauth.atlas.catalog.models.PcaGetBondAccountsQuery	
+pca	PcaApi	createBondAccount	POST	/v1/pca/bond-accounts	net.atlasauth.atlas.catalog.models.PcaCreateBondAccountBody	
+pca	PcaApi	createConstitution	POST	/v1/pca/constitutions	net.atlasauth.atlas.catalog.models.PcaCreateConstitutionBody	
+pca	PcaApi	listGrants	GET	/v1/pca/grants	net.atlasauth.atlas.catalog.models.PcaListGrantsQuery	
+pca	PcaApi	deleteGrant	DELETE	/v1/pca/grants/{grantRef}	java.lang.String,net.atlasauth.atlas.catalog.models.PcaDeleteGrantBody,net.atlasauth.atlas.catalog.models.PcaDeleteGrantQuery	
+pca	PcaApi	getGrant	GET	/v1/pca/grants/{grantRef}	java.lang.String	
+pca	PcaApi	amend	POST	/v1/pca/grants/{grantRef}/amend	java.lang.String,net.atlasauth.atlas.catalog.models.PcaAmendBody	
+pca	PcaApi	setAuthority	PUT	/v1/pca/grants/{grantRef}/authority	java.lang.String,net.atlasauth.atlas.catalog.models.PcaSetAuthorityBody	
+pca	PcaApi	listNeeds	GET	/v1/pca/grants/{grantRef}/needs	java.lang.String,net.atlasauth.atlas.catalog.models.PcaListNeedsQuery	
+pca	PcaApi	createNeed	POST	/v1/pca/grants/{grantRef}/needs	java.lang.String,net.atlasauth.atlas.catalog.models.PcaCreateNeedBody	
+pca	PcaApi	stepUp	POST	/v1/pca/grants/{grantRef}/step-up	java.lang.String,Map&lt;String, Object>	
+pca	PcaApi	approve	POST	/v1/pca/grants/{grantRef}/step-up/{challengeId}/approve	java.lang.String,java.lang.String,net.atlasauth.atlas.catalog.models.PcaApproveBody	
+pca	PcaApi	rotate	POST	/v1/pca/guardian/rotate	Map&lt;String, Object>	
+pca	PcaApi	listObservations	GET	/v1/pca/intent/maps/{digest}/observations	java.lang.String,net.atlasauth.atlas.catalog.models.PcaListObservationsQuery	
+pca	PcaApi	createSchema	POST	/v1/pca/intent/schemas	net.atlasauth.atlas.catalog.models.PcaCreateSchemaBody	
+pca	PcaApi	needsApprove	POST	/v1/pca/needs/{needId}/approve	java.lang.String,net.atlasauth.atlas.catalog.models.PcaNeedsApproveBody	
+pca	PcaApi	deny	POST	/v1/pca/needs/{needId}/deny	java.lang.String,net.atlasauth.atlas.catalog.models.PcaDenyBody	
+pca	PcaApi	deletePqPin	DELETE	/v1/pca/pq-pins/{identity}	java.lang.String	
+pca	PcaApi	listPrincipals	GET	/v1/pca/principals	net.atlasauth.atlas.catalog.models.PcaListPrincipalsQuery	
+pca	PcaApi	createPrincipal	POST	/v1/pca/principals	net.atlasauth.atlas.catalog.models.PcaCreatePrincipalBody	
+pca	PcaApi	deletePrincipal	DELETE	/v1/pca/principals/{principalPub}	java.lang.String	
+pca	PcaApi	createRevocation	POST	/v1/pca/revocations	net.atlasauth.atlas.catalog.models.PcaCreateRevocationBody	
+pca	PcaApi	createRecord	POST	/v1/pca/undo/records	net.atlasauth.atlas.catalog.models.PcaCreateRecordBody	
+pca	PcaApi	getRecord	GET	/v1/pca/undo/records/{id}	java.lang.String	
+pca	PcaApi	setRecord	PUT	/v1/pca/undo/records/{id}	java.lang.String,net.atlasauth.atlas.catalog.models.PcaSetRecordBody	
+pca	PcaApi	listVetoes	GET	/v1/pca/undo/vetoes	net.atlasauth.atlas.catalog.models.PcaListVetoesQuery	
+pca	PcaApi	createWorkflowReceipt	POST	/v1/pca/workflow-receipts	net.atlasauth.atlas.catalog.models.PcaCreateWorkflowReceiptBody	
+permission_aliases	PermissionAliasesApi	list	GET	/v1/permission_aliases	net.atlasauth.atlas.catalog.models.PermissionAliasesListQuery	
+permission_aliases	PermissionAliasesApi	create	POST	/v1/permission_aliases	net.atlasauth.atlas.catalog.models.PermissionAliasesCreateBody	
+permission_aliases	PermissionAliasesApi	delete	DELETE	/v1/permission_aliases/{alias}	java.lang.String	
+permission_aliases	PermissionAliasesApi	set	PUT	/v1/permission_aliases/{alias}	java.lang.String,net.atlasauth.atlas.catalog.models.PermissionAliasesSetBody	
+permissions	PermissionsApi	rename	POST	/v1/permissions/{id}/rename	java.lang.String,net.atlasauth.atlas.catalog.models.PermissionsRenameBody	
 platform_apps	PlatformAppsApi	create	POST	/v1/platform/apps	net.atlasauth.atlas.catalog.models.PlatformAppsCreateBody	
 platform_apps	PlatformAppsApi	claim	POST	/v1/platform/apps/claim	net.atlasauth.atlas.catalog.models.PlatformAppsClaimBody	
 platform_apps	PlatformAppsApi	createInstance	POST	/v1/platform/apps/{id}/instances	java.lang.String,net.atlasauth.atlas.catalog.models.PlatformAppsCreateInstanceBody	
@@ -736,7 +867,9 @@ platform_apps	PlatformAppsApi	listClones	GET	/v1/platform/apps/{id}/instances/{i
 platform_apps	PlatformAppsApi	createClone	POST	/v1/platform/apps/{id}/instances/{instanceId}/clones	java.lang.String,java.lang.String,net.atlasauth.atlas.catalog.models.PlatformAppsCreateCloneBody	
 platform_apps	PlatformAppsApi	deleteClone	DELETE	/v1/platform/apps/{id}/instances/{instanceId}/clones/{cloneId}	java.lang.String,java.lang.String,java.lang.String	
 platform_apps	PlatformAppsApi	getClone	GET	/v1/platform/apps/{id}/instances/{instanceId}/clones/{cloneId}	java.lang.String,java.lang.String,java.lang.String	
+platform_apps	PlatformAppsApi	refresh	POST	/v1/platform/apps/{id}/instances/{instanceId}/clones/{cloneId}/refresh	java.lang.String,java.lang.String,java.lang.String,net.atlasauth.atlas.catalog.models.PlatformAppsRefreshBody	
 platform_apps	PlatformAppsApi	createNarrowSecretKey	POST	/v1/platform/apps/{id}/narrow_secret_keys	java.lang.String,net.atlasauth.atlas.catalog.models.PlatformAppsCreateNarrowSecretKeyBody	
+platform_apps	PlatformAppsApi	renew	POST	/v1/platform/apps/{id}/provisioning_key/renew	java.lang.String,net.atlasauth.atlas.catalog.models.PlatformAppsRenewBody	
 platform_apps	PlatformAppsApi	createSecretKey	POST	/v1/platform/apps/{id}/secret_keys	java.lang.String,net.atlasauth.atlas.catalog.models.PlatformAppsCreateSecretKeyBody	
 platform_atlas_id_apps	PlatformAtlasIdAppsApi	list	GET	/v1/platform/atlas_id_apps	net.atlasauth.atlas.catalog.models.PlatformAtlasIdAppsListQuery	
 platform_atlas_id_apps	PlatformAtlasIdAppsApi	create	POST	/v1/platform/atlas_id_apps	net.atlasauth.atlas.catalog.models.PlatformAtlasIdAppsCreateBody	
@@ -758,6 +891,7 @@ platform_atlas_id_publisher	PlatformAtlasIdPublisherApi	update	PATCH	/v1/platfor
 platform_atlas_id_publisher	PlatformAtlasIdPublisherApi	set	PUT	/v1/platform/atlas_id_publisher	net.atlasauth.atlas.catalog.models.PlatformAtlasIdPublisherSetBody	
 platform_atlas_id_publisher	PlatformAtlasIdPublisherApi	verify	POST	/v1/platform/atlas_id_publisher/verify		
 platform_config_changelog	PlatformConfigChangelogApi	list	GET	/v1/platform/config_changelog	net.atlasauth.atlas.catalog.models.PlatformConfigChangelogListQuery	
+platform_whoami	PlatformWhoamiApi	get	GET	/v1/platform/whoami		
 policies	PoliciesApi	getAudience	GET	/v1/policies/{id}/audience	java.lang.String	
 policies	PoliciesApi	setAudience	PUT	/v1/policies/{id}/audience	java.lang.String,net.atlasauth.atlas.catalog.models.PoliciesSetAudienceBody	
 policies	PoliciesApi	listVersions	GET	/v1/policies/{id}/versions	java.lang.String,net.atlasauth.atlas.catalog.models.PoliciesListVersionsQuery	
@@ -805,6 +939,7 @@ region	RegionApi	set	PUT	/v1/region	net.atlasauth.atlas.catalog.models.RegionSet
 region	RegionApi	getFailover	GET	/v1/region/failover	net.atlasauth.atlas.catalog.models.RegionGetFailoverQuery	
 resource_role_assignments	ResourceRoleAssignmentsApi	listChanges	GET	/v1/resource_role_assignments/changes	net.atlasauth.atlas.catalog.models.ResourceRoleAssignmentsListChangesQuery	
 resource_servers	ResourceServersApi	listRevokedTokens	GET	/v1/resource_servers/{id}/revoked_tokens	java.lang.String,net.atlasauth.atlas.catalog.models.ResourceServersListRevokedTokensQuery	
+revocations	RevocationsApi	list	GET	/v1/revocations	net.atlasauth.atlas.catalog.models.RevocationsListQuery	
 risk_based_mfa	RiskBasedMfaApi	get	GET	/v1/risk_based_mfa		
 risk_based_mfa	RiskBasedMfaApi	update	PATCH	/v1/risk_based_mfa	net.atlasauth.atlas.catalog.models.RiskBasedMfaUpdateBody	
 risk_based_mfa	RiskBasedMfaApi	replay	POST	/v1/risk_based_mfa/replay	net.atlasauth.atlas.catalog.models.RiskBasedMfaReplayBody	
@@ -855,19 +990,30 @@ sessions	SessionsApi	revokeByFilter	POST	/v1/sessions/revoke_by_filter	net.atlas
 sessions	SessionsApi	listRevokeJobs	GET	/v1/sessions/revoke_jobs	net.atlasauth.atlas.catalog.models.SessionsListRevokeJobsQuery	
 sessions	SessionsApi	getRevokeJob	GET	/v1/sessions/revoke_jobs/{id}	java.lang.String	
 sessions	SessionsApi	get	GET	/v1/sessions/{id}	java.lang.String	
+sessions	SessionsApi	setActiveOrganization	PUT	/v1/sessions/{id}/active_organization	java.lang.String,net.atlasauth.atlas.catalog.models.SessionsSetActiveOrganizationBody	
 sessions	SessionsApi	deleteBinding	DELETE	/v1/sessions/{id}/binding	java.lang.String	
 sessions	SessionsApi	getBinding	GET	/v1/sessions/{id}/binding	java.lang.String	
 sessions	SessionsApi	updateCustomData	PATCH	/v1/sessions/{id}/custom_data	java.lang.String,net.atlasauth.atlas.catalog.models.SessionsUpdateCustomDataBody	
 sessions	SessionsApi	setCustomData	PUT	/v1/sessions/{id}/custom_data	java.lang.String,net.atlasauth.atlas.catalog.models.SessionsSetCustomDataBody	
 sessions	SessionsApi	listEvents	GET	/v1/sessions/{id}/events	java.lang.String,net.atlasauth.atlas.catalog.models.SessionsListEventsQuery	
 sessions	SessionsApi	getRisk	GET	/v1/sessions/{id}/risk	java.lang.String	
+ssf	SsfApi	addSubject	POST	/v1/ssf/add_subject	net.atlasauth.atlas.catalog.models.SsfAddSubjectBody	
+ssf	SsfApi	deleteConfiguration	DELETE	/v1/ssf/configuration	Map&lt;String, Object>,net.atlasauth.atlas.catalog.models.SsfDeleteConfigurationQuery	
+ssf	SsfApi	getConfiguration	GET	/v1/ssf/configuration	net.atlasauth.atlas.catalog.models.SsfGetConfigurationQuery	
+ssf	SsfApi	updateConfiguration	PATCH	/v1/ssf/configuration	net.atlasauth.atlas.catalog.models.SsfUpdateConfigurationBody	
+ssf	SsfApi	configuration	POST	/v1/ssf/configuration	net.atlasauth.atlas.catalog.models.SsfConfigurationBody	
+ssf	SsfApi	setConfiguration	PUT	/v1/ssf/configuration	net.atlasauth.atlas.catalog.models.SsfSetConfigurationBody	
 ssf	SsfApi	createEvent	POST	/v1/ssf/events	net.atlasauth.atlas.catalog.models.SsfCreateEventBody	
+ssf	SsfApi	getMetadata	GET	/v1/ssf/metadata		
+ssf	SsfApi	removeSubject	POST	/v1/ssf/remove_subject	net.atlasauth.atlas.catalog.models.SsfRemoveSubjectBody	
 ssf	SsfApi	getStatus	GET	/v1/ssf/status	net.atlasauth.atlas.catalog.models.SsfGetStatusQuery	
 ssf	SsfApi	status	POST	/v1/ssf/status	net.atlasauth.atlas.catalog.models.SsfStatusBody	
 ssf	SsfApi	createStream	POST	/v1/ssf/streams	net.atlasauth.atlas.catalog.models.SsfCreateStreamBody	
 ssf	SsfApi	listSubjects	GET	/v1/ssf/streams/{id}/subjects	java.lang.String,net.atlasauth.atlas.catalog.models.SsfListSubjectsQuery	
+ssf	SsfApi	poll	POST	/v1/ssf/streams/{streamId}/poll	java.lang.String,net.atlasauth.atlas.catalog.models.SsfPollBody	
 ssf	SsfApi	add	POST	/v1/ssf/subjects/add	net.atlasauth.atlas.catalog.models.SsfAddBody	
 ssf	SsfApi	remove	POST	/v1/ssf/subjects/remove	net.atlasauth.atlas.catalog.models.SsfRemoveBody	
+ssf	SsfApi	verification	POST	/v1/ssf/verification	net.atlasauth.atlas.catalog.models.SsfVerificationBody	
 ssf	SsfApi	verify	POST	/v1/ssf/verify	net.atlasauth.atlas.catalog.models.SsfVerifyBody	
 sso_connections	SsoConnectionsApi	list	GET	/v1/sso_connections	net.atlasauth.atlas.catalog.models.SsoConnectionsListQuery	
 sso_connections	SsoConnectionsApi	create	POST	/v1/sso_connections	net.atlasauth.atlas.catalog.models.SsoConnectionsCreateBody	
@@ -905,6 +1051,8 @@ users	UsersApi	listBulkActions	GET	/v1/users/bulk_actions	net.atlasauth.atlas.ca
 users	UsersApi	createBulkAction	POST	/v1/users/bulk_actions	net.atlasauth.atlas.catalog.models.UsersCreateBulkActionBody	
 users	UsersApi	getBulkAction	GET	/v1/users/bulk_actions/{id}	java.lang.String	
 users	UsersApi	cancel	POST	/v1/users/bulk_actions/{id}/cancel	java.lang.String	
+users	UsersApi	setByExternalId	PUT	/v1/users/by_external_id/{external_id}	java.lang.String,net.atlasauth.atlas.catalog.models.UsersSetByExternalIdBody	
+users	UsersApi	listDeleted	GET	/v1/users/deleted	net.atlasauth.atlas.catalog.models.UsersListDeletedQuery	
 users	UsersApi	createDeletedAddresse	POST	/v1/users/deleted_addresses	net.atlasauth.atlas.catalog.models.UsersCreateDeletedAddresseBody	
 users	UsersApi	check	POST	/v1/users/deleted_addresses/check	net.atlasauth.atlas.catalog.models.UsersCheckBody	
 users	UsersApi	search	POST	/v1/users/search	net.atlasauth.atlas.catalog.models.UsersSearchBody	
@@ -926,12 +1074,15 @@ users	UsersApi	deleteAppRole	DELETE	/v1/users/{id}/app_roles/{roleId}	java.lang.
 users	UsersApi	listApprovalDevices	GET	/v1/users/{id}/approval_devices	java.lang.String,net.atlasauth.atlas.catalog.models.UsersListApprovalDevicesQuery	
 users	UsersApi	trust	POST	/v1/users/{id}/approval_devices/trust	java.lang.String,net.atlasauth.atlas.catalog.models.UsersTrustBody	
 users	UsersApi	deleteApprovalDevice	DELETE	/v1/users/{id}/approval_devices/{deviceId}	java.lang.String,java.lang.String	
+users	UsersApi	listApprovalRequests	GET	/v1/users/{id}/approval_requests	java.lang.String,net.atlasauth.atlas.catalog.models.UsersListApprovalRequestsQuery	
 users	UsersApi	createApprovalRequest	POST	/v1/users/{id}/approval_requests	java.lang.String,net.atlasauth.atlas.catalog.models.UsersCreateApprovalRequestBody	
 users	UsersApi	getApprovalRequest	GET	/v1/users/{id}/approval_requests/{approvalId}	java.lang.String,java.lang.String	
 users	UsersApi	approvalRequestsCancel	POST	/v1/users/{id}/approval_requests/{approvalId}/cancel	java.lang.String,java.lang.String	
 users	UsersApi	ban	POST	/v1/users/{id}/ban	java.lang.String,net.atlasauth.atlas.catalog.models.UsersBanBody	
 users	UsersApi	contain	POST	/v1/users/{id}/contain	java.lang.String,net.atlasauth.atlas.catalog.models.UsersContainBody	
 users	UsersApi	deleteCookieConsents	DELETE	/v1/users/{id}/cookie_consents	java.lang.String	
+users	UsersApi	createDelegationToken	POST	/v1/users/{id}/delegation_tokens	java.lang.String,net.atlasauth.atlas.catalog.models.UsersCreateDelegationTokenBody	
+users	UsersApi	updateDeletion	PATCH	/v1/users/{id}/deletion	java.lang.String,net.atlasauth.atlas.catalog.models.UsersUpdateDeletionBody	
 users	UsersApi	deletion	POST	/v1/users/{id}/deletion	java.lang.String,net.atlasauth.atlas.catalog.models.UsersDeletionBody	
 users	UsersApi	deletionCancel	POST	/v1/users/{id}/deletion/cancel	java.lang.String	
 users	UsersApi	reconfirm	POST	/v1/users/{id}/deletion/reconfirm	java.lang.String	
@@ -964,6 +1115,10 @@ users	UsersApi	deleteProfileImage	DELETE	/v1/users/{id}/profile_image	java.lang.
 users	UsersApi	getReferral	GET	/v1/users/{id}/referral	java.lang.String	
 users	UsersApi	resync	POST	/v1/users/{id}/referral/resync	java.lang.String	
 users	UsersApi	releaseById	POST	/v1/users/{id}/release	java.lang.String	
+users	UsersApi	deleteRiskSignals	DELETE	/v1/users/{id}/risk_signals	java.lang.String	
+users	UsersApi	listRiskSignals	GET	/v1/users/{id}/risk_signals	java.lang.String,net.atlasauth.atlas.catalog.models.UsersListRiskSignalsQuery	
+users	UsersApi	createRiskSignal	POST	/v1/users/{id}/risk_signals	java.lang.String,net.atlasauth.atlas.catalog.models.UsersCreateRiskSignalBody	
+users	UsersApi	getSecuritySummary	GET	/v1/users/{id}/security_summary	java.lang.String	
 users	UsersApi	listSessions	GET	/v1/users/{id}/sessions	java.lang.String,net.atlasauth.atlas.catalog.models.UsersListSessionsQuery	
 users	UsersApi	sessionsRevoke	POST	/v1/users/{id}/sessions/revoke	java.lang.String,net.atlasauth.atlas.catalog.models.UsersSessionsRevokeBody	
 users	UsersApi	listTemporaryAccess	GET	/v1/users/{id}/temporary_access	java.lang.String,net.atlasauth.atlas.catalog.models.UsersListTemporaryAccessQuery	
@@ -985,6 +1140,7 @@ web_bot_auth	WebBotAuthApi	set	PUT	/v1/web_bot_auth	net.atlasauth.atlas.catalog.
 web_bot_auth	WebBotAuthApi	listDirectories	GET	/v1/web_bot_auth/directories	net.atlasauth.atlas.catalog.models.WebBotAuthListDirectoriesQuery	
 web_bot_auth	WebBotAuthApi	createDirectory	POST	/v1/web_bot_auth/directories	net.atlasauth.atlas.catalog.models.WebBotAuthCreateDirectoryBody	
 web_bot_auth	WebBotAuthApi	deleteDirectory	DELETE	/v1/web_bot_auth/directories/{id}	java.lang.String	
+webhook_dlq	WebhookDlqApi	list	GET	/v1/webhook_dlq	net.atlasauth.atlas.catalog.models.WebhookDlqListQuery	
 webhook_endpoints	WebhookEndpointsApi	list	GET	/v1/webhook_endpoints	net.atlasauth.atlas.catalog.models.WebhookEndpointsListQuery	
 webhook_endpoints	WebhookEndpointsApi	create	POST	/v1/webhook_endpoints	net.atlasauth.atlas.catalog.models.WebhookEndpointsCreateBody	
 webhook_endpoints	WebhookEndpointsApi	setByUrl	PUT	/v1/webhook_endpoints/by_url	net.atlasauth.atlas.catalog.models.WebhookEndpointsSetByUrlBody	
@@ -993,6 +1149,7 @@ webhook_endpoints	WebhookEndpointsApi	update	PATCH	/v1/webhook_endpoints/{id}	ja
 webhook_endpoints	WebhookEndpointsApi	listDlq	GET	/v1/webhook_endpoints/{id}/dlq	java.lang.String,net.atlasauth.atlas.catalog.models.WebhookEndpointsListDlqQuery	
 webhook_endpoints	WebhookEndpointsApi	ack	POST	/v1/webhook_endpoints/{id}/dlq/ack	java.lang.String,net.atlasauth.atlas.catalog.models.WebhookEndpointsAckBody	
 webhook_endpoints	WebhookEndpointsApi	requeue	POST	/v1/webhook_endpoints/{id}/dlq/requeue	java.lang.String,net.atlasauth.atlas.catalog.models.WebhookEndpointsRequeueBody	
+whoami	WhoamiApi	get	GET	/v1/whoami		
 workflow_approvals	WorkflowApprovalsApi	list	GET	/v1/workflow_approvals	net.atlasauth.atlas.catalog.models.WorkflowApprovalsListQuery	
 workflow_approvals	WorkflowApprovalsApi	decide	POST	/v1/workflow_approvals/{id}/decide	java.lang.String,net.atlasauth.atlas.catalog.models.WorkflowApprovalsDecideBody	
 workflow_templates	WorkflowTemplatesApi	list	GET	/v1/workflow_templates	net.atlasauth.atlas.catalog.models.WorkflowTemplatesListQuery	

@@ -14,6 +14,7 @@ public record PreflightFinding(
         @JsonProperty("message") String message,
         @JsonProperty("fix") String fix,
         @JsonProperty("fix_call") PreflightFindingFixCall fixCall,
+        @JsonProperty("autofix_body") Map<String, Object> autofixBody,
         @JsonProperty("safe_to_autofix") Boolean safeToAutofix,
         @JsonProperty("subject") Map<String, String> subject,
         @JsonProperty("group") String group,

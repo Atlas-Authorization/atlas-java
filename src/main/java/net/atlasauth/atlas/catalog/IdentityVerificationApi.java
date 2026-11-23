@@ -32,4 +32,10 @@ public final class IdentityVerificationApi {
         return t.request("PUT", "/v1/identity_verification/settings", null, body, null, false, new TypeReference<IdentityVerificationSetSettingsResponse>() {
         });
     }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public IdentityVerificationSetSettingsResponse setSettings(IdentityVerificationSetSettingsBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/identity_verification/settings", null, body, idempotencyKey, false, new TypeReference<IdentityVerificationSetSettingsResponse>() {
+        });
+    }
 }

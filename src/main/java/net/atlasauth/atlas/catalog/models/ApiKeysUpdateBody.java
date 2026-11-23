@@ -16,6 +16,11 @@ public final class ApiKeysUpdateBody {
     public String name;
     @JsonProperty("claims")
     public Map<String, Object> claims;
+    @JsonProperty("metadata")
+    public Map<String, Object> metadata;
+    /** One of: sign_out_everywhere. */
+    @JsonProperty("dies_with")
+    public String diesWith;
     @JsonProperty("expires_at")
     public Double expiresAt;
     @JsonProperty("scopes")
@@ -47,6 +52,12 @@ public final class ApiKeysUpdateBody {
     public ApiKeysUpdateBody claims(Map<String, Object> v) { this.claims = v; clearedFields.remove("claims"); return this; }
     /** Send {@code "claims": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public ApiKeysUpdateBody clearClaims() { this.claims = null; clearedFields.add("claims"); return this; }
+    public ApiKeysUpdateBody metadata(Map<String, Object> v) { this.metadata = v; clearedFields.remove("metadata"); return this; }
+    /** Send {@code "metadata": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public ApiKeysUpdateBody clearMetadata() { this.metadata = null; clearedFields.add("metadata"); return this; }
+    public ApiKeysUpdateBody diesWith(String v) { this.diesWith = v; clearedFields.remove("dies_with"); return this; }
+    /** Send {@code "dies_with": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public ApiKeysUpdateBody clearDiesWith() { this.diesWith = null; clearedFields.add("dies_with"); return this; }
     public ApiKeysUpdateBody expiresAt(Double v) { this.expiresAt = v; clearedFields.remove("expires_at"); return this; }
     /** Send {@code "expires_at": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public ApiKeysUpdateBody clearExpiresAt() { this.expiresAt = null; clearedFields.add("expires_at"); return this; }
