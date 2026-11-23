@@ -10,6 +10,8 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class MintApiKeyTokenBody {
     public String secret;
+    /** A signed key-pair assertion, sent instead of {@code secret}. */
+    public String assertion;
     public Double ttlSeconds;
     public Object audience;
 
@@ -20,6 +22,7 @@ public final class MintApiKeyTokenBody {
     }
 
     public MintApiKeyTokenBody secret(String v) { this.secret = v; return this; }
+    public MintApiKeyTokenBody assertion(String v) { this.assertion = v; return this; }
     public MintApiKeyTokenBody ttlSeconds(Double v) { this.ttlSeconds = v; return this; }
     public MintApiKeyTokenBody audience(Object v) { this.audience = v; return this; }
 

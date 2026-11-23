@@ -71,6 +71,18 @@ public final class ApiKeys {
         });
     }
 
+    /** Check a key-pair assertion (see {@code ApiKeyAssertion.sign}) instead of a secret. */
+    public ApiKeyVerification verifyAssertion(String token) {
+        return verifyAssertion(token, null);
+    }
+
+    /** Verify an assertion requiring {@code requiredScopes}. */
+    public ApiKeyVerification verifyAssertion(String token, List<String> requiredScopes) {
+        Map<String, Object> body = Params.of("token", token).set("required_scopes", requiredScopes).map();
+        return t.post("/v1/api_keys/verify", body, new TypeReference<>() {
+        });
+    }
+
     public ApiKey get(String id) {
         return t.get("/v1/api_keys/" + enc(id), new TypeReference<>() {
         });

@@ -14,6 +14,11 @@ import java.util.List;
  * @param revokedAt      epoch ms, null = live
  * @param organizationId the organization a user key is bound to, null = unbound
  * @param revokedReason  why it was revoked, when Atlas said
+ * @param enabled        false = refused like an unknown key; null = enabled
+ * @param credential     {@code secret} or {@code key_pair}; a key-pair row has no secret hash ({@code hash} is a placeholder nothing matches)
+ * @param publicKeyPem   key pair: the SPKI PEM assertions are verified against
+ * @param audience       key pair: the {@code aud} an assertion must carry
+ * @param maxTokenLifetimeSeconds key pair: the longest assertion lifetime, null = 3600
  */
 public record MirroredApiKey(
         String id,
@@ -27,13 +32,37 @@ public record MirroredApiKey(
         Long expiresAt,
         Long revokedAt,
         String organizationId,
-        String revokedReason) {
+        String revokedReason,
+        Boolean enabled,
+        String credential,
+        String publicKeyPem,
+        String audience,
+        Long maxTokenLifetimeSeconds) {
+
+    /** The shape before the key-pair fields: an enabled secret key. */
+    public MirroredApiKey(String id, String hash, String prefix, String subjectType, String subjectId, String name, List<String> scopes,
+                          List<String> allowedIps, Long expiresAt, Long revokedAt, String organizationId, String revokedReason) {
+        this(id, hash, prefix, subjectType, subjectId, name, scopes, allowedIps, expiresAt, revokedAt, organizationId, revokedReason,
+                null, "secret", null, null, null);
+    }
 
     public MirroredApiKey withRevoked(Long at, String reason) {
-        return new MirroredApiKey(id, hash, prefix, subjectType, subjectId, name, scopes, allowedIps, expiresAt, at, organizationId, reason);
+        return new MirroredApiKey(id, hash, prefix, subjectType, subjectId, name, scopes, allowedIps, expiresAt, at, organizationId, reason,
+                enabled, credential, publicKeyPem, audience, maxTokenLifetimeSeconds);
     }
 
     public MirroredApiKey withHash(String newHash) {
-        return new MirroredApiKey(id, newHash, prefix, subjectType, subjectId, name, scopes, allowedIps, expiresAt, revokedAt, organizationId, revokedReason);
+        return new MirroredApiKey(id, newHash, prefix, subjectType, subjectId, name, scopes, allowedIps, expiresAt, revokedAt, organizationId, revokedReason,
+                enabled, credential, publicKeyPem, audience, maxTokenLifetimeSeconds);
+    }
+
+    public MirroredApiKey withExpiresAt(Long at) {
+        return new MirroredApiKey(id, hash, prefix, subjectType, subjectId, name, scopes, allowedIps, at, revokedAt, organizationId, revokedReason,
+                enabled, credential, publicKeyPem, audience, maxTokenLifetimeSeconds);
+    }
+
+    public MirroredApiKey withEnabled(Boolean value) {
+        return new MirroredApiKey(id, hash, prefix, subjectType, subjectId, name, scopes, allowedIps, expiresAt, revokedAt, organizationId, revokedReason,
+                value, credential, publicKeyPem, audience, maxTokenLifetimeSeconds);
     }
 }

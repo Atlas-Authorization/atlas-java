@@ -29,6 +29,12 @@ public final class CreateApiKeyBody {
     /** Per-key spend caps, metered with {@code ApiKeys.recordUsage}. */
     public List<ApiKeyLimit> limits;
     /** Bring over a key minted elsewhere by its hash: no secret is returned, and the original secret verifies. */
+    /** "secret" (default) or "key_pair". */
+    public String credential;
+    /** Assertion audience of a key-pair key (default: the instance id). */
+    public String audience;
+    /** Your own SPKI PEM (P-256 or Ed25519) for a key-pair key; without it Atlas generates the pair. */
+    public String publicKey;
     @JsonProperty("import")
     public ApiKeyImport importKey;
 
@@ -48,6 +54,9 @@ public final class CreateApiKeyBody {
     public CreateApiKeyBody limits(List<ApiKeyLimit> v) { this.limits = v; return this; }
     public CreateApiKeyBody importKey(ApiKeyImport v) { this.importKey = v; return this; }
 
+    public CreateApiKeyBody credential(String v) { this.credential = v; return this; }
+    public CreateApiKeyBody audience(String v) { this.audience = v; return this; }
+    public CreateApiKeyBody publicKey(String v) { this.publicKey = v; return this; }
     public CreateApiKeyBody expiresInSeconds(Long v) { this.expiresInSeconds = v; return this; }
     public CreateApiKeyBody prefix(String v) { this.prefix = v; return this; }
     public CreateApiKeyBody enabled(Boolean v) { this.enabled = v; return this; }

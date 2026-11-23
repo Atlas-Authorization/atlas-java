@@ -38,4 +38,12 @@ public interface KeyMirrorStore {
 
     default void setLastSyncAt(long at) {
     }
+
+    /**
+     * Optional: record an assertion {@code jti} as used until {@code expiresAtMs} and return false when it was already used (a
+     * replay). Return null (the default) and the mirror keeps used ids in process memory, which a restart or a second instance does not share.
+     */
+    default Boolean claimAssertionJti(String keyId, String jti, long expiresAtMs) {
+        return null;
+    }
 }

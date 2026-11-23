@@ -22,14 +22,14 @@ Maven:
 <dependency>
   <groupId>net.atlasauth</groupId>
   <artifactId>atlas-java</artifactId>
-  <version>1.22.0</version>
+  <version>1.23.0</version>
 </dependency>
 ```
 
 Gradle:
 
 ```kotlin
-implementation("net.atlasauth:atlas-java:1.22.0")
+implementation("net.atlasauth:atlas-java:1.23.0")
 ```
 
 ## The management client
@@ -606,6 +606,22 @@ int handleBackchannelLogout(String formBody, Map<String, String> responseHeaders
 The verifier does not remember tokens. To reject replays, keep each `jti` for a
 few minutes (longer than the token lifetime) in a shared store such as Redis or
 your database, and refuse one you have already seen.
+
+## Key-pair API keys
+
+A key-pair key has no shared secret: Atlas returns a PKCS#8 private key once and keeps only the public key. Sign a short-lived assertion and present it where you would present a secret.
+
+```java
+ApiKeyWithSecret key = atlas.apiKeys().create(new CreateApiKeyBody("user", "user_123")
+        .credential("key_pair").audience("https://api.example.com"));
+String assertion = ApiKeyAssertion.sign(key.privateKey(), key.keyId(), "https://api.example.com");
+atlas.apiKeys().verifyAssertion(assertion);
+atlas.apiKeys().mintToken(new MintApiKeyTokenBody().assertion(assertion));
+```
+
+ES256 (P-256) and EdDSA (Ed25519) keys are supported. Set `publicKey` on create to bring your own key; no private key is returned then.
+
+`mirror.verifyAssertion(assertion, List.of(), clientIp)` checks an assertion against the mirrored public key with no network call, with the same refusal codes Atlas answers.
 
 ## Verifying session tokens
 

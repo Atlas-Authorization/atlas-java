@@ -28,10 +28,21 @@ public record ApiKeyWithSecret(
         /** With an `X-Secret-Recipient`: the secret sealed to it (then the plaintext field is absent). */ String sealedSecret,
         /** With an `X-Secret-Recipient`: the client secret sealed to it. */ String sealedClientSecret,
         /** With an `X-Secret-Recipient`: the webhook secret sealed to it. */ String sealedWebhookSecret,
-        /** Names the fields that arrived sealed. */ SecretsSealed secretsSealed) {
+        /** Names the fields that arrived sealed. */ SecretsSealed secretsSealed,
+        /** "secret" or "key_pair". */ String credential,
+        /** Assertion audience of a key-pair key; null for a secret key. */ String audience,
+        /** The JWT {@code kid} of a key-pair key (equal to {@code id}). */ String keyId,
+        String publicKey,
+        String publicKeyJkt,
+        /** PKCS#8 PEM of an Atlas-generated key pair, revealed once (key-pair keys only). */ String privateKey) {
+    /** The shape before the key-pair fields. */
+    public ApiKeyWithSecret(String object, String id, String subjectType, String subjectId, String name, String prefix, Map<String, Object> claims, Long lastUsedAt, Long expiresAt, Long revokedAt, long createdAt, String secret, String note, List<ApiKeyLimit> limits, List<ApiKeyLimitState> usage, String sealedSecret, String sealedClientSecret, String sealedWebhookSecret, SecretsSealed secretsSealed) {
+        this(object, id, subjectType, subjectId, name, prefix, claims, lastUsedAt, expiresAt, revokedAt, createdAt, secret, note, limits, usage, sealedSecret, sealedClientSecret, sealedWebhookSecret, secretsSealed, null, null, null, null, null, null);
+    }
+
     /** The shape before sealedSecret, sealedClientSecret, sealedWebhookSecret, secretsSealed. */
     public ApiKeyWithSecret(String object, String id, String subjectType, String subjectId, String name, String prefix, Map<String, Object> claims, Long lastUsedAt, Long expiresAt, Long revokedAt, long createdAt, String secret, String note, List<ApiKeyLimit> limits, List<ApiKeyLimitState> usage) {
-        this(object, id, subjectType, subjectId, name, prefix, claims, lastUsedAt, expiresAt, revokedAt, createdAt, secret, note, limits, usage, null, null, null, null);
+        this(object, id, subjectType, subjectId, name, prefix, claims, lastUsedAt, expiresAt, revokedAt, createdAt, secret, note, limits, usage, null, null, null, null, null, null, null, null, null, null);
     }
 
 

@@ -34,11 +34,21 @@ public record ApiKey(
         /** False for a disabled key (it verifies as invalid until re-enabled). */ Boolean enabled,
         /** The per-key verify throttle, or null. */ ApiKeyRateLimit rateLimit,
         /** Uses left (each successful verify spends one); null = unlimited. */ Long remaining,
-        /** Scopes embedded into tokens minted from this key. */ java.util.List<String> scopes) {
+        /** Scopes embedded into tokens minted from this key. */ java.util.List<String> scopes,
+        /** "secret" or "key_pair". */ String credential,
+        /** Assertion audience of a key-pair key; null for a secret key. */ String audience,
+        /** The JWT {@code kid} of a key-pair key (equal to {@code id}). */ String keyId,
+        String publicKey,
+        String publicKeyJkt) {
+
+    /** The shape before the key-pair fields. */
+    public ApiKey(String object, String id, String subjectType, String subjectId, String name, String prefix, Map<String, Object> claims, Long lastUsedAt, Long expiresAt, Long revokedAt, long createdAt, List<ApiKeyLimit> limits, List<ApiKeyLimitState> usage, Boolean enabled, ApiKeyRateLimit rateLimit, Long remaining, java.util.List<String> scopes) {
+        this(object, id, subjectType, subjectId, name, prefix, claims, lastUsedAt, expiresAt, revokedAt, createdAt, limits, usage, enabled, rateLimit, remaining, scopes, null, null, null, null, null);
+    }
 
     /** The 1.10 shape, before the 1.11 fields. */
     public ApiKey(String object, String id, String subjectType, String subjectId, String name, String prefix, Map<String, Object> claims, Long lastUsedAt, Long expiresAt, Long revokedAt, long createdAt, List<ApiKeyLimit> limits, List<ApiKeyLimitState> usage) {
-        this(object, id, subjectType, subjectId, name, prefix, claims, lastUsedAt, expiresAt, revokedAt, createdAt, limits, usage, null, null, null, null);
+        this(object, id, subjectType, subjectId, name, prefix, claims, lastUsedAt, expiresAt, revokedAt, createdAt, limits, usage, null, null, null, null, null, null, null, null, null);
     }
 
     /** The 1.1 shape, without spend caps. */

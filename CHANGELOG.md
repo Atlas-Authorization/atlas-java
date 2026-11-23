@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.23.0 - 2026-11-22
+
+### Added
+
+- **Key-pair API keys.** `ApiKeyAssertion.sign(privateKeyPem, keyId, audience[, ttlSeconds, scope, jti])` signs the short-lived JWT a key-pair key presents (ES256 for P-256, EdDSA for Ed25519). `CreateApiKeyBody` takes `credential`, `audience` and `publicKey`; `ApiKey` and `ApiKeyWithSecret` carry `credential`, `audience`, `keyId` and, for a generated pair, `privateKey` once; `apiKeys.verifyAssertion(token)` and `MintApiKeyTokenBody.assertion` present an assertion instead of a secret. `KeyMirror.verifyAssertion` verifies an assertion locally with the server's refusal codes; `MirroredApiKey` carries `credential`, `publicKeyPem`, `audience`, `maxTokenLifetimeSeconds` and `enabled` (a disabled key is refused by `verify` and `verifyAssertion`), and `applyWebhook` copies `enabled`. A store may override `claimAssertionJti` to share used ids between processes.
+
 ## 1.22.0 - 2026-11-14
 
 ### Added

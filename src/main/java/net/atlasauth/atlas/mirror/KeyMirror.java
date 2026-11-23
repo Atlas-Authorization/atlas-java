@@ -1,6 +1,7 @@
 package net.atlasauth.atlas.mirror;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.atlasauth.atlas.ApiKeyAssertion;
 import net.atlasauth.atlas.AtlasApiException;
 
 import java.net.InetAddress;
@@ -45,7 +46,14 @@ public final class KeyMirror {
 
     /** The answer of {@link #verify}. {@code code} is null for a plain invalid key (unknown, revoked, expired). */
     public record Verification(boolean valid, String code, MirroredApiKey key, List<String> effectiveScopes,
-                               List<String> missingScopes, boolean stale, Map<String, Object> organization, Long lastSyncAt) {
+                               List<String> missingScopes, boolean stale, Map<String, Object> organization, Long lastSyncAt,
+                               String credential, String jti, Long exp) {
+        /** The shape before {@link #verifyAssertion}. */
+        public Verification(boolean valid, String code, MirroredApiKey key, List<String> effectiveScopes, List<String> missingScopes,
+                            boolean stale, Map<String, Object> organization, Long lastSyncAt) {
+            this(valid, code, key, effectiveScopes, missingScopes, stale, organization, lastSyncAt, null, null, null);
+        }
+
         static Verification invalid(String code) {
             return new Verification(false, code, null, List.of(), List.of(), false, null, null);
         }
@@ -64,6 +72,7 @@ public final class KeyMirror {
     private final BiFunction<String, String, Membership> membership;
     private final LongSupplier now;
     private volatile Long memorySyncAt;
+    private final Map<String, Long> usedJtis = new java.util.HashMap<>();
 
     /** Called each time an answer is served inside the {@code serveStaleForMs} grace. */
     @FunctionalInterface
@@ -162,7 +171,7 @@ public final class KeyMirror {
     /** Mint at Atlas, then mirror it. Returns Atlas's answer, which carries the one-time {@code secret}. */
     public JsonNode mint(Map<String, Object> body, String idempotencyKey) {
         JsonNode created = backend.createApiKey(body, idempotencyKey);
-        store.put(toMirrored(created, hashApiKeySecret(created.path("secret").asText())));
+        store.put(toMirrored(created, keyHash(created)));
         return created;
     }
 
@@ -173,15 +182,14 @@ public final class KeyMirror {
      */
     public JsonNode rotate(String id, Map<String, Object> body, String idempotencyKey) {
         JsonNode rotated = backend.rotateApiKey(id, body == null ? Map.of() : body, idempotencyKey);
-        store.put(toMirrored(rotated, hashApiKeySecret(rotated.path("secret").asText())));
+        store.put(toMirrored(rotated, keyHash(rotated)));
         MirroredApiKey old = store.get(id);
         if (old != null) {
             JsonNode prev = rotated.path("previous_key");
             if (prev.path("revoked").asBoolean(false)) {
                 store.markRevoked(id, now.getAsLong(), "rotated");
             } else if (prev.hasNonNull("expires_at")) {
-                store.put(new MirroredApiKey(old.id(), old.hash(), old.prefix(), old.subjectType(), old.subjectId(), old.name(),
-                        old.scopes(), old.allowedIps(), prev.get("expires_at").asLong(), old.revokedAt(), old.organizationId(), old.revokedReason()));
+                store.put(old.withExpiresAt(prev.get("expires_at").asLong()));
             }
         }
         return rotated;
@@ -237,6 +245,28 @@ public final class KeyMirror {
         }
     }
 
+    private record Freshness(Verification refusal, boolean servedStale) {
+    }
+
+    /** A refusal when the mirror is too stale to answer, and whether the answer is served stale. */
+    private Freshness freshness() {
+        if (maxStalenessMs == null) {
+            return new Freshness(null, false);
+        }
+        Long last = lastSyncAt();
+        double behind = last == null ? Double.POSITIVE_INFINITY : now.getAsLong() - last - maxStalenessMs;
+        if (behind <= 0) {
+            return new Freshness(null, false);
+        }
+        if (last == null || behind > serveStaleForMs) {
+            return new Freshness(new Verification(false, "stale", null, List.of(), List.of(), false, null, last), false);
+        }
+        if (onServeStale != null) {
+            onServeStale.served(last, (long) behind);
+        }
+        return new Freshness(null, true);
+    }
+
     public Verification verify(String secret) {
         return verify(secret, List.of(), null);
     }
@@ -253,20 +283,11 @@ public final class KeyMirror {
         if (secret == null || secret.isEmpty()) {
             return Verification.invalid(null);
         }
-        boolean servedStale = false;
-        if (maxStalenessMs != null) {
-            Long last = lastSyncAt();
-            double behind = last == null ? Double.POSITIVE_INFINITY : now.getAsLong() - last - maxStalenessMs;
-            if (behind > 0) {
-                if (last == null || behind > serveStaleForMs) {
-                    return new Verification(false, "stale", null, List.of(), List.of(), false, null, last);
-                }
-                servedStale = true;
-                if (onServeStale != null) {
-                    onServeStale.served(last, (long) behind);
-                }
-            }
+        Freshness fresh = freshness();
+        if (fresh.refusal() != null) {
+            return fresh.refusal();
         }
+        boolean servedStale = fresh.servedStale();
         String hash = hashApiKeySecret(secret);
         MirroredApiKey key = store.getByHash(hash);
         if (key == null && verifyAtAtlas) {
@@ -276,7 +297,7 @@ public final class KeyMirror {
                 store.put(key);
             }
         }
-        if (key == null || key.revokedAt() != null) {
+        if (key == null || key.revokedAt() != null || Boolean.FALSE.equals(key.enabled())) {
             return Verification.invalid(null);
         }
         if (key.expiresAt() != null && key.expiresAt() <= now.getAsLong()) {
@@ -327,6 +348,127 @@ public final class KeyMirror {
             return new Verification(false, "insufficient_scope", null, List.of(), missing, false, null, null);
         }
         return new Verification(true, null, key, effective, List.of(), servedStale, organization, null);
+    }
+
+    /**
+     * Verify a key-pair assertion ({@code ApiKeyAssertion.sign}) locally with the checks Atlas verify makes: the signature with the
+     * stored public key ({@code alg} must fit its type), {@code iss} = {@code kid}, {@code aud}, {@code iat}, {@code exp} and the
+     * lifetime cap, {@code nbf}, {@code scope} (a subset of the key's, narrows the result), revocation, expiry, the IP allowlist,
+     * then the single-use {@code jti}. A refusal carries the server's {@code code}; a key the mirror does not hold answers invalid
+     * with no code. The {@code jti} is claimed through the store's optional {@code claimAssertionJti}, else in this process's
+     * memory, and only after every other check passed.
+     */
+    public Verification verifyAssertion(String token, List<String> requiredScopes, String clientIp) {
+        Freshness fresh = freshness();
+        if (fresh.refusal() != null) {
+            return fresh.refusal();
+        }
+        ApiKeyAssertion.Parsed parsed = ApiKeyAssertion.parse(token);
+        Object kid = parsed == null ? null : parsed.header().get("kid");
+        if (!(kid instanceof String) || ((String) kid).isEmpty()) {
+            return Verification.invalid("invalid_assertion");
+        }
+        MirroredApiKey key = store.get((String) kid);
+        if (key == null) {
+            return Verification.invalid(null);
+        }
+        Map<String, Object> claims = parsed.claims();
+        if (!"key_pair".equals(key.credential()) || key.publicKeyPem() == null || key.publicKeyPem().isEmpty()
+                || !(parsed.header().get("alg") instanceof String alg)
+                || !ApiKeyAssertion.verifySignature(alg, parsed.signingInput(), parsed.signature(), key.publicKeyPem())
+                || !kid.equals(claims.get("iss")) || Boolean.FALSE.equals(key.enabled())) {
+            return Verification.invalid("invalid_assertion");
+        }
+        long nowMs = now.getAsLong();
+        if (key.revokedAt() != null || (key.expiresAt() != null && key.expiresAt() <= nowMs)) {
+            return Verification.invalid(null);
+        }
+        long nowS = nowMs / 1000;
+        Object aud = claims.get("aud");
+        if (!(aud instanceof String ? aud.equals(key.audience()) : aud instanceof List<?> l && key.audience() != null && l.contains(key.audience()))) {
+            return Verification.invalid("wrong_audience");
+        }
+        Object iat = claims.get("iat");
+        Object exp = claims.get("exp");
+        Object nbf = claims.get("nbf");
+        Object jti = claims.get("jti");
+        Object scope = claims.get("scope");
+        if (!(iat instanceof Number) || !(exp instanceof Number) || (claims.containsKey("nbf") && !(nbf instanceof Number))
+                || (claims.containsKey("jti") && !(jti instanceof String js && !js.isEmpty()))
+                || (claims.containsKey("scope") && !(scope instanceof String))) {
+            return Verification.invalid("invalid_assertion");
+        }
+        long iatS = ((Number) iat).longValue();
+        long expS = ((Number) exp).longValue();
+        if (iatS > nowS + 60 || (nbf instanceof Number n && n.longValue() > nowS + 60)) {
+            return Verification.invalid("assertion_not_yet_valid");
+        }
+        if (expS <= nowS - 30) {
+            return Verification.invalid("assertion_expired");
+        }
+        if (expS - iatS > Math.min(key.maxTokenLifetimeSeconds() == null ? 3600 : key.maxTokenLifetimeSeconds(), 86400)) {
+            return Verification.invalid("assertion_lifetime_too_long");
+        }
+        if (key.allowedIps() != null && !key.allowedIps().isEmpty()) {
+            if (clientIp == null || clientIp.isEmpty()) {
+                return Verification.invalid("client_ip_required");
+            }
+            if (!ipInAllowlist(clientIp, key.allowedIps())) {
+                return Verification.invalid("ip_not_allowed");
+            }
+        }
+        List<String> effective = expand(key.scopes() == null ? List.of() : key.scopes());
+        Map<String, Object> organization = null;
+        if ("user".equals(key.subjectType()) && key.organizationId() != null && !key.organizationId().isEmpty()) {
+            if (membership == null) {
+                return Verification.invalid("membership_unresolved");
+            }
+            Membership held = membership.apply(key.subjectId(), key.organizationId());
+            if (held == null) {
+                return Verification.invalid(null);
+            }
+            organization = held.data();
+            effective = intersectScopesWithPermissions(effective, held.permissions());
+        }
+        if (scope instanceof String sc && !sc.isBlank()) {
+            List<String> asked = List.of(sc.trim().split("\\s+"));
+            List<String> notGranted = new ArrayList<>();
+            for (String x : asked) {
+                if (!effective.contains(x)) {
+                    notGranted.add(x);
+                }
+            }
+            if (!notGranted.isEmpty()) {
+                return new Verification(false, "scope_not_granted", null, List.of(), notGranted, false, null, null);
+            }
+            effective = effective.stream().filter(asked::contains).toList();
+        }
+        List<String> missing = new ArrayList<>();
+        for (String x : requiredScopes == null ? List.<String>of() : requiredScopes) {
+            if (!effective.contains(x)) {
+                missing.add(x);
+            }
+        }
+        if (!missing.isEmpty()) {
+            return new Verification(false, "insufficient_scope", null, List.of(), missing, false, null, null);
+        }
+        // Last, so a refused assertion never burns its jti.
+        if (jti instanceof String id && !claimJti(key.id(), id, expS * 1000, nowMs)) {
+            return Verification.invalid("assertion_replayed");
+        }
+        return new Verification(true, null, key, effective, List.of(), fresh.servedStale(), organization, null,
+                "key_pair", jti instanceof String jid ? jid : null, expS);
+    }
+
+    private boolean claimJti(String keyId, String jti, long untilMs, long nowMs) {
+        Boolean stored = store.claimAssertionJti(keyId, jti, untilMs);
+        if (stored != null) {
+            return stored;
+        }
+        synchronized (usedJtis) {
+            usedJtis.values().removeIf(t -> t <= nowMs);
+            return usedJtis.putIfAbsent(keyId + "\n" + jti, untilMs) == null;
+        }
     }
 
     /**
@@ -388,8 +530,7 @@ public final class KeyMirror {
             if (held.revokedAt() == null) {
                 return false;
             }
-            store.put(new MirroredApiKey(held.id(), held.hash(), held.prefix(), held.subjectType(), held.subjectId(), held.name(),
-                    held.scopes(), held.allowedIps(), expires, null, held.organizationId(), null));
+            store.put(held.withExpiresAt(expires).withRevoked(null, null));
             return true;
         }
         if (type.equals("api_key.revoked") || (data.path("revoked_at").isNumber() && held.revokedAt() == null)) {
@@ -398,11 +539,13 @@ public final class KeyMirror {
             return true;
         }
         if (type.equals("api_key.updated") || type.equals("api_key.created")) {
-            store.put(new MirroredApiKey(held.id(), held.hash(), held.prefix(), held.subjectType(), held.subjectId(),
+            MirroredApiKey merged = new MirroredApiKey(held.id(), held.hash(), held.prefix(), held.subjectType(), held.subjectId(),
                     data.has("name") ? (data.get("name").isNull() ? null : data.get("name").asText()) : held.name(),
                     data.has("scopes") ? strings(data.get("scopes")) : held.scopes(),
                     data.has("allowed_ips") ? strings(data.get("allowed_ips")) : held.allowedIps(),
-                    expires, held.revokedAt(), held.organizationId(), held.revokedReason()));
+                    expires, held.revokedAt(), held.organizationId(), held.revokedReason(),
+                    held.enabled(), held.credential(), held.publicKeyPem(), held.audience(), held.maxTokenLifetimeSeconds());
+            store.put(data.hasNonNull("enabled") ? merged.withEnabled(data.get("enabled").asBoolean()) : merged);
             return true;
         }
         return false;
@@ -435,7 +578,16 @@ public final class KeyMirror {
                 k.hasNonNull("scopes") ? strings(k.get("scopes")) : null, k.hasNonNull("allowed_ips") ? strings(k.get("allowed_ips")) : null,
                 k.hasNonNull("expires_at") ? k.get("expires_at").asLong() : null, k.hasNonNull("revoked_at") ? k.get("revoked_at").asLong() : null,
                 k.hasNonNull("organization_id") ? k.get("organization_id").asText() : null,
-                k.hasNonNull("revoked_reason") ? k.get("revoked_reason").asText() : null);
+                k.hasNonNull("revoked_reason") ? k.get("revoked_reason").asText() : null,
+                k.hasNonNull("enabled") ? k.get("enabled").asBoolean() : null, k.path("credential").asText("secret"),
+                k.hasNonNull("public_key") ? k.get("public_key").asText() : null, k.hasNonNull("audience") ? k.get("audience").asText() : null,
+                k.hasNonNull("max_token_lifetime_seconds") ? k.get("max_token_lifetime_seconds").asLong() : null);
+    }
+
+    /** The secret's sha256; a key-pair key has no secret, so its row carries a placeholder nothing can match. */
+    private static String keyHash(JsonNode k) {
+        return k.hasNonNull("secret") && !k.get("secret").asText().isEmpty()
+                ? hashApiKeySecret(k.get("secret").asText()) : "key_pair:" + k.path("id").asText();
     }
 
     private static List<String> strings(JsonNode arr) {
