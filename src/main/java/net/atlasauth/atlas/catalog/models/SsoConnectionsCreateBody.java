@@ -96,6 +96,9 @@ public final class SsoConnectionsCreateBody {
     /** Opt-in (default off): on every later sign-in, also move the role of an existing member who has no recorded role source (joined by invitation, or before sources were recorded) when their claims now map to a different role. A role set through the API or dashboard, and another source's members, are never touched. null turns it off. */
     @JsonProperty("rerole_on_sign_in")
     public Boolean reroleOnSignIn;
+    /** Whether a sign-in through this connection may link to an EXISTING user by a shared verified email. same_org_only (the default for an organization-bound connection) links only to a user who is already a member or end user of the connection's organization, or whose email domain is a verified domain of it, and otherwise refuses with 409; none never links (the sign-in gets its own account); email links by verified email as an instance-level connection does (the default for a connection without an organization). null restores the default. same_org_only needs an organization. One of: email, same_org_only, none. */
+    @JsonProperty("account_linking")
+    public String accountLinking;
     /** Map an IdP claim value to an org role (first match wins). Sets the role a member is seated with, and on later sign-ins moves the role of a member this connection seated when their claims map elsewhere. Claims that map to nothing leave the role unchanged; a role set through the API or dashboard, and the organization's creator, are never changed. */
     @JsonProperty("claim_role_mappings")
     public List<SsoConnectionsCreateBodyClaimRoleMappingsItem> claimRoleMappings;
@@ -224,6 +227,9 @@ public final class SsoConnectionsCreateBody {
     public SsoConnectionsCreateBody reroleOnSignIn(Boolean v) { this.reroleOnSignIn = v; clearedFields.remove("rerole_on_sign_in"); return this; }
     /** Send {@code "rerole_on_sign_in": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public SsoConnectionsCreateBody clearReroleOnSignIn() { this.reroleOnSignIn = null; clearedFields.add("rerole_on_sign_in"); return this; }
+    public SsoConnectionsCreateBody accountLinking(String v) { this.accountLinking = v; clearedFields.remove("account_linking"); return this; }
+    /** Send {@code "account_linking": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public SsoConnectionsCreateBody clearAccountLinking() { this.accountLinking = null; clearedFields.add("account_linking"); return this; }
     public SsoConnectionsCreateBody claimRoleMappings(List<SsoConnectionsCreateBodyClaimRoleMappingsItem> v) { this.claimRoleMappings = v; clearedFields.remove("claim_role_mappings"); return this; }
     /** Send {@code "claim_role_mappings": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public SsoConnectionsCreateBody clearClaimRoleMappings() { this.claimRoleMappings = null; clearedFields.add("claim_role_mappings"); return this; }

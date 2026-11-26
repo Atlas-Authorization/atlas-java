@@ -24,6 +24,8 @@ public record BillingPlan(
         @JsonProperty("active") Boolean active,
         @JsonProperty("pricing_model") String pricingModel,
         @JsonProperty("trial_days") Long trialDays,
+        @JsonProperty("grace_days") Long graceDays,
+        @JsonProperty("past_due_grace_days") Long pastDueGraceDays,
         @JsonProperty("promotion") Map<String, Object> promotion,
         @JsonProperty("stripe_meter_id") String stripeMeterId,
         @JsonProperty("usage_unit") String usageUnit,

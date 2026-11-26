@@ -114,6 +114,7 @@ authz	AuthzApi	getWhatIf	GET	/v1/authz/what_if/{id}	java.lang.String
 authz_decisions	AuthzDecisionsApi	ingest	POST	/v1/authz_decisions/ingest	net.atlasauth.atlas.catalog.models.AuthzDecisionsIngestBody	
 authz_pdps	AuthzPdpsApi	list	GET	/v1/authz_pdps	net.atlasauth.atlas.catalog.models.AuthzPdpsListQuery	
 authz_pdps	AuthzPdpsApi	delete	DELETE	/v1/authz_pdps/{id}	java.lang.String	
+billing	BillingApi	sync	POST	/v1/billing/checkout/sync	net.atlasauth.atlas.catalog.models.BillingSyncBody	
 billing	BillingApi	listAccounts	GET	/v1/billing/connect/accounts	net.atlasauth.atlas.catalog.models.BillingListAccountsQuery	
 billing	BillingApi	createAccount	POST	/v1/billing/connect/accounts	net.atlasauth.atlas.catalog.models.BillingCreateAccountBody	
 billing	BillingApi	getAccount	GET	/v1/billing/connect/accounts/{id}	java.lang.String	
@@ -142,7 +143,9 @@ billing	BillingApi	listProviders	GET	/v1/billing/providers	net.atlasauth.atlas.c
 billing	BillingApi	getProvider	GET	/v1/billing/providers/{provider}	java.lang.String	
 billing	BillingApi	setProvider	PUT	/v1/billing/providers/{provider}	java.lang.String,net.atlasauth.atlas.catalog.models.BillingSetProviderBody	
 billing	BillingApi	createStoreLink	POST	/v1/billing/store_links	net.atlasauth.atlas.catalog.models.BillingCreateStoreLinkBody	
+billing	BillingApi	createEvent	POST	/v1/billing/stripe/events	net.atlasauth.atlas.catalog.models.BillingCreateEventBody	
 billing	BillingApi	extendTrial	POST	/v1/billing/subscriptions/{id}/extend_trial	java.lang.String,net.atlasauth.atlas.catalog.models.BillingExtendTrialBody	
+billing	BillingApi	subscriptionsSync	POST	/v1/billing/subscriptions/{id}/sync	java.lang.String	
 billing	BillingApi	getUsage	GET	/v1/billing/usage	net.atlasauth.atlas.catalog.models.BillingGetUsageQuery	
 billing	BillingApi	batch	POST	/v1/billing/usage/batch	net.atlasauth.atlas.catalog.models.BillingBatchBody	
 bot_signals	BotSignalsApi	list	GET	/v1/bot_signals	net.atlasauth.atlas.catalog.models.BotSignalsListQuery	
@@ -462,6 +465,7 @@ instance	InstanceApi	getBeforeUserCreate	GET	/v1/instance/hooks/before_user_crea
 instance	InstanceApi	updateBeforeUserCreate	PATCH	/v1/instance/hooks/before_user_create	net.atlasauth.atlas.catalog.models.InstanceUpdateBeforeUserCreateBody,net.atlasauth.atlas.catalog.models.InstanceUpdateBeforeUserCreateQuery	
 instance	InstanceApi	listCalls	GET	/v1/instance/hooks/before_user_create/calls	net.atlasauth.atlas.catalog.models.InstanceListCallsQuery	
 instance	InstanceApi	test	POST	/v1/instance/hooks/before_user_create/test		
+instance	InstanceApi	createHostedMethodFilter	POST	/v1/instance/hosted_method_filters	net.atlasauth.atlas.catalog.models.InstanceCreateHostedMethodFilterBody	
 instance	InstanceApi	getHostedPages	GET	/v1/instance/hosted_pages		
 instance	InstanceApi	updateHostedPages	PATCH	/v1/instance/hosted_pages	net.atlasauth.atlas.catalog.models.InstanceUpdateHostedPagesBody	
 instance	InstanceApi	getImpersonationPolicy	GET	/v1/instance/impersonation_policy		
@@ -671,7 +675,10 @@ oauth_clients	OauthClientsApi	listUsage	GET	/v1/oauth_clients/{id}/usage	java.la
 oauth_clients	OauthClientsApi	deleteWebhook	DELETE	/v1/oauth_clients/{id}/webhook	java.lang.String	
 oauth_clients	OauthClientsApi	getWebhook	GET	/v1/oauth_clients/{id}/webhook	java.lang.String	
 oauth_clients	OauthClientsApi	setWebhook	PUT	/v1/oauth_clients/{id}/webhook	java.lang.String,net.atlasauth.atlas.catalog.models.OauthClientsSetWebhookBody	
+oauth_clients	OauthClientsApi	webhookRotateSecret	POST	/v1/oauth_clients/{id}/webhook/rotate_secret	java.lang.String,net.atlasauth.atlas.catalog.models.OauthClientsWebhookRotateSecretBody	
+oauth_clients	OauthClientsApi	test	POST	/v1/oauth_clients/{id}/webhook/test	java.lang.String,net.atlasauth.atlas.catalog.models.OauthClientsTestBody	
 oauth_consent_requests	OauthConsentRequestsApi	get	GET	/v1/oauth_consent_requests	net.atlasauth.atlas.catalog.models.OauthConsentRequestsGetQuery	
+oauth_consent_requests	OauthConsentRequestsApi	setAccept	PUT	/v1/oauth_consent_requests/accept	net.atlasauth.atlas.catalog.models.OauthConsentRequestsSetAcceptBody,net.atlasauth.atlas.catalog.models.OauthConsentRequestsSetAcceptQuery	
 oauth_consent_requests	OauthConsentRequestsApi	setSwitchAccount	PUT	/v1/oauth_consent_requests/switch_account	net.atlasauth.atlas.catalog.models.OauthConsentRequestsSetSwitchAccountQuery	
 oauth_device_requests	OauthDeviceRequestsApi	get	GET	/v1/oauth_device_requests	net.atlasauth.atlas.catalog.models.OauthDeviceRequestsGetQuery	
 oauth_device_requests	OauthDeviceRequestsApi	setAccept	PUT	/v1/oauth_device_requests/accept	net.atlasauth.atlas.catalog.models.OauthDeviceRequestsSetAcceptQuery	
@@ -750,6 +757,8 @@ organizations	OrganizationsApi	listItAlerts	GET	/v1/organizations/{id}/it_alerts
 organizations	OrganizationsApi	getItHealth	GET	/v1/organizations/{id}/it_health	java.lang.String	
 organizations	OrganizationsApi	createMembershipImport	POST	/v1/organizations/{id}/membership_imports	java.lang.String,net.atlasauth.atlas.catalog.models.OrganizationsCreateMembershipImportBody	
 organizations	OrganizationsApi	listMemberships	GET	/v1/organizations/{id}/memberships	java.lang.String,net.atlasauth.atlas.catalog.models.OrganizationsListMembershipsQuery	
+organizations	OrganizationsApi	deleteByExternalId	DELETE	/v1/organizations/{id}/memberships/by_external_id/{userExternalId}	java.lang.String,java.lang.String	
+organizations	OrganizationsApi	setByExternalId	PUT	/v1/organizations/{id}/memberships/by_external_id/{userExternalId}	java.lang.String,java.lang.String,net.atlasauth.atlas.catalog.models.OrganizationsSetByExternalIdBody	
 organizations	OrganizationsApi	deleteMembership	DELETE	/v1/organizations/{id}/memberships/{userId}	java.lang.String,java.lang.String,net.atlasauth.atlas.catalog.models.OrganizationsDeleteMembershipQuery	
 organizations	OrganizationsApi	updateMembership	PATCH	/v1/organizations/{id}/memberships/{userId}	java.lang.String,java.lang.String,net.atlasauth.atlas.catalog.models.OrganizationsUpdateMembershipBody	
 organizations	OrganizationsApi	setMembership	PUT	/v1/organizations/{id}/memberships/{userId}	java.lang.String,java.lang.String,net.atlasauth.atlas.catalog.models.OrganizationsSetMembershipBody	

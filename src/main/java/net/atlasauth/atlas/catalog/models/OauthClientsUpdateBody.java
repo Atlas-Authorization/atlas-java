@@ -12,6 +12,125 @@ import java.util.Map;
 /** The OauthClientsUpdateBody object. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class OauthClientsUpdateBody {
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("id_token_signed_response_alg")
+    public String idTokenSignedResponseAlg;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("userinfo_signed_response_alg")
+    public String userinfoSignedResponseAlg;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("authorization_signed_response_alg")
+    public String authorizationSignedResponseAlg;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("introspection_signed_response_alg")
+    public String introspectionSignedResponseAlg;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("id_token_encrypted_response_alg")
+    public String idTokenEncryptedResponseAlg;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("id_token_encrypted_response_enc")
+    public String idTokenEncryptedResponseEnc;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("userinfo_encrypted_response_alg")
+    public String userinfoEncryptedResponseAlg;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("userinfo_encrypted_response_enc")
+    public String userinfoEncryptedResponseEnc;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("authorization_encrypted_response_alg")
+    public String authorizationEncryptedResponseAlg;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("authorization_encrypted_response_enc")
+    public String authorizationEncryptedResponseEnc;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("introspection_encrypted_response_alg")
+    public String introspectionEncryptedResponseAlg;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("introspection_encrypted_response_enc")
+    public String introspectionEncryptedResponseEnc;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("request_object_signing_alg")
+    public String requestObjectSigningAlg;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("request_object_encryption_alg")
+    public String requestObjectEncryptionAlg;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("request_object_encryption_enc")
+    public String requestObjectEncryptionEnc;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("initiate_login_uri")
+    public String initiateLoginUri;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("backchannel_token_delivery_mode")
+    public String backchannelTokenDeliveryMode;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("backchannel_client_notification_endpoint")
+    public String backchannelClientNotificationEndpoint;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("backchannel_authentication_request_signing_alg")
+    public String backchannelAuthenticationRequestSigningAlg;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("wimse_workload_id")
+    public String wimseWorkloadId;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("min_app_version")
+    public String minAppVersion;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("native_sso_group")
+    public String nativeSsoGroup;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("org_selection")
+    public String orgSelection;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("software_id")
+    public String softwareId;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("software_version")
+    public String softwareVersion;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("tls_client_auth_san_dns")
+    public String tlsClientAuthSanDns;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("tls_client_auth_san_uri")
+    public String tlsClientAuthSanUri;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("tls_client_auth_san_ip")
+    public String tlsClientAuthSanIp;
+    /** OIDC / RFC 7591 client metadata (see the OpenID Provider guide). */
+    @JsonProperty("tls_client_auth_san_email")
+    public String tlsClientAuthSanEmail;
+    /** OIDC / RFC 7591 client metadata. */
+    @JsonProperty("require_signed_request_object")
+    public Boolean requireSignedRequestObject;
+    /** OIDC / RFC 7591 client metadata. */
+    @JsonProperty("require_auth_time")
+    public Boolean requireAuthTime;
+    /** OIDC / RFC 7591 client metadata. */
+    @JsonProperty("tls_client_certificate_bound_access_tokens")
+    public Boolean tlsClientCertificateBoundAccessTokens;
+    /** OIDC / RFC 7591 client metadata. */
+    @JsonProperty("dpop_bound_access_tokens")
+    public Boolean dpopBoundAccessTokens;
+    /** OIDC / RFC 7591 client metadata. */
+    @JsonProperty("txn_token_unsigned_subject")
+    public Boolean txnTokenUnsignedSubject;
+    /** OIDC / RFC 7591 client metadata. */
+    @JsonProperty("backchannel_user_code_parameter")
+    public Boolean backchannelUserCodeParameter;
+    /** OIDC response types the client may use (default `code`). */
+    @JsonProperty("response_types")
+    public List<String> responseTypes;
+    /** Pre-registered https request object URIs. */
+    @JsonProperty("request_uris")
+    public List<String> requestUris;
+    /** Default maximum authentication age in seconds. */
+    @JsonProperty("default_max_age")
+    public Long defaultMaxAge;
+    @JsonProperty("default_acr_values")
+    public List<String> defaultAcrValues;
+    /** Contact addresses of the app's developers. */
+    @JsonProperty("contacts")
+    public List<String> contacts;
     @JsonProperty("name")
     public String name;
     @JsonProperty("redirect_uris")
@@ -25,6 +144,33 @@ public final class OauthClientsUpdateBody {
     public String tokenEndpointAuthMethod;
     @JsonProperty("logo_url")
     public String logoUrl;
+    /** RFC 7591 name for logo_url. */
+    @JsonProperty("logo_uri")
+    public String logoUri;
+    /** RFC 7591: the app's homepage (absolute https URL), shown on the consent page. null clears (update). */
+    @JsonProperty("client_uri")
+    public String clientUri;
+    /** Alias of client_uri. */
+    @JsonProperty("homepage_url")
+    public String homepageUrl;
+    /** RFC 7591: the app's privacy policy (absolute https URL), linked from the consent page. null clears (update). */
+    @JsonProperty("policy_uri")
+    public String policyUri;
+    /** RFC 7591: the app's terms of service (absolute https URL), linked from the consent page. null clears (update). */
+    @JsonProperty("tos_uri")
+    public String tosUri;
+    /** Provisioning tags (filter lists with ?metadata[key]=value). Update replaces them. */
+    @JsonProperty("metadata")
+    public Map<String, Object> metadata;
+    /** Client public keys (JWK Set) for private_key_jwt and signed request objects. */
+    @JsonProperty("jwks")
+    public OauthClientsUpdateBodyJwks jwks;
+    /** https URL of the client's JWK Set, instead of jwks. */
+    @JsonProperty("jwks_uri")
+    public String jwksUri;
+    /** RFC 8705 expected certificate Subject DN for tls_client_auth. */
+    @JsonProperty("tls_client_auth_subject_dn")
+    public String tlsClientAuthSubjectDn;
     /** Skips the consent screen for a first-party app. */
     @JsonProperty("first_party")
     public Boolean firstParty;
@@ -53,10 +199,16 @@ public final class OauthClientsUpdateBody {
     /** When true, /oauth2/authorize issues no code to this client for a user whose primary email is not proven (a sign-up that skipped verification does not count). The first time, the user is sent through the hosted sign-in, which asks them to verify the address with a code, and the authorization then continues; if they come back still unverified, or under prompt=none, or when the account has no email, the application has no email provider, or the client uses its own login_url, the redirect carries error=access_denied with an error_description saying why. Only new authorizations are checked (existing refresh tokens keep working). Default false. */
     @JsonProperty("require_verified_email")
     public Boolean requireVerifiedEmail;
+    /** When true, /oauth2/authorize shows the consent screen for this client, a first-party client included, until the user approves with remember; a remembered approval (for that organization, under per-organization consent) skips it next time. Send prompt=consent to ask every time. Under prompt=none with no remembered approval the request fails with consent_required. Default false. */
+    @JsonProperty("require_consent")
+    public Boolean requireConsent;
+    /** Keep the user's consent per organization. null (default): per organization whenever the request names one (`organization`, an organization choice, or the request resolves to one), so approving the app for organization A never covers organization B and revoking one organization's consent ends only that organization's tokens. true: always per organization. false: one consent for the user whatever the organization. null clears (update). */
+    @JsonProperty("consent_per_organization")
+    public Boolean consentPerOrganization;
     /** The developer (an Atlas user or organization id) who owns this client. null clears (update). */
     @JsonProperty("owner")
     public String owner;
-    /** Review state; default approved. development: only the owner and testers can authorize. suspended: new authorizations and refreshes are refused at once and `oauth_client.status_changed` fires on every change. One of: development, in_review, approved, suspended. */
+    /** Review state; default approved. development and in_review: only the owner and testers can authorize (in_review is a development client awaiting review). suspended: new authorizations and refreshes are refused at once and `oauth_client.status_changed` fires on every change. One of: development, in_review, approved, suspended. */
     @JsonProperty("status")
     public String status;
     /** User ids besides the owner who may authorize a client in development. */
@@ -123,6 +275,126 @@ public final class OauthClientsUpdateBody {
     public OauthClientsUpdateBody() {
     }
 
+    public OauthClientsUpdateBody idTokenSignedResponseAlg(String v) { this.idTokenSignedResponseAlg = v; clearedFields.remove("id_token_signed_response_alg"); return this; }
+    /** Send {@code "id_token_signed_response_alg": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearIdTokenSignedResponseAlg() { this.idTokenSignedResponseAlg = null; clearedFields.add("id_token_signed_response_alg"); return this; }
+    public OauthClientsUpdateBody userinfoSignedResponseAlg(String v) { this.userinfoSignedResponseAlg = v; clearedFields.remove("userinfo_signed_response_alg"); return this; }
+    /** Send {@code "userinfo_signed_response_alg": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearUserinfoSignedResponseAlg() { this.userinfoSignedResponseAlg = null; clearedFields.add("userinfo_signed_response_alg"); return this; }
+    public OauthClientsUpdateBody authorizationSignedResponseAlg(String v) { this.authorizationSignedResponseAlg = v; clearedFields.remove("authorization_signed_response_alg"); return this; }
+    /** Send {@code "authorization_signed_response_alg": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearAuthorizationSignedResponseAlg() { this.authorizationSignedResponseAlg = null; clearedFields.add("authorization_signed_response_alg"); return this; }
+    public OauthClientsUpdateBody introspectionSignedResponseAlg(String v) { this.introspectionSignedResponseAlg = v; clearedFields.remove("introspection_signed_response_alg"); return this; }
+    /** Send {@code "introspection_signed_response_alg": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearIntrospectionSignedResponseAlg() { this.introspectionSignedResponseAlg = null; clearedFields.add("introspection_signed_response_alg"); return this; }
+    public OauthClientsUpdateBody idTokenEncryptedResponseAlg(String v) { this.idTokenEncryptedResponseAlg = v; clearedFields.remove("id_token_encrypted_response_alg"); return this; }
+    /** Send {@code "id_token_encrypted_response_alg": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearIdTokenEncryptedResponseAlg() { this.idTokenEncryptedResponseAlg = null; clearedFields.add("id_token_encrypted_response_alg"); return this; }
+    public OauthClientsUpdateBody idTokenEncryptedResponseEnc(String v) { this.idTokenEncryptedResponseEnc = v; clearedFields.remove("id_token_encrypted_response_enc"); return this; }
+    /** Send {@code "id_token_encrypted_response_enc": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearIdTokenEncryptedResponseEnc() { this.idTokenEncryptedResponseEnc = null; clearedFields.add("id_token_encrypted_response_enc"); return this; }
+    public OauthClientsUpdateBody userinfoEncryptedResponseAlg(String v) { this.userinfoEncryptedResponseAlg = v; clearedFields.remove("userinfo_encrypted_response_alg"); return this; }
+    /** Send {@code "userinfo_encrypted_response_alg": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearUserinfoEncryptedResponseAlg() { this.userinfoEncryptedResponseAlg = null; clearedFields.add("userinfo_encrypted_response_alg"); return this; }
+    public OauthClientsUpdateBody userinfoEncryptedResponseEnc(String v) { this.userinfoEncryptedResponseEnc = v; clearedFields.remove("userinfo_encrypted_response_enc"); return this; }
+    /** Send {@code "userinfo_encrypted_response_enc": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearUserinfoEncryptedResponseEnc() { this.userinfoEncryptedResponseEnc = null; clearedFields.add("userinfo_encrypted_response_enc"); return this; }
+    public OauthClientsUpdateBody authorizationEncryptedResponseAlg(String v) { this.authorizationEncryptedResponseAlg = v; clearedFields.remove("authorization_encrypted_response_alg"); return this; }
+    /** Send {@code "authorization_encrypted_response_alg": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearAuthorizationEncryptedResponseAlg() { this.authorizationEncryptedResponseAlg = null; clearedFields.add("authorization_encrypted_response_alg"); return this; }
+    public OauthClientsUpdateBody authorizationEncryptedResponseEnc(String v) { this.authorizationEncryptedResponseEnc = v; clearedFields.remove("authorization_encrypted_response_enc"); return this; }
+    /** Send {@code "authorization_encrypted_response_enc": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearAuthorizationEncryptedResponseEnc() { this.authorizationEncryptedResponseEnc = null; clearedFields.add("authorization_encrypted_response_enc"); return this; }
+    public OauthClientsUpdateBody introspectionEncryptedResponseAlg(String v) { this.introspectionEncryptedResponseAlg = v; clearedFields.remove("introspection_encrypted_response_alg"); return this; }
+    /** Send {@code "introspection_encrypted_response_alg": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearIntrospectionEncryptedResponseAlg() { this.introspectionEncryptedResponseAlg = null; clearedFields.add("introspection_encrypted_response_alg"); return this; }
+    public OauthClientsUpdateBody introspectionEncryptedResponseEnc(String v) { this.introspectionEncryptedResponseEnc = v; clearedFields.remove("introspection_encrypted_response_enc"); return this; }
+    /** Send {@code "introspection_encrypted_response_enc": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearIntrospectionEncryptedResponseEnc() { this.introspectionEncryptedResponseEnc = null; clearedFields.add("introspection_encrypted_response_enc"); return this; }
+    public OauthClientsUpdateBody requestObjectSigningAlg(String v) { this.requestObjectSigningAlg = v; clearedFields.remove("request_object_signing_alg"); return this; }
+    /** Send {@code "request_object_signing_alg": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearRequestObjectSigningAlg() { this.requestObjectSigningAlg = null; clearedFields.add("request_object_signing_alg"); return this; }
+    public OauthClientsUpdateBody requestObjectEncryptionAlg(String v) { this.requestObjectEncryptionAlg = v; clearedFields.remove("request_object_encryption_alg"); return this; }
+    /** Send {@code "request_object_encryption_alg": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearRequestObjectEncryptionAlg() { this.requestObjectEncryptionAlg = null; clearedFields.add("request_object_encryption_alg"); return this; }
+    public OauthClientsUpdateBody requestObjectEncryptionEnc(String v) { this.requestObjectEncryptionEnc = v; clearedFields.remove("request_object_encryption_enc"); return this; }
+    /** Send {@code "request_object_encryption_enc": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearRequestObjectEncryptionEnc() { this.requestObjectEncryptionEnc = null; clearedFields.add("request_object_encryption_enc"); return this; }
+    public OauthClientsUpdateBody initiateLoginUri(String v) { this.initiateLoginUri = v; clearedFields.remove("initiate_login_uri"); return this; }
+    /** Send {@code "initiate_login_uri": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearInitiateLoginUri() { this.initiateLoginUri = null; clearedFields.add("initiate_login_uri"); return this; }
+    public OauthClientsUpdateBody backchannelTokenDeliveryMode(String v) { this.backchannelTokenDeliveryMode = v; clearedFields.remove("backchannel_token_delivery_mode"); return this; }
+    /** Send {@code "backchannel_token_delivery_mode": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearBackchannelTokenDeliveryMode() { this.backchannelTokenDeliveryMode = null; clearedFields.add("backchannel_token_delivery_mode"); return this; }
+    public OauthClientsUpdateBody backchannelClientNotificationEndpoint(String v) { this.backchannelClientNotificationEndpoint = v; clearedFields.remove("backchannel_client_notification_endpoint"); return this; }
+    /** Send {@code "backchannel_client_notification_endpoint": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearBackchannelClientNotificationEndpoint() { this.backchannelClientNotificationEndpoint = null; clearedFields.add("backchannel_client_notification_endpoint"); return this; }
+    public OauthClientsUpdateBody backchannelAuthenticationRequestSigningAlg(String v) { this.backchannelAuthenticationRequestSigningAlg = v; clearedFields.remove("backchannel_authentication_request_signing_alg"); return this; }
+    /** Send {@code "backchannel_authentication_request_signing_alg": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearBackchannelAuthenticationRequestSigningAlg() { this.backchannelAuthenticationRequestSigningAlg = null; clearedFields.add("backchannel_authentication_request_signing_alg"); return this; }
+    public OauthClientsUpdateBody wimseWorkloadId(String v) { this.wimseWorkloadId = v; clearedFields.remove("wimse_workload_id"); return this; }
+    /** Send {@code "wimse_workload_id": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearWimseWorkloadId() { this.wimseWorkloadId = null; clearedFields.add("wimse_workload_id"); return this; }
+    public OauthClientsUpdateBody minAppVersion(String v) { this.minAppVersion = v; clearedFields.remove("min_app_version"); return this; }
+    /** Send {@code "min_app_version": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearMinAppVersion() { this.minAppVersion = null; clearedFields.add("min_app_version"); return this; }
+    public OauthClientsUpdateBody nativeSsoGroup(String v) { this.nativeSsoGroup = v; clearedFields.remove("native_sso_group"); return this; }
+    /** Send {@code "native_sso_group": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearNativeSsoGroup() { this.nativeSsoGroup = null; clearedFields.add("native_sso_group"); return this; }
+    public OauthClientsUpdateBody orgSelection(String v) { this.orgSelection = v; clearedFields.remove("org_selection"); return this; }
+    /** Send {@code "org_selection": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearOrgSelection() { this.orgSelection = null; clearedFields.add("org_selection"); return this; }
+    public OauthClientsUpdateBody softwareId(String v) { this.softwareId = v; clearedFields.remove("software_id"); return this; }
+    /** Send {@code "software_id": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearSoftwareId() { this.softwareId = null; clearedFields.add("software_id"); return this; }
+    public OauthClientsUpdateBody softwareVersion(String v) { this.softwareVersion = v; clearedFields.remove("software_version"); return this; }
+    /** Send {@code "software_version": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearSoftwareVersion() { this.softwareVersion = null; clearedFields.add("software_version"); return this; }
+    public OauthClientsUpdateBody tlsClientAuthSanDns(String v) { this.tlsClientAuthSanDns = v; clearedFields.remove("tls_client_auth_san_dns"); return this; }
+    /** Send {@code "tls_client_auth_san_dns": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearTlsClientAuthSanDns() { this.tlsClientAuthSanDns = null; clearedFields.add("tls_client_auth_san_dns"); return this; }
+    public OauthClientsUpdateBody tlsClientAuthSanUri(String v) { this.tlsClientAuthSanUri = v; clearedFields.remove("tls_client_auth_san_uri"); return this; }
+    /** Send {@code "tls_client_auth_san_uri": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearTlsClientAuthSanUri() { this.tlsClientAuthSanUri = null; clearedFields.add("tls_client_auth_san_uri"); return this; }
+    public OauthClientsUpdateBody tlsClientAuthSanIp(String v) { this.tlsClientAuthSanIp = v; clearedFields.remove("tls_client_auth_san_ip"); return this; }
+    /** Send {@code "tls_client_auth_san_ip": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearTlsClientAuthSanIp() { this.tlsClientAuthSanIp = null; clearedFields.add("tls_client_auth_san_ip"); return this; }
+    public OauthClientsUpdateBody tlsClientAuthSanEmail(String v) { this.tlsClientAuthSanEmail = v; clearedFields.remove("tls_client_auth_san_email"); return this; }
+    /** Send {@code "tls_client_auth_san_email": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearTlsClientAuthSanEmail() { this.tlsClientAuthSanEmail = null; clearedFields.add("tls_client_auth_san_email"); return this; }
+    public OauthClientsUpdateBody requireSignedRequestObject(Boolean v) { this.requireSignedRequestObject = v; clearedFields.remove("require_signed_request_object"); return this; }
+    /** Send {@code "require_signed_request_object": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearRequireSignedRequestObject() { this.requireSignedRequestObject = null; clearedFields.add("require_signed_request_object"); return this; }
+    public OauthClientsUpdateBody requireAuthTime(Boolean v) { this.requireAuthTime = v; clearedFields.remove("require_auth_time"); return this; }
+    /** Send {@code "require_auth_time": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearRequireAuthTime() { this.requireAuthTime = null; clearedFields.add("require_auth_time"); return this; }
+    public OauthClientsUpdateBody tlsClientCertificateBoundAccessTokens(Boolean v) { this.tlsClientCertificateBoundAccessTokens = v; clearedFields.remove("tls_client_certificate_bound_access_tokens"); return this; }
+    /** Send {@code "tls_client_certificate_bound_access_tokens": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearTlsClientCertificateBoundAccessTokens() { this.tlsClientCertificateBoundAccessTokens = null; clearedFields.add("tls_client_certificate_bound_access_tokens"); return this; }
+    public OauthClientsUpdateBody dpopBoundAccessTokens(Boolean v) { this.dpopBoundAccessTokens = v; clearedFields.remove("dpop_bound_access_tokens"); return this; }
+    /** Send {@code "dpop_bound_access_tokens": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearDpopBoundAccessTokens() { this.dpopBoundAccessTokens = null; clearedFields.add("dpop_bound_access_tokens"); return this; }
+    public OauthClientsUpdateBody txnTokenUnsignedSubject(Boolean v) { this.txnTokenUnsignedSubject = v; clearedFields.remove("txn_token_unsigned_subject"); return this; }
+    /** Send {@code "txn_token_unsigned_subject": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearTxnTokenUnsignedSubject() { this.txnTokenUnsignedSubject = null; clearedFields.add("txn_token_unsigned_subject"); return this; }
+    public OauthClientsUpdateBody backchannelUserCodeParameter(Boolean v) { this.backchannelUserCodeParameter = v; clearedFields.remove("backchannel_user_code_parameter"); return this; }
+    /** Send {@code "backchannel_user_code_parameter": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearBackchannelUserCodeParameter() { this.backchannelUserCodeParameter = null; clearedFields.add("backchannel_user_code_parameter"); return this; }
+    public OauthClientsUpdateBody responseTypes(List<String> v) { this.responseTypes = v; clearedFields.remove("response_types"); return this; }
+    /** Send {@code "response_types": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearResponseTypes() { this.responseTypes = null; clearedFields.add("response_types"); return this; }
+    public OauthClientsUpdateBody requestUris(List<String> v) { this.requestUris = v; clearedFields.remove("request_uris"); return this; }
+    /** Send {@code "request_uris": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearRequestUris() { this.requestUris = null; clearedFields.add("request_uris"); return this; }
+    public OauthClientsUpdateBody defaultMaxAge(Long v) { this.defaultMaxAge = v; clearedFields.remove("default_max_age"); return this; }
+    /** Send {@code "default_max_age": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearDefaultMaxAge() { this.defaultMaxAge = null; clearedFields.add("default_max_age"); return this; }
+    public OauthClientsUpdateBody defaultAcrValues(List<String> v) { this.defaultAcrValues = v; clearedFields.remove("default_acr_values"); return this; }
+    /** Send {@code "default_acr_values": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearDefaultAcrValues() { this.defaultAcrValues = null; clearedFields.add("default_acr_values"); return this; }
+    public OauthClientsUpdateBody contacts(List<String> v) { this.contacts = v; clearedFields.remove("contacts"); return this; }
+    /** Send {@code "contacts": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearContacts() { this.contacts = null; clearedFields.add("contacts"); return this; }
     public OauthClientsUpdateBody name(String v) { this.name = v; clearedFields.remove("name"); return this; }
     /** Send {@code "name": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public OauthClientsUpdateBody clearName() { this.name = null; clearedFields.add("name"); return this; }
@@ -141,6 +413,33 @@ public final class OauthClientsUpdateBody {
     public OauthClientsUpdateBody logoUrl(String v) { this.logoUrl = v; clearedFields.remove("logo_url"); return this; }
     /** Send {@code "logo_url": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public OauthClientsUpdateBody clearLogoUrl() { this.logoUrl = null; clearedFields.add("logo_url"); return this; }
+    public OauthClientsUpdateBody logoUri(String v) { this.logoUri = v; clearedFields.remove("logo_uri"); return this; }
+    /** Send {@code "logo_uri": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearLogoUri() { this.logoUri = null; clearedFields.add("logo_uri"); return this; }
+    public OauthClientsUpdateBody clientUri(String v) { this.clientUri = v; clearedFields.remove("client_uri"); return this; }
+    /** Send {@code "client_uri": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearClientUri() { this.clientUri = null; clearedFields.add("client_uri"); return this; }
+    public OauthClientsUpdateBody homepageUrl(String v) { this.homepageUrl = v; clearedFields.remove("homepage_url"); return this; }
+    /** Send {@code "homepage_url": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearHomepageUrl() { this.homepageUrl = null; clearedFields.add("homepage_url"); return this; }
+    public OauthClientsUpdateBody policyUri(String v) { this.policyUri = v; clearedFields.remove("policy_uri"); return this; }
+    /** Send {@code "policy_uri": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearPolicyUri() { this.policyUri = null; clearedFields.add("policy_uri"); return this; }
+    public OauthClientsUpdateBody tosUri(String v) { this.tosUri = v; clearedFields.remove("tos_uri"); return this; }
+    /** Send {@code "tos_uri": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearTosUri() { this.tosUri = null; clearedFields.add("tos_uri"); return this; }
+    public OauthClientsUpdateBody metadata(Map<String, Object> v) { this.metadata = v; clearedFields.remove("metadata"); return this; }
+    /** Send {@code "metadata": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearMetadata() { this.metadata = null; clearedFields.add("metadata"); return this; }
+    public OauthClientsUpdateBody jwks(OauthClientsUpdateBodyJwks v) { this.jwks = v; clearedFields.remove("jwks"); return this; }
+    /** Send {@code "jwks": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearJwks() { this.jwks = null; clearedFields.add("jwks"); return this; }
+    public OauthClientsUpdateBody jwksUri(String v) { this.jwksUri = v; clearedFields.remove("jwks_uri"); return this; }
+    /** Send {@code "jwks_uri": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearJwksUri() { this.jwksUri = null; clearedFields.add("jwks_uri"); return this; }
+    public OauthClientsUpdateBody tlsClientAuthSubjectDn(String v) { this.tlsClientAuthSubjectDn = v; clearedFields.remove("tls_client_auth_subject_dn"); return this; }
+    /** Send {@code "tls_client_auth_subject_dn": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearTlsClientAuthSubjectDn() { this.tlsClientAuthSubjectDn = null; clearedFields.add("tls_client_auth_subject_dn"); return this; }
     public OauthClientsUpdateBody firstParty(Boolean v) { this.firstParty = v; clearedFields.remove("first_party"); return this; }
     /** Send {@code "first_party": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public OauthClientsUpdateBody clearFirstParty() { this.firstParty = null; clearedFields.add("first_party"); return this; }
@@ -174,6 +473,12 @@ public final class OauthClientsUpdateBody {
     public OauthClientsUpdateBody requireVerifiedEmail(Boolean v) { this.requireVerifiedEmail = v; clearedFields.remove("require_verified_email"); return this; }
     /** Send {@code "require_verified_email": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public OauthClientsUpdateBody clearRequireVerifiedEmail() { this.requireVerifiedEmail = null; clearedFields.add("require_verified_email"); return this; }
+    public OauthClientsUpdateBody requireConsent(Boolean v) { this.requireConsent = v; clearedFields.remove("require_consent"); return this; }
+    /** Send {@code "require_consent": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearRequireConsent() { this.requireConsent = null; clearedFields.add("require_consent"); return this; }
+    public OauthClientsUpdateBody consentPerOrganization(Boolean v) { this.consentPerOrganization = v; clearedFields.remove("consent_per_organization"); return this; }
+    /** Send {@code "consent_per_organization": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthClientsUpdateBody clearConsentPerOrganization() { this.consentPerOrganization = null; clearedFields.add("consent_per_organization"); return this; }
     public OauthClientsUpdateBody owner(String v) { this.owner = v; clearedFields.remove("owner"); return this; }
     /** Send {@code "owner": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public OauthClientsUpdateBody clearOwner() { this.owner = null; clearedFields.add("owner"); return this; }

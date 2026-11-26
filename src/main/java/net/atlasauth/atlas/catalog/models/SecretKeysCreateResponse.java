@@ -32,6 +32,8 @@ public record SecretKeysCreateResponse(
         @JsonProperty("allowed_origins") List<String> allowedOrigins,
         @JsonProperty("organization_ids") List<String> organizationIds,
         @JsonProperty("rotated_from") String rotatedFrom,
+        @JsonProperty("last_app_used_at") Long lastAppUsedAt,
+        @JsonProperty("last_used_user_agent") String lastUsedUserAgent,
         @JsonProperty("metadata") Map<String, Object> metadata,
         @JsonProperty("external_ref") String externalRef,
         @JsonProperty("idempotent_replay") Boolean idempotentReplay,

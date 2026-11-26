@@ -16,5 +16,6 @@ public record InstanceListScopesResponseDataItem(
         @JsonProperty("requires_verified_client") Boolean requiresVerifiedClient,
         @JsonProperty("requires_client_level") String requiresClientLevel,
         @JsonProperty("owner_exempt") Boolean ownerExempt,
+        @JsonProperty("optional") Boolean optional,
         @JsonProperty("wildcard") Boolean wildcard) {
 }

@@ -31,6 +31,9 @@ public final class InstanceSetScopesBodyScopesItem {
     /** The developer who owns a client may request the scope with it on their own account whatever its level. */
     @JsonProperty("owner_exempt")
     public Boolean ownerExempt;
+    /** The consent screen lets the user leave this scope out; an app that asked for it must work without it. Never for openid. */
+    @JsonProperty("optional")
+    public Boolean optional;
     /** Wire names sent as an explicit JSON null (see the clear methods); unset fields are omitted. */
     @JsonIgnore
     private final java.util.Set<String> clearedFields = new java.util.LinkedHashSet<>();
@@ -57,6 +60,9 @@ public final class InstanceSetScopesBodyScopesItem {
     public InstanceSetScopesBodyScopesItem ownerExempt(Boolean v) { this.ownerExempt = v; clearedFields.remove("owner_exempt"); return this; }
     /** Send {@code "owner_exempt": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public InstanceSetScopesBodyScopesItem clearOwnerExempt() { this.ownerExempt = null; clearedFields.add("owner_exempt"); return this; }
+    public InstanceSetScopesBodyScopesItem optional(Boolean v) { this.optional = v; clearedFields.remove("optional"); return this; }
+    /** Send {@code "optional": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public InstanceSetScopesBodyScopesItem clearOptional() { this.optional = null; clearedFields.add("optional"); return this; }
 
     @JsonAnyGetter
     Map<String, Object> clearedAsNull() {

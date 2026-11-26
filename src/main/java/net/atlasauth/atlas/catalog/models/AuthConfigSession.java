@@ -13,6 +13,7 @@ public record AuthConfigSession(
         @JsonProperty("audience") Object audience,
         @JsonProperty("browserHandoff") Boolean browserHandoff,
         @JsonProperty("cookieDomain") String cookieDomain,
+        @JsonProperty("cookieIsolation") Boolean cookieIsolation,
         @JsonProperty("crossSubdomainCookies") Boolean crossSubdomainCookies,
         @JsonProperty("csrfCookie") Boolean csrfCookie,
         @JsonProperty("customData") AuthConfigSessionCustomData customData,

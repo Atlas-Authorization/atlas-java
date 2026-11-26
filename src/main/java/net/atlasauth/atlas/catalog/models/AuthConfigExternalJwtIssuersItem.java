@@ -9,9 +9,11 @@ import java.util.Map;
 /** The AuthConfigExternalJwtIssuersItem object. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record AuthConfigExternalJwtIssuersItem(
+        @JsonProperty("accountLinking") String accountLinking,
         @JsonProperty("audience") String audience,
         @JsonProperty("emailClaim") String emailClaim,
         @JsonProperty("id") String id,
         @JsonProperty("issuer") String issuer,
-        @JsonProperty("jwksUri") String jwksUri) {
+        @JsonProperty("jwksUri") String jwksUri,
+        @JsonProperty("organizationId") String organizationId) {
 }

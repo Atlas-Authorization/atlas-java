@@ -21,6 +21,7 @@ public record InstanceUpdateCookieConsentResponse(
         @JsonProperty("culture") String culture,
         @JsonProperty("declared_cookies") List<InstanceUpdateCookieConsentResponseDeclaredCookiesItem> declaredCookies,
         @JsonProperty("frontend_mode") InstanceUpdateCookieConsentResponseFrontendMode frontendMode,
+        @JsonProperty("cookie_suffix") String cookieSuffix,
         @JsonProperty("source") String source,
         @JsonProperty("source_integration") String sourceIntegration,
         @JsonProperty("host_aliases") List<String> hostAliases,

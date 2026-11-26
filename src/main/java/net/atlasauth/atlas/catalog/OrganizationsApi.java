@@ -469,6 +469,30 @@ public final class OrganizationsApi {
         return listMembershipsAll(id, null);
     }
 
+    /** {@code DELETE /v1/organizations/{id}/memberships/by_external_id/{userExternalId}} - Cancel a seat that is still waiting for its person. 404 when none is waiting (a seat that was already attached is removed by the user id). Scope: {@code organizations:write}. */
+    public OrganizationsDeleteByExternalIdResponse deleteByExternalId(String id, String userExternalId) {
+        return t.request("DELETE", "/v1/organizations/" + enc(id) + "/memberships/by_external_id/" + enc(userExternalId), null, null, null, false, new TypeReference<OrganizationsDeleteByExternalIdResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OrganizationsDeleteByExternalIdResponse deleteByExternalId(String id, String userExternalId, String idempotencyKey) {
+        return t.request("DELETE", "/v1/organizations/" + enc(id) + "/memberships/by_external_id/" + enc(userExternalId), null, null, idempotencyKey, false, new TypeReference<OrganizationsDeleteByExternalIdResponse>() {
+        });
+    }
+
+    /** {@code PUT /v1/organizations/{id}/memberships/by_external_id/{userExternalId}} - Seat a person by the id your own system gives them (`external_id`), before they have signed in. Same body as PUT .../memberships/&#123;userId&#125;. When a user with that external_id exists this is that create-or-update (201 when it adds the member, 200 when it changes it, `status: "active"`). When none exists the seat waits: 202 with `status: "pending"`, and it is attached (with `organizationMembership.created`) when a user with that external_id is created, imported or given the id. `user.created` then carries the user's `organization_memberships`. `&#123;id&#125;` is the organization's Atlas id or its own external_id. Repeating the call replaces the waiting seat. Scope: {@code organizations:write}. */
+    public OrganizationsSetByExternalIdResponse setByExternalId(String id, String userExternalId, OrganizationsSetByExternalIdBody body) {
+        return t.request("PUT", "/v1/organizations/" + enc(id) + "/memberships/by_external_id/" + enc(userExternalId), null, body, null, false, new TypeReference<OrganizationsSetByExternalIdResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OrganizationsSetByExternalIdResponse setByExternalId(String id, String userExternalId, OrganizationsSetByExternalIdBody body, String idempotencyKey) {
+        return t.request("PUT", "/v1/organizations/" + enc(id) + "/memberships/by_external_id/" + enc(userExternalId), null, body, idempotencyKey, false, new TypeReference<OrganizationsSetByExternalIdResponse>() {
+        });
+    }
+
     /** {@code DELETE /v1/organizations/{id}/memberships/{userId}} - Remove a member. Removing the last admin returns LAST_ADMIN. The organization connections they authorized or shared move to the member named by `transfer_to`, else per GET /v1/instance/org_departure_policy. Scope: {@code organizations:write}. */
     public OrganizationsDeleteMembershipResponse deleteMembership(String id, String userId) {
         return t.request("DELETE", "/v1/organizations/" + enc(id) + "/memberships/" + enc(userId), null, null, null, false, new TypeReference<OrganizationsDeleteMembershipResponse>() {

@@ -33,6 +33,9 @@ public final class InstanceSetForwardingBody {
     /** webhook: the https receiver. */
     @JsonProperty("url")
     public String url;
+    /** watchtower: your Watchtower ingest host (https). `server_key` is then an ingestion key with the ingest:logs scope. */
+    @JsonProperty("endpoint")
+    public String endpoint;
     @JsonProperty("active")
     public Boolean active;
     /** Wire names sent as an explicit JSON null (see the clear methods); unset fields are omitted. */
@@ -63,6 +66,9 @@ public final class InstanceSetForwardingBody {
     public InstanceSetForwardingBody url(String v) { this.url = v; clearedFields.remove("url"); return this; }
     /** Send {@code "url": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public InstanceSetForwardingBody clearUrl() { this.url = null; clearedFields.add("url"); return this; }
+    public InstanceSetForwardingBody endpoint(String v) { this.endpoint = v; clearedFields.remove("endpoint"); return this; }
+    /** Send {@code "endpoint": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public InstanceSetForwardingBody clearEndpoint() { this.endpoint = null; clearedFields.add("endpoint"); return this; }
     public InstanceSetForwardingBody active(Boolean v) { this.active = v; clearedFields.remove("active"); return this; }
     /** Send {@code "active": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public InstanceSetForwardingBody clearActive() { this.active = null; clearedFields.add("active"); return this; }

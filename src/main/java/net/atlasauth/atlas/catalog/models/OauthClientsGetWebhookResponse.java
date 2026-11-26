@@ -15,6 +15,9 @@ public record OauthClientsGetWebhookResponse(
         @JsonProperty("enabled_events") List<String> enabledEvents,
         @JsonProperty("active") Boolean active,
         @JsonProperty("available_events") List<String> availableEvents,
+        @JsonProperty("created_at") Long createdAt,
+        @JsonProperty("last_delivery_at") Long lastDeliveryAt,
+        @JsonProperty("previous_secret_expires_at") Long previousSecretExpiresAt,
         @JsonProperty("webhook_secret") String webhookSecret,
         @JsonProperty("note") String note) {
 }

@@ -31,6 +31,7 @@ public record OAuthProvider(
         @JsonProperty("custom_redirect_uri") String customRedirectUri,
         @JsonProperty("hosted_id_token") OAuthProviderHostedIdToken hostedIdToken,
         @JsonProperty("configured") Boolean configured,
+        @JsonProperty("use_shared_dev_credentials") Boolean useSharedDevCredentials,
         @JsonProperty("client_id") String clientId,
         @JsonProperty("has_secret") Boolean hasSecret,
         @JsonProperty("enabled") Boolean enabled,

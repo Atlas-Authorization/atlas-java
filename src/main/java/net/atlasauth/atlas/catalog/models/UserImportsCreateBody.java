@@ -16,6 +16,9 @@ public final class UserImportsCreateBody {
     public List<Map<String, Object>> users;
     @JsonProperty("upsert")
     public Boolean upsert;
+    /** The Unicode form the old system normalised passwords to before hashing. Applied to the typed password before the imported hash is checked, and dropped when the first sign-in rehashes to Argon2id. A row's own password_normalize overrides it. One of: nfkc, nfc, none. */
+    @JsonProperty("password_normalize")
+    public String passwordNormalize;
     @JsonProperty("create_organizations")
     public Boolean createOrganizations;
     /** until_email_verified holds a row's password until an email on the account is proven: a correct password is refused with password_not_yet_usable until then. A row with email_verified true is never held. One of: active, until_email_verified. */
@@ -39,6 +42,9 @@ public final class UserImportsCreateBody {
     public UserImportsCreateBody upsert(Boolean v) { this.upsert = v; clearedFields.remove("upsert"); return this; }
     /** Send {@code "upsert": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public UserImportsCreateBody clearUpsert() { this.upsert = null; clearedFields.add("upsert"); return this; }
+    public UserImportsCreateBody passwordNormalize(String v) { this.passwordNormalize = v; clearedFields.remove("password_normalize"); return this; }
+    /** Send {@code "password_normalize": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public UserImportsCreateBody clearPasswordNormalize() { this.passwordNormalize = null; clearedFields.add("password_normalize"); return this; }
     public UserImportsCreateBody createOrganizations(Boolean v) { this.createOrganizations = v; clearedFields.remove("create_organizations"); return this; }
     /** Send {@code "create_organizations": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public UserImportsCreateBody clearCreateOrganizations() { this.createOrganizations = null; clearedFields.add("create_organizations"); return this; }

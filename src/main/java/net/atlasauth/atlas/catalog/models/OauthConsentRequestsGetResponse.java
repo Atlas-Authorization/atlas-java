@@ -16,6 +16,7 @@ public record OauthConsentRequestsGetResponse(
         @JsonProperty("audience") String audience,
         @JsonProperty("authorization_details") List<Map<String, Object>> authorizationDetails,
         @JsonProperty("organization_id") String organizationId,
+        @JsonProperty("optional_scopes") List<String> optionalScopes,
         @JsonProperty("redirect_uri") String redirectUri,
         @JsonProperty("request_url") String requestUrl,
         @JsonProperty("prompt") List<String> prompt,

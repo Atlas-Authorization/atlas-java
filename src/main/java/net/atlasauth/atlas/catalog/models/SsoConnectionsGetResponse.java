@@ -48,6 +48,8 @@ public record SsoConnectionsGetResponse(
         @JsonProperty("provisioning_mode") String provisioningMode,
         @JsonProperty("attribute_mapping") Map<String, String> attributeMapping,
         @JsonProperty("oidc_scopes") List<String> oidcScopes,
+        @JsonProperty("account_linking") String accountLinking,
+        @JsonProperty("account_linking_effective") String accountLinkingEffective,
         @JsonProperty("rerole_on_sign_in") Boolean reroleOnSignIn,
         @JsonProperty("profile_mapping") SsoConnectionsGetResponseProfileMapping profileMapping,
         @JsonProperty("token_endpoint_auth_method") String tokenEndpointAuthMethod,

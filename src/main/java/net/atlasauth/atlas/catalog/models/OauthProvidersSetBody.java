@@ -30,6 +30,9 @@ public final class OauthProvidersSetBody {
     public Object nativeClientIds;
     @JsonProperty("native")
     public Boolean native_;
+    /** Development instances only: sign in with Atlas's shared development application for google, github, discord or microsoft, with no OAuth application of your own (the consent screen shows Atlas). Send it alone. A production instance answers 422; saving your own credentials switches it off. GET returns the current value. */
+    @JsonProperty("use_shared_dev_credentials")
+    public Boolean useSharedDevCredentials;
     /** Force the sign-in mode; "" clears the override. Applied together with credentials in one call. One of: native, redirect, . */
     @JsonProperty("mode")
     public String mode;
@@ -73,6 +76,9 @@ public final class OauthProvidersSetBody {
     public OauthProvidersSetBody native_(Boolean v) { this.native_ = v; clearedFields.remove("native"); return this; }
     /** Send {@code "native": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public OauthProvidersSetBody clearNative() { this.native_ = null; clearedFields.add("native"); return this; }
+    public OauthProvidersSetBody useSharedDevCredentials(Boolean v) { this.useSharedDevCredentials = v; clearedFields.remove("use_shared_dev_credentials"); return this; }
+    /** Send {@code "use_shared_dev_credentials": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OauthProvidersSetBody clearUseSharedDevCredentials() { this.useSharedDevCredentials = null; clearedFields.add("use_shared_dev_credentials"); return this; }
     public OauthProvidersSetBody mode(String v) { this.mode = v; clearedFields.remove("mode"); return this; }
     /** Send {@code "mode": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public OauthProvidersSetBody clearMode() { this.mode = null; clearedFields.add("mode"); return this; }

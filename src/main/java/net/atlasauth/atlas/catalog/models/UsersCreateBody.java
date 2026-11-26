@@ -26,6 +26,8 @@ public final class UsersCreateBody {
     public Map<String, Object> passwordHashParams;
     @JsonProperty("password_salt")
     public String passwordSalt;
+    @JsonProperty("password_normalize")
+    public String passwordNormalize;
     @JsonProperty("password_hasher")
     public String passwordHasher;
     @JsonProperty("first_name")
@@ -88,6 +90,9 @@ public final class UsersCreateBody {
     public UsersCreateBody passwordSalt(String v) { this.passwordSalt = v; clearedFields.remove("password_salt"); return this; }
     /** Send {@code "password_salt": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public UsersCreateBody clearPasswordSalt() { this.passwordSalt = null; clearedFields.add("password_salt"); return this; }
+    public UsersCreateBody passwordNormalize(String v) { this.passwordNormalize = v; clearedFields.remove("password_normalize"); return this; }
+    /** Send {@code "password_normalize": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public UsersCreateBody clearPasswordNormalize() { this.passwordNormalize = null; clearedFields.add("password_normalize"); return this; }
     public UsersCreateBody passwordHasher(String v) { this.passwordHasher = v; clearedFields.remove("password_hasher"); return this; }
     /** Send {@code "password_hasher": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public UsersCreateBody clearPasswordHasher() { this.passwordHasher = null; clearedFields.add("password_hasher"); return this; }

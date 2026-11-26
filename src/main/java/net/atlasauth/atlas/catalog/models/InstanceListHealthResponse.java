@@ -10,6 +10,7 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record InstanceListHealthResponse(
         @JsonProperty("object") String object,
+        @JsonProperty("duplicate_delivery_paths") List<InstanceListHealthResponseDuplicateDeliveryPathsItem> duplicateDeliveryPaths,
         @JsonProperty("data") List<InstanceListHealthResponseDataItem> data,
         @JsonProperty("has_more") Boolean hasMore,
         @JsonProperty("unhealthy_count") Long unhealthyCount,

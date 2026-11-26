@@ -18,6 +18,7 @@ public record BillingSetProviderResponse(
         @JsonProperty("secrets_set") Map<String, Boolean> secretsSet,
         @JsonProperty("webhook_url") String webhookUrl,
         @JsonProperty("capabilities") Map<String, Object> capabilities,
+        @JsonProperty("sync") Map<String, Object> sync,
         @JsonProperty("last_verified_at") Long lastVerifiedAt,
         @JsonProperty("last_webhook_at") Long lastWebhookAt,
         @JsonProperty("updated_at") Long updatedAt) {

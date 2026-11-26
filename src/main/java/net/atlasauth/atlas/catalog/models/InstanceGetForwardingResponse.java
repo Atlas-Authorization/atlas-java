@@ -12,6 +12,7 @@ public record InstanceGetForwardingResponse(
         @JsonProperty("object") String object,
         @JsonProperty("forwarding") String forwarding,
         @JsonProperty("event") String event,
+        @JsonProperty("events") List<String> events,
         @JsonProperty("id") String id,
         @JsonProperty("active") Boolean active) {
 }

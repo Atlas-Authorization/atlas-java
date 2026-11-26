@@ -38,6 +38,8 @@ public final class BillingUpdatePlanBody {
     public Double trialDays;
     @JsonProperty("grace_days")
     public Double graceDays;
+    @JsonProperty("past_due_grace_days")
+    public Double pastDueGraceDays;
     @JsonProperty("description")
     public String description;
     @JsonProperty("badge")
@@ -110,6 +112,9 @@ public final class BillingUpdatePlanBody {
     public BillingUpdatePlanBody graceDays(Double v) { this.graceDays = v; clearedFields.remove("grace_days"); return this; }
     /** Send {@code "grace_days": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public BillingUpdatePlanBody clearGraceDays() { this.graceDays = null; clearedFields.add("grace_days"); return this; }
+    public BillingUpdatePlanBody pastDueGraceDays(Double v) { this.pastDueGraceDays = v; clearedFields.remove("past_due_grace_days"); return this; }
+    /** Send {@code "past_due_grace_days": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public BillingUpdatePlanBody clearPastDueGraceDays() { this.pastDueGraceDays = null; clearedFields.add("past_due_grace_days"); return this; }
     public BillingUpdatePlanBody description(String v) { this.description = v; clearedFields.remove("description"); return this; }
     /** Send {@code "description": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public BillingUpdatePlanBody clearDescription() { this.description = null; clearedFields.add("description"); return this; }

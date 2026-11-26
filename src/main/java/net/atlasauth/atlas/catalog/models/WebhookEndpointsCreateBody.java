@@ -27,7 +27,7 @@ public final class WebhookEndpointsCreateBody {
     /** A third-party receiver (not on your own origins): preflight does not flag its host. */
     @JsonProperty("external")
     public Boolean external;
-    /** Mark an endpoint you created for a connected platform as that platform's, so config export, plan and preflight treat it like one the platform set up itself. The url must be an https URL on that platform's API host. null clears it. One of: cookiemunch, chatly, forumulate, referalli. */
+    /** Mark an endpoint you created for a connected platform as that platform's, so config export, plan and preflight treat it like one the platform set up itself. The url must be an https URL on that platform's API host. null clears it. One of: cookiemunch, chatly, forumulate, referalli, seolyticize. */
     @JsonProperty("managed_by")
     public String managedBy;
     /** Signature entries in atlas-signature: v1 (id.timestamp.body, default) and/or v2 (id.timestamp.url.body). */

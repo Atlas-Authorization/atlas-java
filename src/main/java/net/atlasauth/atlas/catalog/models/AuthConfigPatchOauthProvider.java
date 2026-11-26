@@ -31,6 +31,8 @@ public final class AuthConfigPatchOauthProvider {
     public Double dynamicClientSecretTtlSeconds;
     @JsonProperty("dynamicRegistration")
     public Boolean dynamicRegistration;
+    @JsonProperty("dynamicRegistrationLimits")
+    public AuthConfigPatchOauthProviderDynamicRegistrationLimits dynamicRegistrationLimits;
     @JsonProperty("loginUrl")
     public String loginUrl;
     @JsonProperty("requireInitialAccessToken")
@@ -79,6 +81,9 @@ public final class AuthConfigPatchOauthProvider {
     public AuthConfigPatchOauthProvider dynamicRegistration(Boolean v) { this.dynamicRegistration = v; clearedFields.remove("dynamicRegistration"); return this; }
     /** Send {@code "dynamicRegistration": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchOauthProvider clearDynamicRegistration() { this.dynamicRegistration = null; clearedFields.add("dynamicRegistration"); return this; }
+    public AuthConfigPatchOauthProvider dynamicRegistrationLimits(AuthConfigPatchOauthProviderDynamicRegistrationLimits v) { this.dynamicRegistrationLimits = v; clearedFields.remove("dynamicRegistrationLimits"); return this; }
+    /** Send {@code "dynamicRegistrationLimits": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchOauthProvider clearDynamicRegistrationLimits() { this.dynamicRegistrationLimits = null; clearedFields.add("dynamicRegistrationLimits"); return this; }
     public AuthConfigPatchOauthProvider loginUrl(String v) { this.loginUrl = v; clearedFields.remove("loginUrl"); return this; }
     /** Send {@code "loginUrl": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchOauthProvider clearLoginUrl() { this.loginUrl = null; clearedFields.add("loginUrl"); return this; }

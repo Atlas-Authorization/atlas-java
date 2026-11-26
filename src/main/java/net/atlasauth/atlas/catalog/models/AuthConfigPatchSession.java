@@ -22,6 +22,9 @@ public final class AuthConfigPatchSession {
     /** Explicit Domain for the session cookies, for example ".example.com". Needed by a path-mounted instance, where cookies are otherwise host-only. It must cover your sign-in host and can never be a public suffix or Atlas's own domain; an invalid value is refused on write. Default null. */
     @JsonProperty("cookieDomain")
     public String cookieDomain;
+    /** Give this instance's Frontend API cookies a short suffix derived from its publishable key (__session_&lt;suffix&gt;, __atlas_rt_&lt;suffix&gt;, ...), so two instances on one host or registrable domain never read, overwrite or clear each other's cookies. Required to share a hostname between two path mounts. Existing browsers sign in again once when it changes. Default false. */
+    @JsonProperty("cookieIsolation")
+    public Boolean cookieIsolation;
     @JsonProperty("crossSubdomainCookies")
     public Boolean crossSubdomainCookies;
     /** Set a readable __atlas_csrf cookie with each session token: a signed token tied to the session, replaced whenever the session token is. Verify it in your backend with the instance JWKS. Default false. */
@@ -100,6 +103,9 @@ public final class AuthConfigPatchSession {
     public AuthConfigPatchSession cookieDomain(String v) { this.cookieDomain = v; clearedFields.remove("cookieDomain"); return this; }
     /** Send {@code "cookieDomain": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchSession clearCookieDomain() { this.cookieDomain = null; clearedFields.add("cookieDomain"); return this; }
+    public AuthConfigPatchSession cookieIsolation(Boolean v) { this.cookieIsolation = v; clearedFields.remove("cookieIsolation"); return this; }
+    /** Send {@code "cookieIsolation": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchSession clearCookieIsolation() { this.cookieIsolation = null; clearedFields.add("cookieIsolation"); return this; }
     public AuthConfigPatchSession crossSubdomainCookies(Boolean v) { this.crossSubdomainCookies = v; clearedFields.remove("crossSubdomainCookies"); return this; }
     /** Send {@code "crossSubdomainCookies": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchSession clearCrossSubdomainCookies() { this.crossSubdomainCookies = null; clearedFields.add("crossSubdomainCookies"); return this; }

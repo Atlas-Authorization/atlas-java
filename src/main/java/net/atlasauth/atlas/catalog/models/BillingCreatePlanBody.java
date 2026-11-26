@@ -43,6 +43,9 @@ public final class BillingCreatePlanBody {
     public String pricingModel;
     @JsonProperty("trial_days")
     public Long trialDays;
+    /** Days a past_due subscription keeps its entitlement (1 to 90). Same as grace_days. */
+    @JsonProperty("past_due_grace_days")
+    public Long pastDueGraceDays;
     /** Wire names sent as an explicit JSON null (see the clear methods); unset fields are omitted. */
     @JsonIgnore
     private final java.util.Set<String> clearedFields = new java.util.LinkedHashSet<>();
@@ -82,6 +85,9 @@ public final class BillingCreatePlanBody {
     public BillingCreatePlanBody trialDays(Long v) { this.trialDays = v; clearedFields.remove("trial_days"); return this; }
     /** Send {@code "trial_days": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public BillingCreatePlanBody clearTrialDays() { this.trialDays = null; clearedFields.add("trial_days"); return this; }
+    public BillingCreatePlanBody pastDueGraceDays(Long v) { this.pastDueGraceDays = v; clearedFields.remove("past_due_grace_days"); return this; }
+    /** Send {@code "past_due_grace_days": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public BillingCreatePlanBody clearPastDueGraceDays() { this.pastDueGraceDays = null; clearedFields.add("past_due_grace_days"); return this; }
 
     @JsonAnyGetter
     Map<String, Object> clearedAsNull() {

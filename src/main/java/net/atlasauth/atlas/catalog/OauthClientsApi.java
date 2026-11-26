@@ -21,7 +21,7 @@ public final class OauthClientsApi {
         this.t = t;
     }
 
-    /** {@code GET /v1/oauth_clients} - List "Sign in with Atlas" OAuth clients. The client secret is never returned. Filter with ?metadata[key]=value or ?owner=&lt;developer id&gt;; each item carries `metadata` and `external_ref`. Scope: {@code oauth_clients:read}. */
+    /** {@code GET /v1/oauth_clients} - List the OAuth clients of this instance. The client secret is never returned. Filter with ?metadata[key]=value or ?owner=&lt;developer id&gt;; each item carries `metadata` and `external_ref`. Scope: {@code oauth_clients:read}. */
     public OauthClientsListResponse list() {
         return t.request("GET", "/v1/oauth_clients", null, null, null, false, new TypeReference<OauthClientsListResponse>() {
         });
@@ -71,7 +71,7 @@ public final class OauthClientsApi {
         });
     }
 
-    /** {@code GET /v1/oauth_clients/{id}} - Fetch one OAuth client. Another instance id is 404, never 403. Never the secret. Scope: {@code oauth_clients:read}. */
+    /** {@code GET /v1/oauth_clients/{id}} - Fetch one OAuth client by its id (oac_…) or its public client_id (client_…). Another instance id is 404, never 403. Never the secret. Scope: {@code oauth_clients:read}. */
     public OauthClientsGetResponse get(String id) {
         return t.request("GET", "/v1/oauth_clients/" + enc(id), null, null, null, false, new TypeReference<OauthClientsGetResponse>() {
         });
@@ -281,7 +281,7 @@ public final class OauthClientsApi {
         });
     }
 
-    /** {@code PUT /v1/oauth_clients/{id}/webhook} - Create or update the client's event webhook: a signed, retried endpoint that receives events about users who granted the client access, never the instance's own stream. user.updated carries only what the user's granted scopes allow (email with the email scope, name and picture with profile). enabled_events may also name your own types declared with PUT /v1/instance/app_event_types; those reach the client only for users who granted the type's required scope. The signing secret is returned once, on create (201). Audited. Scope: {@code oauth_clients:write}. */
+    /** {@code PUT /v1/oauth_clients/{id}/webhook} - Create or update the client's event webhook: a signed, retried endpoint that receives events about users who granted the client access, never the instance's own stream. user.updated carries only what the user's granted scopes allow (email with the email scope, name and picture with profile). enabled_events may also name your own types declared with PUT /v1/instance/app_event_types; those reach the client only for users who granted the type's required scope. The signing secret is returned once, on create (201). Every delivery carries a top-level `creator` (&#123; id &#125;, the user as this client sees them: exactly the `sub` of the tokens issued to it, pairwise or external_id included; null when the event has no acting user). Audited. Scope: {@code oauth_clients:write}. */
     public OauthClientsSetWebhookResponse setWebhook(String id, OauthClientsSetWebhookBody body) {
         return t.request("PUT", "/v1/oauth_clients/" + enc(id) + "/webhook", null, body, null, false, new TypeReference<OauthClientsSetWebhookResponse>() {
         });
@@ -290,6 +290,30 @@ public final class OauthClientsApi {
     /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
     public OauthClientsSetWebhookResponse setWebhook(String id, OauthClientsSetWebhookBody body, String idempotencyKey) {
         return t.request("PUT", "/v1/oauth_clients/" + enc(id) + "/webhook", null, body, idempotencyKey, false, new TypeReference<OauthClientsSetWebhookResponse>() {
+        });
+    }
+
+    /** {@code POST /v1/oauth_clients/{id}/webhook/rotate_secret} - Rotate the client webhook's signing secret. The new secret is returned exactly once. The previous secret keeps signing for `overlap_seconds` (default 86400 = 24 hours, 0 to 604800 = 7 days; 0 stops it now): during the overlap every delivery's signature header carries one entry per secret, the new one first, so a receiver holding either secret verifies it. `previous_secret_expires_at` says when the old one stops (epoch ms), or null. 404 when the client has no webhook. An operator token needs a recent MFA. Audited. Scope: {@code oauth_clients:write}. */
+    public OauthClientsWebhookRotateSecretResponse webhookRotateSecret(String id, OauthClientsWebhookRotateSecretBody body) {
+        return t.request("POST", "/v1/oauth_clients/" + enc(id) + "/webhook/rotate_secret", null, body, null, false, new TypeReference<OauthClientsWebhookRotateSecretResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OauthClientsWebhookRotateSecretResponse webhookRotateSecret(String id, OauthClientsWebhookRotateSecretBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/oauth_clients/" + enc(id) + "/webhook/rotate_secret", null, body, idempotencyKey, false, new TypeReference<OauthClientsWebhookRotateSecretResponse>() {
+        });
+    }
+
+    /** {@code POST /v1/oauth_clients/{id}/webhook/test} - Send ONE signed `webhook.test` delivery to this client's webhook URL (and to nobody else), in the same envelope as a real delivery, and return the attempt: the HTTP status your endpoint answered with, how long it took and the error, if any. With `user_id` (the Atlas user id, or the `sub` this client receives) the delivery's `creator` is that user (404 for an unknown user; no grant is needed); otherwise `creator` is null. Not retried. Audited. Scope: {@code oauth_clients:write}. */
+    public OauthClientsTestResponse test(String id, OauthClientsTestBody body) {
+        return t.request("POST", "/v1/oauth_clients/" + enc(id) + "/webhook/test", null, body, null, false, new TypeReference<OauthClientsTestResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OauthClientsTestResponse test(String id, OauthClientsTestBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/oauth_clients/" + enc(id) + "/webhook/test", null, body, idempotencyKey, false, new TypeReference<OauthClientsTestResponse>() {
         });
     }
 }

@@ -14,5 +14,6 @@ public record EntitlementsGetResponse(
         @JsonProperty("subject") EntitlementsGetResponseSubject subject,
         @JsonProperty("plan") String plan,
         @JsonProperty("planSource") String planSource,
+        @JsonProperty("version") Long version,
         @JsonProperty("entitlements") List<EntitlementsGetResponseEntitlementsItem> entitlements) {
 }

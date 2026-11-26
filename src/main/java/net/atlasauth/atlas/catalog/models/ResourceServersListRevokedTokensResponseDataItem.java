@@ -9,10 +9,12 @@ import java.util.Map;
 /** The ResourceServersListRevokedTokensResponseDataItem object. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record ResourceServersListRevokedTokensResponseDataItem(
+        @JsonProperty("kind") String kind,
         @JsonProperty("family_id") String familyId,
         @JsonProperty("jti") String jti,
         @JsonProperty("user_id") String userId,
         @JsonProperty("client_id") String clientId,
+        @JsonProperty("oauth_client_id") String oauthClientId,
         @JsonProperty("reason") String reason,
         @JsonProperty("revoked_at") Long revokedAt) {
 }

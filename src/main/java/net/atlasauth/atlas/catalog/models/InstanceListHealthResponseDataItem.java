@@ -15,6 +15,7 @@ public record InstanceListHealthResponseDataItem(
         @JsonProperty("url") String url,
         @JsonProperty("managed_by") String managedBy,
         @JsonProperty("destination") String destination,
+        @JsonProperty("duplicate_delivery_path") InstanceListHealthResponseDataItemDuplicateDeliveryPath duplicateDeliveryPath,
         @JsonProperty("state") String state,
         @JsonProperty("last_success_at") Long lastSuccessAt,
         @JsonProperty("last_failure") InstanceListHealthResponseDataItemLastFailure lastFailure,

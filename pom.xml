@@ -6,7 +6,7 @@
 
   <groupId>net.atlasauth</groupId>
   <artifactId>atlas-java</artifactId>
-  <version>1.23.1</version>
+  <version>1.24.0</version>
   <packaging>jar</packaging>
 
   <name>Atlas Java SDK</name>

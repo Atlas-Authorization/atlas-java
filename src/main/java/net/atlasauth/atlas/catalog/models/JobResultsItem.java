@@ -12,5 +12,6 @@ public record JobResultsItem(
         @JsonProperty("email_address") String emailAddress,
         @JsonProperty("user_id") String userId,
         @JsonProperty("outcome") String outcome,
-        @JsonProperty("warnings") List<JobResultsItemWarningsItem> warnings) {
+        @JsonProperty("warnings") List<JobResultsItemWarningsItem> warnings,
+        @JsonProperty("factors") List<JobResultsItemFactorsItem> factors) {
 }

@@ -27,6 +27,18 @@ public final class OauthConsentRequestsApi {
         });
     }
 
+    /** {@code PUT /v1/oauth_consent_requests/accept} - Accept a consent challenge, optionally narrowing the granted scopes (only optional scopes may be dropped with granted_scopes) or choosing the organization. Following redirect_to (in the same browser that started the flow) records the consent (kept for revocation only when remember is false), and returns the application to its redirect_uri with a code. Scope: {@code oauth_clients:write}. */
+    public OauthConsentRequestsSetAcceptResponse setAccept(OauthConsentRequestsSetAcceptBody body, OauthConsentRequestsSetAcceptQuery query) {
+        return t.request("PUT", "/v1/oauth_consent_requests/accept", query == null ? null : query.toMap(), body, null, false, new TypeReference<OauthConsentRequestsSetAcceptResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public OauthConsentRequestsSetAcceptResponse setAccept(OauthConsentRequestsSetAcceptBody body, OauthConsentRequestsSetAcceptQuery query, String idempotencyKey) {
+        return t.request("PUT", "/v1/oauth_consent_requests/accept", query == null ? null : query.toMap(), body, idempotencyKey, false, new TypeReference<OauthConsentRequestsSetAcceptResponse>() {
+        });
+    }
+
     /** {@code PUT /v1/oauth_consent_requests/switch_account} - The signed-in user is not the person who should grant this application access. Returns redirect_to: the application's original authorization request restarted with prompt=login, so the visitor signs in again (as another account) and a fresh consent challenge follows. Needs request_url on the challenge. Audited. Scope: {@code oauth_clients:write}. */
     public OauthConsentRequestsSetSwitchAccountResponse setSwitchAccount(OauthConsentRequestsSetSwitchAccountQuery query) {
         return t.request("PUT", "/v1/oauth_consent_requests/switch_account", query == null ? null : query.toMap(), null, null, false, new TypeReference<OauthConsentRequestsSetSwitchAccountResponse>() {

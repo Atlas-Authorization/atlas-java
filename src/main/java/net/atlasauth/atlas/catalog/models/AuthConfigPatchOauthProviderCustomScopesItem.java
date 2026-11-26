@@ -25,6 +25,8 @@ public final class AuthConfigPatchOauthProviderCustomScopesItem {
     /** Required. */
     @JsonProperty("name")
     public String name;
+    @JsonProperty("optional")
+    public Boolean optional;
     @JsonProperty("ownerExempt")
     public Boolean ownerExempt;
     @JsonProperty("parameters")
@@ -52,6 +54,9 @@ public final class AuthConfigPatchOauthProviderCustomScopesItem {
     /** Send {@code "labels": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchOauthProviderCustomScopesItem clearLabels() { this.labels = null; clearedFields.add("labels"); return this; }
     public AuthConfigPatchOauthProviderCustomScopesItem name(String v) { this.name = v; clearedFields.remove("name"); return this; }
+    public AuthConfigPatchOauthProviderCustomScopesItem optional(Boolean v) { this.optional = v; clearedFields.remove("optional"); return this; }
+    /** Send {@code "optional": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchOauthProviderCustomScopesItem clearOptional() { this.optional = null; clearedFields.add("optional"); return this; }
     public AuthConfigPatchOauthProviderCustomScopesItem ownerExempt(Boolean v) { this.ownerExempt = v; clearedFields.remove("ownerExempt"); return this; }
     /** Send {@code "ownerExempt": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public AuthConfigPatchOauthProviderCustomScopesItem clearOwnerExempt() { this.ownerExempt = null; clearedFields.add("ownerExempt"); return this; }

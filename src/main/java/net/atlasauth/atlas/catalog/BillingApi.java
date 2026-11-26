@@ -21,6 +21,18 @@ public final class BillingApi {
         this.t = t;
     }
 
+    /** {@code POST /v1/billing/checkout/sync} - Read a Stripe Checkout Session back with your own key and record the purchase, for an instance that syncs without a Stripe webhook. The session's reference must name this instance; any other session is a 404. Idempotent. `status` is `synced`, or `pending` when Stripe has not completed the session yet. Scope: {@code billing:write}. */
+    public BillingSyncResponse sync(BillingSyncBody body) {
+        return t.request("POST", "/v1/billing/checkout/sync", null, body, null, false, new TypeReference<BillingSyncResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public BillingSyncResponse sync(BillingSyncBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/billing/checkout/sync", null, body, idempotencyKey, false, new TypeReference<BillingSyncResponse>() {
+        });
+    }
+
     /** {@code GET /v1/billing/connect/accounts} - List the connected accounts, newest first. Scope: {@code billing:read}. */
     public BillingListAccountsResponse listAccounts() {
         return t.request("GET", "/v1/billing/connect/accounts", null, null, null, false, new TypeReference<BillingListAccountsResponse>() {
@@ -405,6 +417,18 @@ public final class BillingApi {
         });
     }
 
+    /** {@code POST /v1/billing/stripe/events} - Forward a Stripe event from your own webhook endpoint, for an account that cannot add an Atlas endpoint. Post `&#123; id: "evt_…" &#125;` or the whole event; only the id is read. Atlas fetches the event from Stripe with your own key and processes THAT object, never the posted body, and ignores anything that is not one of this instance's subscriptions. Safe to repeat. `outcome` is `processed` or `ignored`; both are 200. Scope: {@code billing:write}. */
+    public BillingCreateEventResponse createEvent(BillingCreateEventBody body) {
+        return t.request("POST", "/v1/billing/stripe/events", null, body, null, false, new TypeReference<BillingCreateEventResponse>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public BillingCreateEventResponse createEvent(BillingCreateEventBody body, String idempotencyKey) {
+        return t.request("POST", "/v1/billing/stripe/events", null, body, idempotencyKey, false, new TypeReference<BillingCreateEventResponse>() {
+        });
+    }
+
     /** {@code POST /v1/billing/subscriptions/{id}/extend_trial} - Move a trialing subscription's trial end later, on the payment provider (Stripe today; others answer 422 `unsupported`). Send exactly one of `days` (added to the current trial end) or `trial_end` (an absolute time, epoch ms or ISO). A trial can be extended by at most 365 days in total. Only a `trialing` subscription qualifies (409 otherwise). `idempotency_key` is required: a retry returns the first extension. Emits billing_trial.extended. Scope: {@code billing:write}. */
     public BillingExtendTrialResponse extendTrial(String id, BillingExtendTrialBody body) {
         return t.request("POST", "/v1/billing/subscriptions/" + enc(id) + "/extend_trial", null, body, null, false, new TypeReference<BillingExtendTrialResponse>() {
@@ -414,6 +438,18 @@ public final class BillingApi {
     /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
     public BillingExtendTrialResponse extendTrial(String id, BillingExtendTrialBody body, String idempotencyKey) {
         return t.request("POST", "/v1/billing/subscriptions/" + enc(id) + "/extend_trial", null, body, idempotencyKey, false, new TypeReference<BillingExtendTrialResponse>() {
+        });
+    }
+
+    /** {@code POST /v1/billing/subscriptions/{id}/sync} - Re-read one subscription from Stripe now, with your own key, and apply what Stripe reports (status, plan, period, cancellation). For an instance that syncs without a Stripe webhook, or to refresh one subscription on demand. A subscription on another account, or not Stripe, is refused. Scope: {@code billing:write}. */
+    public Subscription subscriptionsSync(String id) {
+        return t.request("POST", "/v1/billing/subscriptions/" + enc(id) + "/sync", null, null, null, false, new TypeReference<Subscription>() {
+        });
+    }
+
+    /** As above, with an {@code Idempotency-Key} so a retry replays the first response. */
+    public Subscription subscriptionsSync(String id, String idempotencyKey) {
+        return t.request("POST", "/v1/billing/subscriptions/" + enc(id) + "/sync", null, null, idempotencyKey, false, new TypeReference<Subscription>() {
         });
     }
 

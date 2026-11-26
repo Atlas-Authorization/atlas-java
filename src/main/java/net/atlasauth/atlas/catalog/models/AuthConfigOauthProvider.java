@@ -18,6 +18,7 @@ public record AuthConfigOauthProvider(
         @JsonProperty("deviceApprovalRequiresStepUp") Boolean deviceApprovalRequiresStepUp,
         @JsonProperty("dynamicClientSecretTtlSeconds") Double dynamicClientSecretTtlSeconds,
         @JsonProperty("dynamicRegistration") Boolean dynamicRegistration,
+        @JsonProperty("dynamicRegistrationLimits") AuthConfigOauthProviderDynamicRegistrationLimits dynamicRegistrationLimits,
         @JsonProperty("loginUrl") String loginUrl,
         @JsonProperty("requireInitialAccessToken") Boolean requireInitialAccessToken,
         @JsonProperty("requirePkce") Boolean requirePkce,

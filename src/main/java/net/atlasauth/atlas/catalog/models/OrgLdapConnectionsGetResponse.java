@@ -19,6 +19,8 @@ public record OrgLdapConnectionsGetResponse(
         @JsonProperty("user_filter") String userFilter,
         @JsonProperty("start_tls") Boolean startTls,
         @JsonProperty("require_consent_screen") Boolean requireConsentScreen,
+        @JsonProperty("account_linking") String accountLinking,
+        @JsonProperty("account_linking_effective") String accountLinkingEffective,
         @JsonProperty("attributes") OrgLdapConnectionsGetResponseAttributes attributes,
         @JsonProperty("group_role_mappings") List<OrgLdapConnectionsGetResponseGroupRoleMappingsItem> groupRoleMappings,
         @JsonProperty("has_bind_password") Boolean hasBindPassword,

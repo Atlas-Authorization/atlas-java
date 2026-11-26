@@ -32,6 +32,9 @@ public final class OrgLdapConnectionsCreateBody {
     public String userFilter;
     @JsonProperty("start_tls")
     public Boolean startTls;
+    /** Whether a directory sign-in may link to an existing user by shared email. same_org_only (the default) links only to members or end users of the connection's organization, or users at its verified domains; none never links; email links to any user with that verified email. null restores the default. One of: email, same_org_only, none. */
+    @JsonProperty("account_linking")
+    public String accountLinking;
     /** Show the person a confirmation ("sign in as ...") before an LDAP sign-in completes. The sign-in response carries consent_required and a consent_token instead of a ticket. */
     @JsonProperty("require_consent_screen")
     public Boolean requireConsentScreen;
@@ -74,6 +77,9 @@ public final class OrgLdapConnectionsCreateBody {
     public OrgLdapConnectionsCreateBody startTls(Boolean v) { this.startTls = v; clearedFields.remove("start_tls"); return this; }
     /** Send {@code "start_tls": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public OrgLdapConnectionsCreateBody clearStartTls() { this.startTls = null; clearedFields.add("start_tls"); return this; }
+    public OrgLdapConnectionsCreateBody accountLinking(String v) { this.accountLinking = v; clearedFields.remove("account_linking"); return this; }
+    /** Send {@code "account_linking": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public OrgLdapConnectionsCreateBody clearAccountLinking() { this.accountLinking = null; clearedFields.add("account_linking"); return this; }
     public OrgLdapConnectionsCreateBody requireConsentScreen(Boolean v) { this.requireConsentScreen = v; clearedFields.remove("require_consent_screen"); return this; }
     /** Send {@code "require_consent_screen": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
     public OrgLdapConnectionsCreateBody clearRequireConsentScreen() { this.requireConsentScreen = null; clearedFields.add("require_consent_screen"); return this; }

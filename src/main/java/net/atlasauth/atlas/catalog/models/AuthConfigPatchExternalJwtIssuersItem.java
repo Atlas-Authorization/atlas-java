@@ -12,6 +12,9 @@ import java.util.Map;
 /** The AuthConfigPatchExternalJwtIssuersItem object. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AuthConfigPatchExternalJwtIssuersItem {
+    /** One of: email, none, same_org_only. */
+    @JsonProperty("accountLinking")
+    public String accountLinking;
     /** Required. */
     @JsonProperty("audience")
     public String audience;
@@ -26,6 +29,8 @@ public final class AuthConfigPatchExternalJwtIssuersItem {
     /** Required. */
     @JsonProperty("jwksUri")
     public String jwksUri;
+    @JsonProperty("organizationId")
+    public String organizationId;
     /** Wire names sent as an explicit JSON null (see the clear methods); unset fields are omitted. */
     @JsonIgnore
     private final java.util.Set<String> clearedFields = new java.util.LinkedHashSet<>();
@@ -33,6 +38,9 @@ public final class AuthConfigPatchExternalJwtIssuersItem {
     public AuthConfigPatchExternalJwtIssuersItem() {
     }
 
+    public AuthConfigPatchExternalJwtIssuersItem accountLinking(String v) { this.accountLinking = v; clearedFields.remove("accountLinking"); return this; }
+    /** Send {@code "accountLinking": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchExternalJwtIssuersItem clearAccountLinking() { this.accountLinking = null; clearedFields.add("accountLinking"); return this; }
     public AuthConfigPatchExternalJwtIssuersItem audience(String v) { this.audience = v; clearedFields.remove("audience"); return this; }
     public AuthConfigPatchExternalJwtIssuersItem emailClaim(String v) { this.emailClaim = v; clearedFields.remove("emailClaim"); return this; }
     /** Send {@code "emailClaim": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
@@ -40,6 +48,9 @@ public final class AuthConfigPatchExternalJwtIssuersItem {
     public AuthConfigPatchExternalJwtIssuersItem id(String v) { this.id = v; clearedFields.remove("id"); return this; }
     public AuthConfigPatchExternalJwtIssuersItem issuer(String v) { this.issuer = v; clearedFields.remove("issuer"); return this; }
     public AuthConfigPatchExternalJwtIssuersItem jwksUri(String v) { this.jwksUri = v; clearedFields.remove("jwksUri"); return this; }
+    public AuthConfigPatchExternalJwtIssuersItem organizationId(String v) { this.organizationId = v; clearedFields.remove("organizationId"); return this; }
+    /** Send {@code "organizationId": null} to clear the stored value (a PATCH); leaving it unset omits the field. */
+    public AuthConfigPatchExternalJwtIssuersItem clearOrganizationId() { this.organizationId = null; clearedFields.add("organizationId"); return this; }
 
     @JsonAnyGetter
     Map<String, Object> clearedAsNull() {
